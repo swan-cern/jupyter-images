@@ -201,3 +201,13 @@ HEALTHCHECK --interval=5s --timeout=3s --start-period=5s --retries=3 \
 # Switch back to jovyan to avoid accidental container runs as root
 USER ${NB_UID}
 WORKDIR "${HOME}"
+
+# ------------------------------------
+#               SWAN
+# ------------------------------------
+
+# This part of the base image contains SWAN specific customizations
+# and python packages.
+
+# TODO: Uncomment after PR is merged.
+# RUN pip install swanheader

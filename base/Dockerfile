@@ -16,6 +16,12 @@ SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 #       DOCKER STACKS FOUNDATION
 # ------------------------------------
 
+# This part of the base image is based on the upstream docker-stacks-foundation
+# image, available GitHub: 
+# https://github.com/jupyter/docker-stacks/tree/00a67281613254de8a253a292313eb7187c83982/images/docker-stacks-foundation
+# This image is the base image of the base-notebook one, and we decided to merge
+# them into one single image in this Dockerfile.
+
 USER root
 
 # Install all OS dependencies and additional packages for Server that starts
@@ -38,6 +44,9 @@ RUN dnf update -y && \
     #   https://github.com/krallin/tini#why-tini for details.
     tini \
     wget
+
+# We do not clean the dnf cache because we do it in the last image, as we
+# expect the images to be squashed.
 
 # Configure environment
 ENV CONDA_DIR=/opt/conda \
@@ -133,6 +142,10 @@ RUN mkdir /usr/local/bin/start-notebook.d && \
 # ------------------------------------
 #            BASE NOTEBOOK
 # ------------------------------------
+
+# This part of the base image is based on the upstream base-notebook
+# image and files, available GitHub: 
+# https://github.com/jupyter/docker-stacks/tree/0d8b4e498766fb451e3ba08f9ade9da344db5d83/images/base-notebook
 
 # Install all base notebook dependencies
 RUN dnf install -y pandoc

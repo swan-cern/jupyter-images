@@ -1,5 +1,4 @@
-FROM gitlab-registry.cern.ch/linuxsupport/alma9-base:20231001-1.aarch64
-# FROM gitlab-registry.cern.ch/linuxsupport/alma9-base:20231001-1.x86_64
+FROM gitlab-registry.cern.ch/linuxsupport/alma9-base:20231001-1
 
 LABEL maintainer="swan-admins@cern.ch"
 ARG NB_USER="jovyan"

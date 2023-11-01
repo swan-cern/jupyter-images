@@ -158,12 +158,17 @@ USER ${NB_UID}
 # Correct permissions
 # Do all this in a single RUN command to avoid duplicating all of the
 # files across image layers when the permissions change
+# Force the current latest versions of the python packages installed
+# in the SWAN base image, except for the notebook one. This package
+# is using the latest version (6.5.6) before major version 7, as there
+# are incompatibility issues that arise due to the usage of such
+# version along with the package nbclassic or swanclassic.
 WORKDIR /tmp
 RUN mamba install --yes \
-    'jupyterlab' \
-    'notebook==6.4.2' \
-    'jupyterhub' \
-    'nbclassic' && \
+    'jupyterlab==4.0.7' \
+    'notebook==6.5.6' \
+    'jupyterhub==4.0.2' \
+    'nbclassic==1.0.0' && \
     jupyter server --generate-config && \
     mamba clean --all -f -y && \
     npm cache clean --force && \

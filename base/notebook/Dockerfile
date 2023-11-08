@@ -1,4 +1,5 @@
-FROM gitlab-registry.cern.ch/linuxsupport/alma9-base:20230918-1.x86_64
+FROM gitlab-registry.cern.ch/linuxsupport/alma9-base:20231001-1.aarch64
+# FROM gitlab-registry.cern.ch/linuxsupport/alma9-base:20231001-1.x86_64
 
 LABEL maintainer="swan-admins@cern.ch"
 ARG NB_USER="jovyan"
@@ -135,10 +136,7 @@ RUN mkdir /usr/local/bin/start-notebook.d && \
 # ------------------------------------
 
 # Install all base notebook dependencies
-RUN dnf install -y pandoc && \
-    # Clear the dnf cache as we no longer need to install packages
-    dnf clean all && \
-    rm -rf /var/cache/dnf
+RUN dnf install -y pandoc
 
 # Switch back to jovyan to avoid accidental container runs as root
 USER ${NB_UID}
@@ -152,7 +150,7 @@ USER ${NB_UID}
 WORKDIR /tmp
 RUN mamba install --yes \
     'jupyterlab' \
-    'notebook' \
+    'notebook==6.4.2' \
     'jupyterhub' \
     'nbclassic' && \
     jupyter server --generate-config && \
@@ -192,6 +190,3 @@ HEALTHCHECK --interval=5s --timeout=3s --start-period=5s --retries=3 \
 # Switch back to jovyan to avoid accidental container runs as root
 USER ${NB_UID}
 WORKDIR "${HOME}"
-
-# Separate the code from base-network and docker-stacks-foundation
-# Change spawner to allow containers to start as root and be able to change username to the user of the person

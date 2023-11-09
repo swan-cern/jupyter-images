@@ -15,15 +15,6 @@ log_error() {
     echo "[ERROR $(date '+%Y-%m-%d %T.%3N') $(basename $0)] $1"
 }
 
-log_info "Creating user $USER ($USER_ID) with home $HOME"
-export SWAN_HOME=$HOME
-if [[ $SWAN_HOME == /eos/* ]]; then export CERNBOX_HOME=$SWAN_HOME; fi
-useradd -u $USER_ID -s $SHELL -M -d $SWAN_HOME $USER
-export SCRATCH_HOME=/scratch/$USER
-mkdir -p $SCRATCH_HOME
-echo "This directory is temporary and will be deleted when your SWAN session ends!" > $SCRATCH_HOME/IMPORTANT.txt
-chown -R $USER:$USER $SCRATCH_HOME
-
 # Store the oAuth token given by the spawner inside a file
 # so that EOS can use it
 if [[ ! -z "$ACCESS_TOKEN" ]];
@@ -54,9 +45,9 @@ export LCG_VIEW=$ROOT_LCG_VIEW_PATH/$ROOT_LCG_VIEW_NAME/$ROOT_LCG_VIEW_PLATFORM
 
 # Set environment for the Jupyter process
 log_info "Setting Jupyter environment"
-export JPY_DIR=$SCRATCH_HOME/.jupyter
+export JPY_DIR=$HOME/.jupyter
 mkdir -p $JPY_DIR
-JPY_LOCAL_DIR=$SCRATCH_HOME/.local
+JPY_LOCAL_DIR=$HOME/.local
 mkdir -p $JPY_LOCAL_DIR
 export JUPYTER_CONFIG_DIR=$JPY_DIR
 JUPYTER_LOCAL_PATH=$JPY_LOCAL_DIR/share/jupyter
@@ -68,7 +59,7 @@ ln -s $LCG_VIEW/share/jupyter/nbextensions $JUPYTER_LOCAL_PATH
 export KERNEL_DIR=$JUPYTER_LOCAL_PATH/kernels
 mkdir -p $KERNEL_DIR
 export JUPYTER_RUNTIME_DIR=$JUPYTER_LOCAL_PATH/runtime
-export IPYTHONDIR=$SCRATCH_HOME/.ipython
+export IPYTHONDIR=$HOME/.ipython
 mkdir -p $IPYTHONDIR
 export PROFILEPATH=$IPYTHONDIR/profile_default
 mkdir -p $PROFILEPATH
@@ -78,7 +69,7 @@ export XDG_CACHE_HOME=/tmp/$USER/.cache/
 ROOT_DATA_DIR=$(readlink $LCG_VIEW/bin/root | sed -e 's/\/bin\/root//g')
 
 JPY_CONFIG=$JUPYTER_CONFIG_DIR/jupyter_notebook_config.py
-echo "c.FileCheckpoints.checkpoint_dir = '$SCRATCH_HOME/.ipynb_checkpoints'"         >> $JPY_CONFIG
+echo "c.FileCheckpoints.checkpoint_dir = '$HOME/.ipynb_checkpoints'"         >> $JPY_CONFIG
 echo "c.NotebookNotary.db_file = '$JUPYTER_LOCAL_PATH/nbsignatures.db'"     >> $JPY_CONFIG
 echo "c.NotebookNotary.secret_file = '$JUPYTER_LOCAL_PATH/notebook_secret'" >> $JPY_CONFIG
 echo "c.NotebookApp.contents_manager_class = 'swancontents.filemanager.swanfilemanager.SwanFileManager'" >> $JPY_CONFIG
@@ -173,7 +164,7 @@ then
 fi
 
 chown -R $USER:$USER $JPY_DIR $JPY_LOCAL_DIR $IPYTHONDIR
-export SWAN_ENV_FILE=$SCRATCH_HOME/.bash_profile
+export SWAN_ENV_FILE=$HOME/.bash_profile
 
 sudo -E -u $USER sh /srv/singleuser/userconfig.sh
 
@@ -315,7 +306,7 @@ fi
 
 # Set the terminal environment
 #in jupyter 6.0.0 login shell (jupyter/notebook#4112) is set by default and /etc/profile.d is respected
-echo "source $SCRATCH_HOME/.bash_profile" > /etc/profile.d/swan.sh
+echo "source $HOME/.bash_profile" > /etc/profile.d/swan.sh
 
 # Allow further configuration by sysadmin (usefull outside of CERN)
 if [[ $CONFIG_SCRIPT ]]; 

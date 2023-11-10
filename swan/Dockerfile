@@ -181,8 +181,13 @@ ENV SHELL=/bin/bash
 # Set environment for the Jupyter process
 ENV JPY_DIR=/home/${NB_USER}/.jupyter
 ENV IPYTHONDIR=/home/${NB_USER}/.ipython
+ENV JUPYTER_CONFIG_DIR=${JPY_DIR}
 ENV JUPYTER_PATH=/home/${NB_USER}/.local/share/jupyter
 ENV USERDATA_PATH=/srv/singleuser/userdata
+
+# Create the iPython directory
+RUN mkdir -p ${IPYTHONDIR} && \
+    chown -R $USER:$USER ${IPYTHONDIR}
 
 # Add shell scripts
 ADD scripts/systemuser.sh /srv/singleuser/systemuser.sh

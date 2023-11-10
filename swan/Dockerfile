@@ -192,10 +192,8 @@ ENV SWAN_ENV_FILE=${HOME}/.bash_profile
 ARG CUSTOM_JS_DIR=${JPY_DIR}/custom
 
 # Create missing directories
-RUN mkdir -p ${IPYTHONDIR} && \
-    mkdir -p ${KERNEL_DIR} && \
-    mkdir -p ${CUSTOM_JS_DIR} && \
-    chown -R ${USER}:${USER} ${IPYTHONDIR}
+RUN mkdir -p ${CUSTOM_JS_DIR} ${IPYTHONDIR} ${KERNEL_DIR} ${USERDATA_PATH} && \
+    chown -R ${USER}:${USER} ${IPYTHONDIR} ${USERDATA_PATH}
 
 # Add shell scripts
 ADD scripts/systemuser.sh /srv/singleuser/systemuser.sh

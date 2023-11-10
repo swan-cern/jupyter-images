@@ -38,7 +38,7 @@ RUN dnf install -y gcc \
 
 # Install a newer version of TeX Live, than the one available in dnf repos
 # For converting to PDF
-ENV PATH /usr/local/texlive/2023/bin/x86_64-linux/:$PATH
+ENV PATH /usr/local/texlive/2023/bin/x86_64-linux/:${PATH}
 RUN tlmgr install adjustbox \
     tcolorbox \
     environ \
@@ -183,11 +183,16 @@ ENV JPY_DIR=/home/${NB_USER}/.jupyter
 ENV IPYTHONDIR=/home/${NB_USER}/.ipython
 ENV JUPYTER_CONFIG_DIR=${JPY_DIR}
 ENV JUPYTER_PATH=/home/${NB_USER}/.local/share/jupyter
+ENV KERNEL_DIR=${JUPYTER_PATH}/kernels
 ENV USERDATA_PATH=/srv/singleuser/userdata
 
-# Create the iPython directory
+ARG CUSTOM_JS_DIR=${JPY_DIR}/custom
+
+# Create missing directories
 RUN mkdir -p ${IPYTHONDIR} && \
-    chown -R $USER:$USER ${IPYTHONDIR}
+    mkdir -p ${KERNEL_DIR} && \
+    mkdir -p ${CUSTOM_JS_DIR} && \
+    chown -R ${USER}:${USER} ${IPYTHONDIR}
 
 # Add shell scripts
 ADD scripts/systemuser.sh /srv/singleuser/systemuser.sh
@@ -198,5 +203,8 @@ ADD scripts/create_dask_certs.sh /srv/singleuser/create_dask_certs.sh
 ADD python/configure_kernels_and_terminal.py /srv/singleuser/configure_kernels_and_terminal.py
 ADD python/start_ipykernel.py /usr/local/bin/start_ipykernel.py
 RUN chmod 705 /usr/local/bin/start_ipykernel.py
+
+# Add js and json files
+ADD js/custom.js ${CUSTOM_JS_DIR}/custom.js
 
 WORKDIR /root

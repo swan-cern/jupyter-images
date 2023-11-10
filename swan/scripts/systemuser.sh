@@ -52,8 +52,6 @@ log_info "Setting up environment from CVMFS"
 export LCG_VIEW=$ROOT_LCG_VIEW_PATH/$ROOT_LCG_VIEW_NAME/$ROOT_LCG_VIEW_PLATFORM
 # symlink $LCG_VIEW/share/jupyter/nbextensions for the notebook extensions
 ln -s $LCG_VIEW/share/jupyter/nbextensions $JUPYTER_PATH
-export KERNEL_DIR=$JUPYTER_PATH/kernels
-mkdir -p $KERNEL_DIR
 #Creating a ROOT_DATA_DIR variable
 export ROOT_DATA_DIR=$(readlink $LCG_VIEW/bin/root | sed -e 's/\/bin\/root//g')
 
@@ -68,15 +66,6 @@ then
 fi
 
 cp -L -r $LCG_VIEW/etc/jupyter/* $JUPYTER_CONFIG_DIR
-
-# Configure %%cpp cell highlighting
-CUSTOM_JS_DIR=$JPY_DIR/custom
-mkdir $CUSTOM_JS_DIR
-echo "
-require(['notebook/js/codecell'], function(codecell) {
-  codecell.CodeCell.options_default.highlight_modes['magic_text/x-c++src'] = {'reg':[/^%%cpp/]};
-});
-" > $CUSTOM_JS_DIR/custom.js
 
 # Configure kernels and terminal
 # The environment of the kernels and the terminal will combine the view and the user script (if any)

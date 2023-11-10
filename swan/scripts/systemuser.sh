@@ -57,46 +57,8 @@ mkdir -p $KERNEL_DIR
 #Creating a ROOT_DATA_DIR variable
 export ROOT_DATA_DIR=$(readlink $LCG_VIEW/bin/root | sed -e 's/\/bin\/root//g')
 
-export JUPYTER_CONFIG_DIR=$JPY_DIR
-JPY_CONFIG=$JUPYTER_CONFIG_DIR/jupyter_notebook_config.py
-echo "c.FileCheckpoints.checkpoint_dir = '$HOME/.ipynb_checkpoints'"         >> $JPY_CONFIG
-echo "c.NotebookNotary.db_file = '$JUPYTER_LOCAL_PATH/nbsignatures.db'"     >> $JPY_CONFIG
-echo "c.NotebookNotary.secret_file = '$JUPYTER_LOCAL_PATH/notebook_secret'" >> $JPY_CONFIG
-echo "c.NotebookApp.contents_manager_class = 'swancontents.filemanager.swanfilemanager.SwanFileManager'" >> $JPY_CONFIG
-echo "c.ContentsManager.checkpoints_class = 'swancontents.filemanager.checkpoints.EOSCheckpoints'" >> $JPY_CONFIG
-
-# Fixes issue with frozen servers with async io errors, fix from https://github.com/jupyter/notebook/issues/6164
-echo "c.NotebookApp.kernel_manager_class = 'notebook.services.kernels.kernelmanager.AsyncMappingKernelManager'" >> $JPY_CONFIG
-
-if [ "${SWAN_USE_JUPYTERLAB}" == "true" ]; 
-then
-  echo "c.NotebookApp.default_url = 'lab'" >> $JPY_CONFIG
-else 
-  echo "c.NotebookApp.default_url = 'projects'" >> $JPY_CONFIG
-fi
-
-echo "c.NotebookApp.extra_static_paths = ['$ROOT_DATA_DIR/js']" >> $JPY_CONFIG
-echo "from swancontents import get_templates" >> $JPY_CONFIG
-echo "c.NotebookApp.extra_template_paths = [get_templates()]" >> $JPY_CONFIG
-
-CERNBOX_OAUTH_ID="${CERNBOX_OAUTH_ID:-cernbox-service}"
-EOS_OAUTH_ID="${EOS_OAUTH_ID:-eos-service}"
-echo "c.SwanOauthRenew.files = [
-    ('/tmp/swan_oauth.token', 'access_token', '{token}'),
-    ('/tmp/cernbox_oauth.token', 'exchanged_tokens/$CERNBOX_OAUTH_ID', '{token}'),
-    ('$OAUTH2_FILE', 'exchanged_tokens/$EOS_OAUTH_ID', 'oauth2:{token}:$OAUTH_INSPECTION_ENDPOINT')
-]" >> $JPY_CONFIG
-
-# Convert the _xsrf cookie into a session cookie, to prevent it from having an expiration date of 30 days
-# Without this setting, _xsrf cookie could expire in the middle of a user editing a notebook, making it
-# impossible to save the notebook without refreshing the page and losing unsaved changes.
-echo "c.NotebookApp.tornado_settings = {
-  'xsrf_cookie_kwargs': {
-    'expires_days': None,
-    'expires': None
-  }
-}" >> $JPY_CONFIG
-
+export CERNBOX_OAUTH_ID="${CERNBOX_OAUTH_ID:-cernbox-service}"
+export EOS_OAUTH_ID="${EOS_OAUTH_ID:-eos-service}"
 
 # Disable pinging for maintenance notifications when running on Kubernetes
 if [ "${SWAN_DISABLE_NOTIFICATIONS}" == "true" ]; 
@@ -153,7 +115,6 @@ then
   cp -rL $JULIA_KERNEL_PATH $KERNEL_DIR
 fi
 
-chown -R $USER:$USER $JPY_DIR $JPY_LOCAL_DIR $IPYTHONDIR
 export SWAN_ENV_FILE=$HOME/.bash_profile
 
 sudo -E -u $USER sh /srv/singleuser/userconfig.sh

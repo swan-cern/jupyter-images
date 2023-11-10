@@ -37,7 +37,6 @@ then
 fi
 
 log_info "Setting directory for Notebook backup"
-export USERDATA_PATH=/srv/singleuser/userdata
 mkdir -p $USERDATA_PATH
 chown -R $USER:$USER $USERDATA_PATH
 
@@ -45,33 +44,22 @@ chown -R $USER:$USER $USERDATA_PATH
 log_info "Setting up environment from CVMFS"
 export LCG_VIEW=$ROOT_LCG_VIEW_PATH/$ROOT_LCG_VIEW_NAME/$ROOT_LCG_VIEW_PLATFORM
 
-# Set environment for the Jupyter process
-log_info "Setting Jupyter environment"
-export JPY_DIR=$SCRATCH_HOME/.jupyter
-mkdir -p $JPY_DIR
-JPY_LOCAL_DIR=$SCRATCH_HOME/.local
-mkdir -p $JPY_LOCAL_DIR
-export JUPYTER_CONFIG_DIR=$JPY_DIR
-JUPYTER_LOCAL_PATH=$JPY_LOCAL_DIR/share/jupyter
-mkdir -p $JUPYTER_LOCAL_PATH
-# Our kernels will be in $JUPYTER_LOCAL_PATH
-export JUPYTER_PATH=$JUPYTER_LOCAL_PATH
-# symlink $LCG_VIEW/share/jupyter/nbextensions for the notebook extensions
-ln -s $LCG_VIEW/share/jupyter/nbextensions $JUPYTER_LOCAL_PATH
-export KERNEL_DIR=$JUPYTER_LOCAL_PATH/kernels
-mkdir -p $KERNEL_DIR
-export JUPYTER_RUNTIME_DIR=$JUPYTER_LOCAL_PATH/runtime
-export IPYTHONDIR=$SCRATCH_HOME/.ipython
-mkdir -p $IPYTHONDIR
-export PROFILEPATH=$IPYTHONDIR/profile_default
-mkdir -p $PROFILEPATH
 # This avoids to create hardlinks on eos when using pip
 export XDG_CACHE_HOME=/tmp/$USER/.cache/
-#Creating a ROOT_DATA_DIR variable
-ROOT_DATA_DIR=$(readlink $LCG_VIEW/bin/root | sed -e 's/\/bin\/root//g')
 
+# Setup the LCG View on CVMFS
+log_info "Setting up environment from CVMFS"
+export LCG_VIEW=$ROOT_LCG_VIEW_PATH/$ROOT_LCG_VIEW_NAME/$ROOT_LCG_VIEW_PLATFORM
+# symlink $LCG_VIEW/share/jupyter/nbextensions for the notebook extensions
+ln -s $LCG_VIEW/share/jupyter/nbextensions $JUPYTER_PATH
+export KERNEL_DIR=$JUPYTER_PATH/kernels
+mkdir -p $KERNEL_DIR
+#Creating a ROOT_DATA_DIR variable
+export ROOT_DATA_DIR=$(readlink $LCG_VIEW/bin/root | sed -e 's/\/bin\/root//g')
+
+export JUPYTER_CONFIG_DIR=$JPY_DIR
 JPY_CONFIG=$JUPYTER_CONFIG_DIR/jupyter_notebook_config.py
-echo "c.FileCheckpoints.checkpoint_dir = '$SCRATCH_HOME/.ipynb_checkpoints'"         >> $JPY_CONFIG
+echo "c.FileCheckpoints.checkpoint_dir = '$HOME/.ipynb_checkpoints'"         >> $JPY_CONFIG
 echo "c.NotebookNotary.db_file = '$JUPYTER_LOCAL_PATH/nbsignatures.db'"     >> $JPY_CONFIG
 echo "c.NotebookNotary.secret_file = '$JUPYTER_LOCAL_PATH/notebook_secret'" >> $JPY_CONFIG
 echo "c.NotebookApp.contents_manager_class = 'swancontents.filemanager.swanfilemanager.SwanFileManager'" >> $JPY_CONFIG
@@ -166,7 +154,7 @@ then
 fi
 
 chown -R $USER:$USER $JPY_DIR $JPY_LOCAL_DIR $IPYTHONDIR
-export SWAN_ENV_FILE=$SCRATCH_HOME/.bash_profile
+export SWAN_ENV_FILE=$HOME/.bash_profile
 
 sudo -E -u $USER sh /srv/singleuser/userconfig.sh
 
@@ -308,7 +296,7 @@ fi
 
 # Set the terminal environment
 #in jupyter 6.0.0 login shell (jupyter/notebook#4112) is set by default and /etc/profile.d is respected
-echo "source $SCRATCH_HOME/.bash_profile" > /etc/profile.d/swan.sh
+echo "source $HOME/.bash_profile" > /etc/profile.d/swan.sh
 
 # Allow further configuration by sysadmin (usefull outside of CERN)
 if [[ $CONFIG_SCRIPT ]]; 

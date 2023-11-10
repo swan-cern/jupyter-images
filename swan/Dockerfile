@@ -182,6 +182,7 @@ ENV SHELL=/bin/bash
 ENV JPY_DIR=/home/${NB_USER}/.jupyter
 ENV IPYTHONDIR=/home/${NB_USER}/.ipython
 ENV JUPYTER_PATH=/home/${NB_USER}/.local/share/jupyter
+ENV USERDATA_PATH=/srv/singleuser/userdata
 
 # Add shell scripts
 ADD scripts/systemuser.sh /srv/singleuser/systemuser.sh

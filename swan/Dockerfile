@@ -179,12 +179,15 @@ RUN jupyter nbextension install --py --system hdfsbrowser && \
 ENV SHELL=/bin/bash
 
 # Set environment for the Jupyter process
-ENV JPY_DIR=/home/${NB_USER}/.jupyter
 ENV IPYTHONDIR=/home/${NB_USER}/.ipython
+ENV JPY_DIR=/home/${NB_USER}/.jupyter
 ENV JUPYTER_CONFIG_DIR=${JPY_DIR}
 ENV JUPYTER_PATH=/home/${NB_USER}/.local/share/jupyter
+
+# Set other environment variables
 ENV KERNEL_DIR=${JUPYTER_PATH}/kernels
 ENV USERDATA_PATH=/srv/singleuser/userdata
+ENV SWAN_ENV_FILE=${HOME}/.bash_profile
 
 ARG CUSTOM_JS_DIR=${JPY_DIR}/custom
 

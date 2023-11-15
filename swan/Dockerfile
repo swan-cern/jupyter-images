@@ -1,7 +1,8 @@
 # Installs the extensions and packages required by SWAN
 # to adapt the base alma9 notebook image to SWAN.
 
-FROM gitlab-registry.cern.ch/swan/docker-images/notebook
+# FROM gitlab-registry.cern.ch/swan/docker-images/notebook
+FROM gitlab-registry.cern.ch/pesteves/imageregistry:notebook
 
 LABEL maintainer="swan-admins@cern.ch"
 ARG NB_USER="jovyan"
@@ -15,62 +16,28 @@ RUN echo "Building systemuser image with tag ${VERSION_DOCKER_IMAGE}"
 USER root
 
 # Install required dnf packages
-RUN dnf install -y gcc \
-    gcc-c++ \
-    git \
-    kernel-devel \
+RUN dnf install -y  git \
+   # gcc \
+   # gcc-c++ \
+   # kernel-devel \
    # libcurl-openssl-devel \  -- Does not exist in dnf repos
-    libffi-devel \
-    ncurses-devel \
+   # libffi-devel \
+   # ncurses-devel \
     nano \
     nodejs \
     patch \
-    sqlite-devel \
+   # sqlite-devel \
     unzip \
     which \
    # zeromq3-devel \ -- Does not exist in dnf repos
     perl-Digest-MD5 \
     texlive \
-    fontconfig && \
-    # Clear the dnf cache as we no longer need to install packages
-    dnf clean all && \
-    rm -rf /var/cache/dnf
+    fontconfig
 
-# Install a newer version of TeX Live, than the one available in dnf repos
-# For converting to PDF
-ENV PATH /usr/local/texlive/2023/bin/x86_64-linux/:${PATH}
-RUN tlmgr install adjustbox \
-    tcolorbox \
-    environ \
-    trimspaces \
-    adjustbox \
-    collectbox \
-    ucs \
-    titling \
-    enumitem \
-    type1cm \
-    cm-super \
-    collection-fontsrecommended
-
-# Install python pip packages
-# RUN pip3 --no-cache-dir install \
-#           'ipyparallel==6.3.0' \
-#            'notebook==6.4.2' \
-#            'jupyterhub==4.0.2' \
-#            'urllib3==1.26.16' \
-#            'jupyterlab==3.0.17' \
-#            'jupyter_nbextensions_configurator' \
-#            'voila'
-
-# Install python pip packages
-RUN mamba install --yes \
-    'jupyter_nbextensions_configurator' \
-    'voila'
-
-VOLUME /notebooks
-WORKDIR /notebooks
-
-CMD ["jupyter", "notebook"]
+# Install HEP_OSlibs
+# This installs system packages for LCGs to work
+RUN dnf -y install https://linuxsoft.cern.ch/wlcg/el9/x86_64/wlcg-repo-1.0.0-1.el9.noarch.rpm
+RUN dnf -y install HEP_OSlibs-9.1.0-2.el9
 
 # Disable requiretty and secure path - required by systemuser.sh
 RUN sed -i'' '/Defaults \+requiretty/d'  /etc/sudoers && \
@@ -112,7 +79,31 @@ RUN dnf install -y \
     # Required by Oracle
     libaio \
     # Required for key4hep
-    environment-modules 
+    environment-modules && \
+    # Clear the dnf cache as we no longer need to install packages
+    dnf clean all && \
+    rm -rf /var/cache/dnf
+
+# Install python pip packages
+RUN mamba install --yes \
+    'jupyter_nbextensions_configurator' \
+    'voila'
+
+# Install a newer version of TeX Live, than the one available in dnf repos
+# For converting to PDF
+# ENV PATH /usr/local/texlive/2023/bin/x86_64-linux/:${PATH}
+RUN tlmgr install adjustbox \
+    tcolorbox \
+    environ \
+    trimspaces \
+    adjustbox \
+    collectbox \
+    ucs \
+    titling \
+    enumitem \
+    type1cm \
+    cm-super \
+    collection-fontsrecommended
 
 # Required by jupyter-resource-usage
 RUN pip install --no-deps --no-cache-dir psutil==5.8.0
@@ -139,6 +130,10 @@ RUN pip install --no-deps --no-cache-dir \
 # swandask must be installed after its dependency dask-labextension to disable the server extension automatically
 RUN pip install --no-deps --no-cache-dir swandask==0.0.3
 
+# Python configuration
+# Add jupyter notebook configuration
+ADD python/jupyter_notebook_config.py ${JUPYTER_CONFIG_DIR}/jupyter_notebook_config.py
+
 # TODO: Review
 # Enable all the nbextensions and server extensions
 RUN jupyter nbextension install --py --system hdfsbrowser && \
@@ -161,44 +156,22 @@ RUN jupyter nbextension install --py --system hdfsbrowser && \
     jupyter serverextension enable --py --system swanportallocator && \
     # Force nbextension_configurator systemwide to prevent users disabling it
     jupyter nbextensions_configurator enable --system && \
-    # Spark Monitor/Connector also need to be available to the user environment since they have kernel extensions
-    # PortAllocator is used by SparkConnector, so it needs to be available too
-    mkdir -p /usr/local/lib/swan/extensions && \
-    ln -s /opt/conda/lib/python3.11/site-packages/sparkmonitor /usr/local/lib/swan/extensions/ && \
-    ln -s /opt/conda/lib/python3.11/site-packages/sparkconnector /usr/local/lib/swan/extensions/ && \
-    ln -s /opt/conda/lib/python3.11/site-packages/swankernelenv /usr/local/lib/swan/extensions/ && \
-    ln -s /opt/conda/lib/python3.11/site-packages/swanportallocator /usr/local/lib/swan/extensions/ && \
-    ln -s /opt/conda/lib/python3.11/site-packages/dask_labextension /usr/local/lib/swan/extensions/ && \
-    ln -s /opt/conda/lib/python3.11/site-packages/jupyter_server_proxy /usr/local/lib/swan/extensions/ && \
-    ln -s /opt/conda/lib/python3.11/site-packages/simpervisor /usr/local/lib/swan/extensions/ && \
-    ln -s /opt/conda/lib/python3.11/site-packages/swandask /usr/local/lib/swan/extensions/ && \
     # FIXME workaround for templates. For some reason, and only in our image, Jupyter is looking for templates inside templates
     cp -r /opt/conda/lib/python3.11/site-packages/swancontents/templates{,2} && \
     mv /opt/conda/lib/python3.11/site-packages/swancontents/templates{2,/templates}
 
+# Switch back to jovyan to avoid accidental container runs as root
+USER ${NB_UID}
+
 ENV SHELL=/bin/bash
 
-# Set environment for the Jupyter process
-ENV IPYTHONDIR=/home/${NB_USER}/.ipython
-ENV JPY_DIR=/home/${NB_USER}/.jupyter
-ENV JUPYTER_CONFIG_DIR=${JPY_DIR}
-ENV JUPYTER_PATH=/home/${NB_USER}/.local/share/jupyter
+# User session configuration scripts
+# Add scripts
+COPY scripts /usr/local/bin/start-notebook.d
 
-# Set other environment variables
-ENV KERNEL_DIR=${JUPYTER_PATH}/kernels
-ENV USERDATA_PATH=/srv/singleuser/userdata
-ENV SWAN_ENV_FILE=${HOME}/.bash_profile
-
-ARG CUSTOM_JS_DIR=${JPY_DIR}/custom
-
-# Create missing directories
-RUN mkdir -p ${CUSTOM_JS_DIR} ${IPYTHONDIR} ${KERNEL_DIR} ${USERDATA_PATH} && \
-    chown -R ${USER}:${USER} ${IPYTHONDIR} ${USERDATA_PATH}
-
-# Add shell scripts
-ADD scripts/systemuser.sh /srv/singleuser/systemuser.sh
-ADD scripts/userconfig.sh /srv/singleuser/userconfig.sh
-ADD scripts/create_dask_certs.sh /srv/singleuser/create_dask_certs.sh
+USER root
+# Grant scripts execution permissions
+RUN chmod +x /usr/local/bin/start-notebook.d/*
 
 # Add python scripts
 ADD python/configure_kernels_and_terminal.py /srv/singleuser/configure_kernels_and_terminal.py
@@ -208,4 +181,5 @@ RUN chmod 705 /usr/local/bin/start_ipykernel.py
 # Add js and json files
 ADD js/custom.js ${CUSTOM_JS_DIR}/custom.js
 
-WORKDIR /root
+# Switch back to jovyan to avoid accidental container runs as root
+USER ${NB_UID}

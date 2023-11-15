@@ -11,8 +11,7 @@ import shutil
 
 SWAN_ENV_FILE = os.environ["SWAN_ENV_FILE"]
 KERNEL_DIR = os.environ["KERNEL_DIR"]
-PYVERSION = os.environ["PYVERSION"]
-PYTHONEXECPATH = shutil.which(f"python{PYVERSION}")
+PYTHONEXECPATH = shutil.which(f"python3")
 
 
 def modify_python_argv(kernel_json):

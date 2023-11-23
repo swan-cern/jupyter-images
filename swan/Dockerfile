@@ -127,25 +127,32 @@ RUN pip install --no-deps --no-cache-dir psutil==5.8.0
 # swandask must be installed after its dependency dask-labextension to disable the server extension automatically
 RUN pip install --no-deps --no-cache-dir swandask==0.0.3
 
+ENV SHELL=/bin/bash
+
 # Python configuration
 # Add jupyter notebook configuration
 ADD python/jupyter_swan_config.py /srv/singleuser/jupyter_swan_config.py
 
 # User session configuration scripts
 # Add scripts
-COPY scripts /usr/local/bin/start-notebook.d
+ADD scripts/01_storage.sh /usr/local/bin/before-notebook.d
+ADD scripts/02_environment.sh /usr/local/bin/before-notebook.d
+ADD scripts/03_userconfig.sh /tmp
 
 USER root
 # Grant scripts execution permissions
-RUN chmod +x /usr/local/bin/start-notebook.d/*
+RUN chmod +x /usr/local/bin/before-notebook.d/*
 
 # Add python scripts
 ADD python/configure_kernels_and_terminal.py /srv/singleuser/configure_kernels_and_terminal.py
+
+# TODO: Confirm that we can remove the python script below
 ADD python/start_ipykernel.py /usr/local/bin/start_ipykernel.py
 RUN chmod 705 /usr/local/bin/start_ipykernel.py
 
 # Add js and json files
-ADD js/custom.js ${CUSTOM_JS_DIR}/custom.js
+ADD js/custom.js /srv/singleuser/custom.js
+ADD config/kernel.json /srv/singleuser/kernel.json
 
 # Switch back to jovyan to avoid accidental container runs as root
 USER ${NB_UID}

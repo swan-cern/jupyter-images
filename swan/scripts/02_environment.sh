@@ -43,21 +43,7 @@ cp -L -r $LCG_VIEW/etc/jupyter/* $JUPYTER_CONFIG_DIR
 
 # Configure kernels and terminal
 # The environment of the kernels and the terminal will combine the view and the user script (if any)
-log_info "Configuring kernels and terminal"
-
-# FIXME: Move to kernel.json file
-PYKERNELDIR=$KERNEL_DIR/python3
-mkdir -p $PYKERNELDIR
-echo "{
- \"display_name\": \"Python 3\",
- \"language\": \"python\",
- \"argv\": [
-  \"python\",
-  \"/usr/local/bin/start_ipykernel.py\",
-  \"-f\",
-  \"{connection_file}\"
- ]
-}" > $PYKERNELDIR/kernel.json
+_log "Configuring kernels and terminal"
 
 # ROOT
 cp -rL $LCG_VIEW/etc/notebook/kernels/root $KERNEL_DIR

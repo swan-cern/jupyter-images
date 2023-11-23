@@ -5,7 +5,6 @@
 FROM gitlab-registry.cern.ch/pesteves/imageregistry:notebook
 
 LABEL maintainer="swan-admins@cern.ch"
-ARG NB_USER="jovyan"
 ARG NB_UID="1000"
 ARG BUILD_TAG=daily
 ENV VERSION_DOCKER_IMAGE=$BUILD_TAG
@@ -39,9 +38,7 @@ RUN dnf install -y  git \
 RUN dnf -y install https://linuxsoft.cern.ch/wlcg/el9/x86_64/wlcg-repo-1.0.0-1.el9.noarch.rpm
 RUN dnf -y install HEP_OSlibs-9.1.0-2.el9
 
-# Disable requiretty and secure path - required by systemuser.sh
-RUN sed -i'' '/Defaults \+requiretty/d'  /etc/sudoers && \
-    sed -i'' '/Defaults \+secure_path/d' /etc/sudoers
+# TODO: Move spark related packages to the third image
 
 # Install required packages
 RUN dnf install -y \
@@ -67,31 +64,32 @@ RUN dnf install -y \
     man \
     passwd \
     # pax \ -- Is not present in DNF repos.
-    perl-CGI \
-    perl-ExtUtils-MakeMaker \
-    perl-Test-Simple \
-    perl-devel \
+    # perl-CGI \
+    # perl-ExtUtils-MakeMaker \
+    # perl-Test-Simple \
+    # perl-devel \
     rsyslog \
     time \
     xz-lzma-compat \
     # Required by Geant4 (libXm)
     openmotif \
     # Required by Oracle
-    libaio \
+    # TODO: Move to third image: libaio \
     # Required for key4hep
     environment-modules && \
     # Clear the dnf cache as we no longer need to install packages
     dnf clean all && \
     rm -rf /var/cache/dnf
 
+# Switch back to jovyan to avoid accidental container runs as root
+USER ${NB_UID}
+
 # Install python pip packages
 RUN mamba install --yes \
     'jupyter_nbextensions_configurator' \
     'voila'
 
-# Install a newer version of TeX Live, than the one available in dnf repos
-# For converting to PDF
-# ENV PATH /usr/local/texlive/2023/bin/x86_64-linux/:${PATH}
+# Install TeX Live required packages
 RUN tlmgr install adjustbox \
     tcolorbox \
     environ \

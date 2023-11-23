@@ -1,20 +1,9 @@
-#!/bin/sh
+#!/bin/bash
 
-# Author: Danilo Piparo, Enric Tejedor 2023
+# Author: Danilo Piparo, Enric Tejedor, Pedro Maximino, Diogo Castro 2023
 # Copyright CERN
 # Here the environment for the notebook server is prepared. Many of the commands are launched as regular 
 # user as it's this entity which is able to access eos and not the super user.
-
-export USER="jovyan"
-export NB_USER=$USER
-SWAN_HOME="/home/jovyan"
-
-log_info() {
-    echo "[INFO $(date '+%Y-%m-%d %T.%3N') $(basename $0)] $1"
-}
-log_error() {
-    echo "[ERROR $(date '+%Y-%m-%d %T.%3N') $(basename $0)] $1"
-}
 
 # Set environment for the Jupyter process
 export IPYTHONDIR=/home/$USER/.ipython

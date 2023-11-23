@@ -1,10 +1,7 @@
 #!/bin/bash
 
-log_info() {
-    echo "[INFO $(date '+%Y-%m-%d %T.%3N') $(basename $0)] $1"
-}
-
-log_info "Configuring user session"
+# Author: Danilo Piparo, Enric Tejedor, Pedro Maximino, Diogo Castro 2023
+# Copyright CERN
 
 START_TIME_SETUP_SWAN_HOME=$( date +%s.%N )
 

@@ -21,18 +21,17 @@ export CUSTOM_JS_DIR=$JPY_DIR/custom
 # Create missing directories
 mkdir -p $CUSTOM_JS_DIR $IPYTHONDIR $PYTHON_KERNEL_DIR
 
-# Disable pinging for maintenance notifications when running on Kubernetes
-if [ "${SWAN_DISABLE_NOTIFICATIONS}" == "true" ]; 
-then
-  log_info "Disable SwanNotifications extension"
-  jupyter nbextension disable swannotifications/extension --system --section common
-fi
+# Move jupyter server configuration to configuration directory
+mv /srv/singleuser/jupyter_swan_config.py $JUPYTER_CONFIG_DIR/jupyter_swan_config.py
 
-# This avoids to create hardlinks on eos when using pip
-export XDG_CACHE_HOME=/tmp/$NB_USER/.cache/
+# Move configuration %%cpp cell highlighting to custom directory
+mv /srv/singleuser/custom.js $CUSTOM_JS_DIR/custom.js
+
+# Move python kernel configuration to python kernel directory
+mv /srv/singleuser/kernel.json $PYTHON_KERNEL_DIR/kernel.json
 
 # Setup the LCG View on CVMFS
-log_info "Setting up environment from CVMFS"
+_log "Setting up environment from CVMFS"
 export LCG_VIEW=$ROOT_LCG_VIEW_PATH/$ROOT_LCG_VIEW_NAME/$ROOT_LCG_VIEW_PLATFORM
 # FIXME: Separar
 # symlink $LCG_VIEW/share/jupyter/nbextensions for the notebook extensions

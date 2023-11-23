@@ -75,49 +75,38 @@ then
   cp -rL $JULIA_KERNEL_PATH $KERNEL_DIR
 fi
 
-bash /usr/local/bin/start-notebook.d/03_userconfig.sh
+# Grant privileges to all files inside the created directories and subdirectoies
+# to the user
+chown -R $NB_USER:$NB_GID $LOCAL_HOME
+
+_log "Running user configuration script for user $NB_USER."
+sudo -E -u $NB_USER bash /tmp/03_userconfig.sh
 
 if [ $? -ne 0 ]
 then
-  log_error "Error configuring user environment"
+  _log "Error configuring user environment"
   exit 1
 fi
 
 START_TIME_CONFIGURE_KERNEL_ENV=$( date +%s.%N )
 
-if [[ $HELP_ENDPOINT ]]
-then
-  echo "{
-    \"help\": \"$HELP_ENDPOINT\"
-}" > /usr/local/etc/jupyter/nbconfig/help.json
-fi
-
-export SWAN_ENV_FILE=$SWAN_HOME/.bash_profile
-
 # Make sure we have a sane terminal
 printf "export TERM=xterm\n" >> $SWAN_ENV_FILE
 
 # If there, source users' .bashrc after the SWAN environment
-BASHRC_LOCATION=$SWAN_HOME/.bashrc
+BASHRC_LOCATION=$LOCAL_HOME/.bashrc
 printf "if [[ -f $BASHRC_LOCATION ]];
 then
-   source $BASHRC_LOCATION
+  source $BASHRC_LOCATION
 fi\n" >> $SWAN_ENV_FILE
 
 if [ $? -ne 0 ]
 then
-  log_error "Error setting the environment for kernels"
+  _log "Error setting the environment for kernels"
   exit 1
 else
   CONFIGURE_KERNEL_ENV_TIME_SEC=$(echo $(date +%s.%N --date="$START_TIME_CONFIGURE_KERNEL_ENV seconds ago") | bc)
-  log_info "user: $USER, host: ${SERVER_HOSTNAME%%.*}, metric: configure_kernel_env.${ROOT_LCG_VIEW_NAME:-none}.${SPARK_CLUSTER_NAME:-none}.duration_sec, value: $CONFIGURE_KERNEL_ENV_TIME_SEC"
+  _log "user: $NB_USER, host: ${SERVER_HOSTNAME%%.*}, metric: configure_kernel_env.${ROOT_LCG_VIEW_NAME:-none}.${SPARK_CLUSTER_NAME:-none}.duration_sec, value: $CONFIGURE_KERNEL_ENV_TIME_SEC"
 fi
 
-# Allow further configuration by sysadmin (usefull outside of CERN)
-if [[ $CONFIG_SCRIPT ]]; 
-then
-  log_info "Found user config script"
-  sh $CONFIG_SCRIPT
-fi
-
-log_info "Finished setting up CVMFS and user environment"
+_log "Finished setting up CVMFS and user environment"

@@ -46,11 +46,19 @@ cp -L -r $LCG_VIEW/etc/jupyter/* $JUPYTER_CONFIG_DIR
 _log "Configuring kernels and terminal"
 
 # ROOT
-cp -rL $LCG_VIEW/etc/notebook/kernels/root $KERNEL_DIR
+ROOT_KERNEL_PATH=$LCG_VIEW/etc/notebook/kernels/root
+if [ -d $ROOT_KERNEL_PATH ];
+then
+  cp -rL $ROOT_KERNEL_PATH $KERNEL_DIR
+fi
 
 # R
-cp -rL $LCG_VIEW/share/jupyter/kernels/ir $KERNEL_DIR
-sed -i "s/IRkernel::main()/options(bitmapType='cairo');IRkernel::main()/g" $KERNEL_DIR/ir/kernel.json # Force cairo for graphics
+R_KERNEL_PATH=$LCG_VIEW/share/jupyter/kernels/ir
+if [ -d $R_KERNEL_PATH ];
+then
+  cp -rL $R_KERNEL_PATH $KERNEL_DIR
+  sed -i "s/IRkernel::main()/options(bitmapType='cairo');IRkernel::main()/g" $KERNEL_DIR/ir/kernel.json # Force cairo for graphics
+fi
 
 # Octave
 OCTAVE_KERNEL_PATH=$LCG_VIEW/share/jupyter/kernels/octave

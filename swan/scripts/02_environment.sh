@@ -6,20 +6,20 @@
 # user as it's this entity which is able to access eos and not the super user.
 
 # Set environment for the Jupyter process
-export IPYTHONDIR=/home/$USER/.ipython
-export JPY_DIR=/home/$USER/.jupyter
+LOCAL_HOME=/home/$NB_USER
+export IPYTHONDIR=$LOCAL_HOME/.ipython
+export JPY_DIR=$LOCAL_HOME/.jupyter
 export JUPYTER_CONFIG_DIR=$JPY_DIR
-export JUPYTER_PATH=/home/$USER/.local/share/jupyter
+export JUPYTER_PATH=$LOCAL_HOME/.local/share/jupyter
 
 # Set other environment variables
 export KERNEL_DIR=$JUPYTER_PATH/kernels
-export SWAN_ENV_FILE=$SWAN_HOME/.bash_profile
-
+export PYTHON_KERNEL_DIR=$KERNEL_DIR/python3
+export SWAN_ENV_FILE=$LOCAL_HOME/.bash_profile
 export CUSTOM_JS_DIR=$JPY_DIR/custom
 
 # Create missing directories
-mkdir -p ${CUSTOM_JS_DIR} ${IPYTHONDIR} ${KERNEL_DIR} && \
-chown -R ${USER}:${NB_GID} ${IPYTHONDIR}
+mkdir -p $CUSTOM_JS_DIR $IPYTHONDIR $PYTHON_KERNEL_DIR
 
 # Disable pinging for maintenance notifications when running on Kubernetes
 if [ "${SWAN_DISABLE_NOTIFICATIONS}" == "true" ]; 

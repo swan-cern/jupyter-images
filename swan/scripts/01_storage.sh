@@ -23,17 +23,15 @@ then
     chmod 600 $OAUTH2_FILE
 fi
 
-if [[ ! -d "$HOME" || ! -x "$HOME" ]]
+sudo -E -u $NB_USER sh -c 'if [[ ! -d "$HOME" || ! -x "$HOME" ]]; then exit 1; fi'
+if [ $? -ne 0 ]
 then
     _log "Error setting notebook working directory, $HOME not accessible by user $NB_USER."
     exit 1
 fi
 
-export CERNBOX_OAUTH_ID="${CERNBOX_OAUTH_ID:-cernbox-service}"
-export EOS_OAUTH_ID="${EOS_OAUTH_ID:-eos-service}"
-
-# Configurations for extensions (used when deployed outside CERN)
-if [[ $SHARE_CBOX_API_DOMAIN && $SHARE_CBOX_API_BASE ]]
+# Change the user home to point to EOS.
+if [[ ! -z "$CERNBOX_HOME" && ! $(usermod --home $HOME $NB_USER 2>&1 | grep "no changes" > /dev/null) ]]; 
 then
     _log "Updated the user home to $HOME."
 fi

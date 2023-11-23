@@ -108,60 +108,28 @@ RUN pip install --no-deps --no-cache-dir psutil==5.8.0
 
 # Install all of our extensions
 # Ignore (almost all) dependencies because they have already been installed or come from CVMFS
-RUN pip install --no-deps --no-cache-dir \
-    dask-labextension==6.1.0 \
-    jupyter-resource-usage==0.6.0 \
-    hdfsbrowser==1.1.1 \
-    sparkconnector==2.4.6 \
-    sparkmonitor==2.1.1 \
-    swancontents==1.4.2 \
-    swanhelp==2.0.2 \
-    swanintro==1.0.0 \
-    swankernelenv==1.0.0 \
-    swannotebookviewer==1.2.0 \
-    swannotifications==1.0.0 \
-    swanoauthrenew==1.0.1 PyJWT \
-    swanshare==1.1.1 \
-    swanheader==1.0.0 \
-    swanportallocator==1.0.1
+# RUN pip install --no-deps --no-cache-dir \
+# TODO: 3rd image   dask-labextension==6.1.0 \
+#    jupyter-resource-usage==0.6.0 \
+# TODO: 3rd image   hdfsbrowser==1.1.1 \
+# TODO: 3rd image   sparkconnector==2.4.6 \
+# TODO: 3rd image  sparkmonitor==2.1.1 \
+#    swancontents==1.4.2 \
+#    swanhelp==2.0.2 \
+#    swanintro==1.0.0 \
+#    swankernelenv==1.0.0 \
+#    swannotebookviewer==1.2.0 \
+#    swannotifications==1.0.0 \
+#    swanoauthrenew==1.0.1 PyJWT \
+#    swanshare==1.1.1 \
+#    swanportallocator==1.0.1
             
 # swandask must be installed after its dependency dask-labextension to disable the server extension automatically
 RUN pip install --no-deps --no-cache-dir swandask==0.0.3
 
 # Python configuration
 # Add jupyter notebook configuration
-ADD python/jupyter_notebook_config.py ${JUPYTER_CONFIG_DIR}/jupyter_notebook_config.py
-
-# TODO: Review
-# Enable all the nbextensions and server extensions
-RUN jupyter nbextension install --py --system hdfsbrowser && \
-    jupyter nbextension install --py --system sparkconnector && \
-    jupyter nbextension install --py --system sparkmonitor && \
-    jupyter nbextension enable --py --system sparkmonitor && \
-    jupyter nbextension install --py --system swancontents && \
-    jupyter serverextension enable --py --system swancontents && \
-    jupyter nbextension install --py --system swanhelp && \
-    jupyter nbextension enable --py --system swanhelp && \
-    jupyter nbextension install --py --system swanintro && \
-    jupyter nbextension enable --py --system swanintro && \
-    jupyter serverextension enable --py --system swannotebookviewer && \
-    jupyter nbextension install --py --system swannotifications && \
-    jupyter nbextension enable --py --system swannotifications && \
-    jupyter serverextension enable --py --system swanoauthrenew && \
-    jupyter nbextension install --py --system swanshare && \
-    jupyter nbextension enable --py --system swanshare && \
-    jupyter serverextension enable --py --system swanshare && \
-    jupyter serverextension enable --py --system swanportallocator && \
-    # Force nbextension_configurator systemwide to prevent users disabling it
-    jupyter nbextensions_configurator enable --system && \
-    # FIXME workaround for templates. For some reason, and only in our image, Jupyter is looking for templates inside templates
-    cp -r /opt/conda/lib/python3.11/site-packages/swancontents/templates{,2} && \
-    mv /opt/conda/lib/python3.11/site-packages/swancontents/templates{2,/templates}
-
-# Switch back to jovyan to avoid accidental container runs as root
-USER ${NB_UID}
-
-ENV SHELL=/bin/bash
+ADD python/jupyter_swan_config.py /srv/singleuser/jupyter_swan_config.py
 
 # User session configuration scripts
 # Add scripts

@@ -12,6 +12,9 @@ ARG PYTHON_VERSION=3.11
 # Fix: https://github.com/koalaman/shellcheck/wiki/SC3014
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
+# DNF should fail to install packages if there are missing names
+RUN echo "skip_missing_names_on_install=False" >> /etc/dnf/dnf.conf
+
 # ------------------------------------
 #       DOCKER STACKS FOUNDATION
 # ------------------------------------

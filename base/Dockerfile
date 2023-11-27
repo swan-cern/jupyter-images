@@ -219,5 +219,4 @@ WORKDIR "${HOME}"
 # This part of the base image contains SWAN specific customizations
 # and python packages.
 
-# TODO: Uncomment after PR is merged.
-# RUN pip install swanheader
+RUN pip install --no-cache-dir swanheader==2.0.1

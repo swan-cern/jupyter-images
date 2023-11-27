@@ -108,6 +108,8 @@ RUN set -x && \
         # Should be simpler, see <https://github.com/mamba-org/mamba/issues/1437>
         arch="64"; \
     fi && \
+    # curl is used instead of wget, as we get a 403 Forbidden error while downloading
+    # micromamba only when using the later command.
     curl -L -o /tmp/micromamba.tar.bz2 \
         "https://micromamba.snakepit.net/api/micromamba/linux-${arch}/latest" && \
     tar -xvjf /tmp/micromamba.tar.bz2 --strip-components=1 bin/micromamba && \

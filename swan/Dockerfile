@@ -86,8 +86,12 @@ USER ${NB_UID}
 
 # Install python pip packages
 RUN mamba install --yes \
-    'jupyter_nbextensions_configurator' \
-    'voila'
+    'jupyter_nbextensions_configurator==0.6.1' \
+    'voila==0.5.5' \
+    'ipyparallel==8.6.1' \
+    # Extensions required by jupyter server
+    'panel==1.3.2' \
+    'webio-jupyter-extension==0.1.0'
 
 # Install TeX Live required packages
 RUN tlmgr install adjustbox \

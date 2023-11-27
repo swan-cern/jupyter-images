@@ -11,6 +11,7 @@ import shutil
 
 SWAN_ENV_FILE = os.environ["SWAN_ENV_FILE"]
 KERNEL_DIR = os.environ["KERNEL_DIR"]
+HOME = os.environ["HOME"]
 PYTHONEXECPATH = shutil.which(f"python3")
 
 
@@ -53,6 +54,9 @@ def configure_terminal():
                 # Setting up colors
                 "alias ls='ls --color'\n",
                 "alias grep='grep --color'\n",
+                # FIXME: Fix this workaround and load the correct user home
+                # correctly
+                f"cd {HOME}\n"
             ]
         )
 

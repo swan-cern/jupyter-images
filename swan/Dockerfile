@@ -17,20 +17,10 @@ USER root
 # Install required dnf packages
 RUN dnf install -y \
     git \
-   # gcc \
-   # gcc-c++ \
-   # kernel-devel \
-   # libcurl-openssl-devel \  -- Does not exist in dnf repos
-   # libffi-devel \
-   # ncurses-devel \
     nano \
-   # nodejs \
     patch \
-   # sqlite-devel \
     unzip \
     which \
-   # zeromq3-devel \ -- Does not exist in dnf repos
-   # perl-Digest-MD5 \
     texlive \
     fontconfig
 
@@ -45,14 +35,8 @@ RUN dnf -y install HEP_OSlibs-9.1.0-2.el9
 RUN dnf install -y \
     # Required by ROOT
     libXft \
-    # Required by matplotlib
-    tk \
     # Useful to monitor resource consumption
     htop \
-    # Required by Geant4 (libXm)
-    openmotif \
-    # Required by Oracle
-    # TODO: Move to third image: libaio \
     # Required for key4hep
     environment-modules && \
     # Clear the dnf cache as we no longer need to install packages

@@ -76,11 +76,7 @@ RUN pip install --no-deps --no-cache-dir psutil==5.8.0
 # Install all of our extensions
 # Ignore (almost all) dependencies because they have already been installed or come from CVMFS
 # RUN pip install --no-deps --no-cache-dir \
-# TODO: 3rd image   dask-labextension==6.1.0 \
 #    jupyter-resource-usage==0.6.0 \
-# TODO: 3rd image   hdfsbrowser==1.1.1 \
-# TODO: 3rd image   sparkconnector==2.4.6 \
-# TODO: 3rd image  sparkmonitor==2.1.1 \
 #    swancontents==1.4.2 \
 #    swanhelp==2.0.2 \
 #    swanintro==1.0.0 \
@@ -90,11 +86,6 @@ RUN pip install --no-deps --no-cache-dir psutil==5.8.0
 #    swanoauthrenew==1.0.1 PyJWT \
 #    swanshare==1.1.1 \
 #    swanportallocator==1.0.1
-            
-# swandask must be installed after its dependency dask-labextension to disable the server extension automatically
-RUN pip install --no-deps --no-cache-dir swandask==0.0.3
-
-ENV SHELL=/bin/bash
 
 # Python configuration
 # Add jupyter notebook configuration

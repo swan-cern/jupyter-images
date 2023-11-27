@@ -24,7 +24,7 @@ RUN dnf install -y \
    # libffi-devel \
    # ncurses-devel \
     nano \
-    nodejs \
+   # nodejs \
     patch \
    # sqlite-devel \
     unzip \

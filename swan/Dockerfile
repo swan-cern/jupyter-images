@@ -15,7 +15,8 @@ RUN echo "Building swan image with tag ${VERSION_DOCKER_IMAGE}"
 USER root
 
 # Install required dnf packages
-RUN dnf install -y  git \
+RUN dnf install -y \
+    git \
    # gcc \
    # gcc-c++ \
    # kernel-devel \

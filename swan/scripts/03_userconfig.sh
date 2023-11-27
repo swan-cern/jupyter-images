@@ -3,19 +3,19 @@
 # Author: Danilo Piparo, Enric Tejedor, Pedro Maximino, Diogo Castro 2023
 # Copyright CERN
 
+_log () {
+    if [[ "$*" == "ERROR:"* ]] || [[ "$*" == "WARNING:"* ]] || [[ "${JUPYTER_DOCKER_STACKS_QUIET}" == "" ]]; then
+        echo "$@"
+    fi
+}
+
 START_TIME_SETUP_SWAN_HOME=$( date +%s.%N )
-
-# FIXME: Move to storage.sh
-# Make sure the user has the SWAN_projects folder
-SWAN_PROJECTS=$HOME/SWAN_projects
-mkdir -p $SWAN_PROJECTS
-
 SETUP_SWAN_HOME_TIME_SEC=$(echo $(date +%s.%N --date="$START_TIME_SETUP_SWAN_HOME seconds ago") | bc)
-log_info "user: $USER, host: ${SERVER_HOSTNAME%%.*}, metric: configure_user_env_swan_home.duration_sec, value: $SETUP_SWAN_HOME_TIME_SEC"
+_log "user: $USER, host: ${SERVER_HOSTNAME%%.*}, metric: configure_user_env_swan_home.duration_sec, value: $SETUP_SWAN_HOME_TIME_SEC"
 
 # FIXME: Move to extensions.
 # Persist enabled notebook nbextensions
-echo $JPY_DIR
+SWAN_PROJECTS=$HOME/SWAN_projects
 NBCONFIG=$JPY_DIR/nbconfig
 mkdir -p $NBCONFIG
 LOCAL_NB_NBEXTENSIONS=$SWAN_PROJECTS/.notebook_nbextensions
@@ -34,7 +34,7 @@ START_TIME_SETUP_LCG=$( date +%s.%N )
 source $LCG_VIEW/setup.sh
 
 SETUP_LCG_TIME_SEC=$(echo $(date +%s.%N --date="$START_TIME_SETUP_LCG seconds ago") | bc)
-log_info "user: $USER, host: ${SERVER_HOSTNAME%%.*}, metric: configure_user_env_cvmfs.${ROOT_LCG_VIEW_NAME:-none}.duration_sec, value: $SETUP_LCG_TIME_SEC"
+_log "user: $USER, host: ${SERVER_HOSTNAME%%.*}, metric: configure_user_env_cvmfs.${ROOT_LCG_VIEW_NAME:-none}.duration_sec, value: $SETUP_LCG_TIME_SEC"
 
 # Add SWAN modules path to PYTHONPATH so that it picks them
 export PYTHONPATH=/usr/local/lib/swan/extensions/:$PYTHONPATH
@@ -55,7 +55,7 @@ export DASK_DISTRIBUTED__CLIENT__SECURITY_LOADER="swandaskcluster.security.loade
 # then
 #  START_TIME_SETUP_SPARK=$( date +%s.%N )
 
-#  log_info "Configuring environment for Spark cluster: $SPARK_CLUSTER_NAME"
+#  _log "Configuring environment for Spark cluster: $SPARK_CLUSTER_NAME"
 #  # detect Spark major version to choose different Spark configuration 
 #  # the second argument of $SPARK_CONFIG_SCRIPT is the classpath compatibility for yarn
 #  SPARK_MJR_VERSION=$(readlink -f `which pyspark` | awk -F\/ '{print substr($7,1,1)}')
@@ -71,29 +71,29 @@ export DASK_DISTRIBUTED__CLIENT__SECURITY_LOADER="swandaskcluster.security.loade
 #     ln -s $CONNECTOR_BUNDLED_CONFIGS/bundles.json $JUPYTER_CONFIG_DIR/nbconfig/sparkconnector_bundles.json
 #     ln -s $CONNECTOR_BUNDLED_CONFIGS/spark_options.json $JUPYTER_CONFIG_DIR/nbconfig/sparkconnector_spark_options.json
 #   fi
-#  log_info "Completed Spark Configuration"
+#  _log "Completed Spark Configuration"
 
 #  SETUP_SPARK_TIME_SEC=$(echo $(date +%s.%N --date="$START_TIME_SETUP_SPARK seconds ago") | bc)
-#  log_info "user: $USER, host: ${SERVER_HOSTNAME%%.*}, metric: configure_user_env_spark.${ROOT_LCG_VIEW_NAME:-none}.${SPARK_CLUSTER_NAME:-none}.duration_sec, value: $SETUP_SPARK_TIME_SEC"
+#  _log "user: $USER, host: ${SERVER_HOSTNAME%%.*}, metric: configure_user_env_spark.${ROOT_LCG_VIEW_NAME:-none}.${SPARK_CLUSTER_NAME:-none}.duration_sec, value: $SETUP_SPARK_TIME_SEC"
 # fi
 
 # Run user startup script
 export JUPYTER_DATA_DIR=$LCG_VIEW/share/jupyter 
-export TMP_SCRIPT=`mktemp`
+TMP_SCRIPT=`mktemp`
 
 if [[ $USER_ENV_SCRIPT && -f `eval echo $USER_ENV_SCRIPT` ]];
 then
- START_TIME_SETUP_SCRIPT=$( date +%s.%N )
- 
- log_info "Found user script: $USER_ENV_SCRIPT"
- export TMP_SCRIPT=`mktemp`
- cat `eval echo $USER_ENV_SCRIPT` > $TMP_SCRIPT
- source $TMP_SCRIPT
+  START_TIME_SETUP_SCRIPT=$( date +%s.%N )
 
- SETUP_SCRIPT_TIME_SEC=$(echo $(date +%s.%N --date="$START_TIME_SETUP_SCRIPT seconds ago") | bc)
- log_info "user: $USER, host: ${SERVER_HOSTNAME%%.*}, metric: configure_user_env_script.duration_sec, value: $SETUP_SCRIPT_TIME_SEC"
+  _log "Found user script: $USER_ENV_SCRIPT"
+  TMP_SCRIPT=`mktemp`
+  cat `eval echo $USER_ENV_SCRIPT` > $TMP_SCRIPT
+  source $TMP_SCRIPT
+
+  SETUP_SCRIPT_TIME_SEC=$(echo $(date +%s.%N --date="$START_TIME_SETUP_SCRIPT seconds ago") | bc)
+  _log "user: $USER, host: ${SERVER_HOSTNAME%%.*}, metric: configure_user_env_script.duration_sec, value: $SETUP_SCRIPT_TIME_SEC"
 else
- log_info "Cannot find user script: $USER_ENV_SCRIPT";
+ _log "Cannot find user script: $USER_ENV_SCRIPT";
 fi
 
 # In k8s, $KRB5CCNAME_NB_TERM points to the location of the EOS kerberos ticket that notebook and terminal

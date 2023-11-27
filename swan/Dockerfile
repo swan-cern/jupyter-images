@@ -135,7 +135,7 @@ ENV SHELL=/bin/bash
 
 # Python configuration
 # Add jupyter notebook configuration
-ADD python/jupyter_swan_config.py /srv/singleuser/jupyter_swan_config.py
+ADD python/jupyter_server_config.py /srv/singleuser/jupyter_server_config.py
 
 # User session configuration scripts
 # Add scripts

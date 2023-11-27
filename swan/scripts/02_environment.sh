@@ -22,7 +22,7 @@ export CUSTOM_JS_DIR=$JPY_DIR/custom
 mkdir -p $CUSTOM_JS_DIR $IPYTHONDIR $PYTHON_KERNEL_DIR
 
 # Move jupyter server configuration to configuration directory
-mv /srv/singleuser/jupyter_swan_config.py $JUPYTER_CONFIG_DIR/jupyter_swan_config.py
+mv /srv/singleuser/jupyter_server_config.py $JUPYTER_CONFIG_DIR/jupyter_server_config.py
 
 # Move configuration %%cpp cell highlighting to custom directory
 mv /srv/singleuser/custom.js $CUSTOM_JS_DIR/custom.js

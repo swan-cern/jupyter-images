@@ -9,7 +9,7 @@ ARG NB_UID="1000"
 ARG BUILD_TAG=daily
 ENV VERSION_DOCKER_IMAGE=$BUILD_TAG
 
-RUN echo "Building systemuser image with tag ${VERSION_DOCKER_IMAGE}"
+RUN echo "Building swan image with tag ${VERSION_DOCKER_IMAGE}"
 
 # Switch to superuser to install packages
 USER root

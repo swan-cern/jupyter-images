@@ -30,7 +30,7 @@ RUN dnf install -y \
     unzip \
     which \
    # zeromq3-devel \ -- Does not exist in dnf repos
-    perl-Digest-MD5 \
+   # perl-Digest-MD5 \
     texlive \
     fontconfig
 

@@ -49,29 +49,6 @@ RUN dnf install -y \
     tk \
     # Useful to monitor resource consumption
     htop \
-    # Install Cloudera dependencies - required by IT Spark clusters
-    alsa-lib \
-    at \
-    bc \
-    cronie \
-    cvs \
-    # db4-cxx \ -- Is not present in DNF repos.
-    # db4-devel \ -- Is not present in DNF repos.
-    file \
-    gdbm-devel \
-    gettext \
-    jpackage-utils \
-    libXtst \
-    man \
-    passwd \
-    # pax \ -- Is not present in DNF repos.
-    # perl-CGI \
-    # perl-ExtUtils-MakeMaker \
-    # perl-Test-Simple \
-    # perl-devel \
-    rsyslog \
-    time \
-    xz-lzma-compat \
     # Required by Geant4 (libXm)
     openmotif \
     # Required by Oracle

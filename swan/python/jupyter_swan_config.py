@@ -1,16 +1,18 @@
 import os
-from swancontents import get_templates
+#from swancontents import get_templates
 
 c.FileCheckpoints.checkpoint_dir = os.environ.get("HOME") + "/.ipynb_checkpoints"
 c.NotebookNotary.db_file = os.environ.get("JUPYTER_PATH") + "/nbsignatures.db"
 c.NotebookNotary.secret_file = os.environ.get("JUPYTER_PATH") + "/notebook_secret"
 
+c.ServerApp.root_dir = os.environ.get("HOME")
+
 # TODO: Needs to change
-c.NotebookApp.contents_manager_class = "swancontents.filemanager.swanfilemanager.SwanFileManager"
+#c.NotebookApp.contents_manager_class = "swancontents.filemanager.swanfilemanager.SwanFileManager"
 
 root_data_dir = os.environ.get("ROOT_DATA_DIR")
 if root_data_dir is not None:
-  c.NotebookApp.extra_static_paths = [root_data_dir + "/js"]
+  c.ServerApp.extra_static_paths = [root_data_dir + "/js"]
 
 # Convert the _xsrf cookie into a session cookie, to prevent it from having an expiration date of 30 days
 # Without this setting, _xsrf cookie could expire in the middle of a user editing a notebook, making it
@@ -28,6 +30,6 @@ oauth2_file = os.environ.get("OAUTH2_FILE", "")
 oauth_inspection_endpoint = os.environ.get("OAUTH_INSPECTION_ENDPOINT", "")
 c.SwanOauthRenew.files = [
     ("/tmp/swan_oauth.token", "access_token", "{token}"),
-    ("/tmp/cernbox_oauth.token", f"exchanged_tokens/"cernbox-service", "{token}"),
+    ("/tmp/cernbox_oauth.token", f"exchanged_tokens/{cernbox_oauth_id}", "{token}"),
     (oauth2_file, f"exchanged_tokens/{eos_oauth_id}", "oauth2:{token}:" + oauth_inspection_endpoint)
 ]

@@ -1,5 +1,5 @@
-# Installs the extensions and packages required by SWAN
-# to adapt the base alma9 notebook image to SWAN.
+# This installs the SWAN packages to enable 
+# using Jupyter with EOS and CVMFS
 
 # FROM gitlab-registry.cern.ch/swan/docker-images/notebook
 FROM gitlab-registry.cern.ch/pesteves/imageregistry:notebook

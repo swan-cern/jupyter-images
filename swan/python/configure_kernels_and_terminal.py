@@ -24,8 +24,8 @@ def modify_python_argv(kernel_json):
 def configure_kernels():
     """Writes kernel.json with env and argv from software stack"""
     kernel_json_file_names = [
-        f"{KERNEL_DIR}/{kernel_dir}/kernel.json"
-        for kernel_dir in os.listdir(KERNEL_DIR)
+        f"{KERNEL_DIR}/{kernel_name}/kernel.json"
+        for kernel_name in os.listdir(KERNEL_DIR)
     ]
     for kernel_json_file in kernel_json_file_names:
         kernel_json = None

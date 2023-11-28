@@ -95,8 +95,7 @@ ADD python/jupyter_server_config.py /srv/singleuser/jupyter_server_config.py
 
 # User session configuration scripts
 # Add scripts
-ADD scripts/01_storage.sh /usr/local/bin/before-notebook.d
-ADD scripts/02_environment.sh /usr/local/bin/before-notebook.d
+COPY scripts/before-notebook.d/* /usr/local/bin/before-notebook.d
 ADD scripts/03_userconfig.sh /tmp
 
 USER root

@@ -109,8 +109,7 @@ ADD python/configure_kernels_and_terminal.py /srv/singleuser/configure_kernels_a
 ADD python/start_ipykernel.py /usr/local/bin/start_ipykernel.py
 RUN chmod 705 /usr/local/bin/start_ipykernel.py
 
-# Add js and json files
-ADD js/custom.js /srv/singleuser/custom.js
+# Add kernel configuration
 ADD config/kernel.json /srv/singleuser/kernel.json
 
 # Switch back to jovyan to avoid accidental container runs as root

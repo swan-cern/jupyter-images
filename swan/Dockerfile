@@ -33,6 +33,8 @@ RUN dnf -y install HEP_OSlibs-9.1.0-2.el9
 
 # Install required packages
 RUN dnf install -y \
+    # Required by before-notebook scripts.
+    bc \
     # Required by ROOT
     libXft \
     # Useful to monitor resource consumption

@@ -1,7 +1,6 @@
 import os
 #from swancontents import get_templates
 
-c.FileCheckpoints.checkpoint_dir = os.environ.get("HOME") + "/.ipynb_checkpoints"
 c.NotebookNotary.db_file = os.environ.get("JUPYTER_PATH") + "/nbsignatures.db"
 c.NotebookNotary.secret_file = os.environ.get("JUPYTER_PATH") + "/notebook_secret"
 

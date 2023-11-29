@@ -7,6 +7,7 @@ FROM gitlab-registry.cern.ch/pesteves/imageregistry:notebook
 
 LABEL maintainer="swan-admins@cern.ch"
 
+ARG NB_USER="jovyan"
 ARG NB_UID="1000"
 ARG BUILD_TAG=daily
 ENV VERSION_DOCKER_IMAGE=$BUILD_TAG
@@ -93,7 +94,7 @@ RUN pip install --no-deps --no-cache-dir psutil==5.8.0
 
 # Python configuration
 # Add jupyter notebook configuration
-ADD python/jupyter_server_config.py /home/${NB_USER}/jupyter_server_config.py
+ADD python/jupyter_server_config.py /home/${NB_USER}/.jupyter/jupyter_server_config.py
 
 # User session configuration scripts
 # Add scripts
@@ -101,14 +102,16 @@ COPY scripts/before-notebook.d/* /usr/local/bin/before-notebook.d
 ADD scripts/03_userconfig.sh /tmp
 
 USER root
+
 # Grant scripts execution permissions
 RUN chmod +x /usr/local/bin/before-notebook.d/*
 
 # Add python scripts
-ADD python/configure_kernels_and_terminal.py /home/${NB_USER}/.local/share/jupyter/configure_kernels_and_terminal.py
+ADD python/configure_kernels_and_terminal.py /srv/singleuser/configure_kernels_and_terminal.py
 
-# Add kernel configuration
-ADD config/kernel.json /srv/singleuser/kernel.json
+# Add Python 3 kernel configuration
+RUN mkdir -p /home/${NB_USER}/.local/share/jupyter/kernels/python3
+ADD config/kernel.json  /home/${NB_USER}/.local/share/jupyter/kernels/python3/kernel.json
 
 # Switch back to jovyan to avoid accidental container runs as root
 USER ${NB_UID}

@@ -20,15 +20,14 @@ export JUPYTER_PATH=$LOCAL_HOME/.local/share/jupyter
 export KERNEL_DIR=$JUPYTER_PATH/kernels
 export PYTHON_KERNEL_DIR=$KERNEL_DIR/python3
 export SWAN_ENV_FILE=$LOCAL_HOME/.bash_profile
-export CUSTOM_JS_DIR=$JPY_DIR/custom
 
 # Create missing directories
-mkdir -p $CUSTOM_JS_DIR $IPYTHONDIR $PYTHON_KERNEL_DIR
+mkdir -p $IPYTHONDIR $PYTHON_KERNEL_DIR
 
 # Setup the LCG View on CVMFS
 _log "Setting up environment from CVMFS"
 export LCG_VIEW=$ROOT_LCG_VIEW_PATH/$ROOT_LCG_VIEW_NAME/$ROOT_LCG_VIEW_PLATFORM
-# FIXME: Separar
+
 # symlink $LCG_VIEW/share/jupyter/nbextensions for the notebook extensions
 ln -s $LCG_VIEW/share/jupyter/nbextensions $JUPYTER_PATH
 #Creating a ROOT_DATA_DIR variable

@@ -1,10 +1,12 @@
+# Author: Danilo Piparo, Enric Tejedor, Pedro Maximino, Diogo Castro 2023
+# Copyright CERN
 # This installs the SWAN packages to enable 
 # using Jupyter with EOS and CVMFS
 
-# FROM gitlab-registry.cern.ch/swan/docker-images/notebook
 FROM gitlab-registry.cern.ch/pesteves/imageregistry:notebook
 
 LABEL maintainer="swan-admins@cern.ch"
+
 ARG NB_UID="1000"
 ARG BUILD_TAG=daily
 ENV VERSION_DOCKER_IMAGE=$BUILD_TAG

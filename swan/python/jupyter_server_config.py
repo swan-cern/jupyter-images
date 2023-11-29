@@ -1,13 +1,11 @@
 import os
-#from swancontents import get_templates
 
 c.NotebookNotary.db_file = os.environ.get("JUPYTER_PATH") + "/nbsignatures.db"
 c.NotebookNotary.secret_file = os.environ.get("JUPYTER_PATH") + "/notebook_secret"
 
 c.ServerApp.root_dir = os.environ.get("HOME")
 
-# TODO: Needs to change
-#c.NotebookApp.contents_manager_class = "swancontents.filemanager.swanfilemanager.SwanFileManager"
+c.NotebookApp.contents_manager_class = "swancontents.filemanager.SwanEosFileManager"
 
 root_data_dir = os.environ.get("ROOT_DATA_DIR")
 if root_data_dir is not None:

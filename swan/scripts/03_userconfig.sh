@@ -2,6 +2,8 @@
 
 # Author: Danilo Piparo, Enric Tejedor, Pedro Maximino, Diogo Castro 2023
 # Copyright CERN
+# Here the user session is configured, including the home directory and 
+# the terminal.
 
 _log () {
     if [[ "$*" == "ERROR:"* ]] || [[ "$*" == "WARNING:"* ]] || [[ "${JUPYTER_DOCKER_STACKS_QUIET}" == "" ]]; then
@@ -115,7 +117,7 @@ export KRB5CCNAME=$KRB5CCNAME_NB_TERM
 
 # As the LCG setup might set PYTHONHOME, run python with -I (Isolated Mode) to prevent
 # the lookup for modules in a Python 3 path and user site
-python -I /srv/singleuser/configure_kernels_and_terminal.py
+python -I /home/$USER/.local/share/jupyter/configure_kernels_and_terminal.py
 
 # Remove our extra paths (where we install our extensions) in the kernel (via SwanKernelEnv kernel extension), 
 # leaving the user env cleaned. It should be the last one called to allow the kernel to load our extensions correctly.

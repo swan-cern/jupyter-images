@@ -32,7 +32,7 @@ def configure_kernels():
         with open(kernel_json_file, "r") as file:
             kernel_json = json.loads(file.read())
 
-        kernel_json["env"] = dict(os.environ)
+        kernel_json["env"] = kernel_json.get("env", {}) | dict(os.environ)
         modify_python_argv(kernel_json)
         with open(kernel_json_file, "w") as file:
             file.write(json.dumps(kernel_json, indent=4))

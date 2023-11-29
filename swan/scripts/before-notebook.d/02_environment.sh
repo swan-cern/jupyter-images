@@ -21,12 +21,6 @@ export CUSTOM_JS_DIR=$JPY_DIR/custom
 # Create missing directories
 mkdir -p $CUSTOM_JS_DIR $IPYTHONDIR $PYTHON_KERNEL_DIR
 
-# Move jupyter server configuration to configuration directory
-mv /srv/singleuser/jupyter_server_config.py $JUPYTER_CONFIG_DIR/jupyter_server_config.py
-
-# Move python kernel configuration to python kernel directory
-mv /srv/singleuser/kernel.json $PYTHON_KERNEL_DIR/kernel.json
-
 # Setup the LCG View on CVMFS
 _log "Setting up environment from CVMFS"
 export LCG_VIEW=$ROOT_LCG_VIEW_PATH/$ROOT_LCG_VIEW_NAME/$ROOT_LCG_VIEW_PLATFORM

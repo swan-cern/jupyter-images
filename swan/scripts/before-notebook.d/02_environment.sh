@@ -2,13 +2,17 @@
 
 # Author: Danilo Piparo, Enric Tejedor, Pedro Maximino, Diogo Castro 2023
 # Copyright CERN
-# Here the environment for the notebook server is prepared. Many of the commands are launched as regular 
-# user as it's this entity which is able to access eos and not the super user.
+# Here the environment for the notebook server is prepared. Many of the commands are 
+# launched as regular user as it's this entity which is able to access 
+# eos and not the super user.
 
 # Set environment for the Jupyter process
 LOCAL_HOME=/home/$NB_USER
 export IPYTHONDIR=$LOCAL_HOME/.ipython
 export JPY_DIR=$LOCAL_HOME/.jupyter
+
+# JUPYTER_CONFIG_DIR is set to point to the local user home (/home/$USER)
+# instead of the EOS path
 export JUPYTER_CONFIG_DIR=$JPY_DIR
 export JUPYTER_PATH=$LOCAL_HOME/.local/share/jupyter
 

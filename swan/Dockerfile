@@ -93,7 +93,7 @@ RUN pip install --no-deps --no-cache-dir psutil==5.8.0
 
 # Python configuration
 # Add jupyter notebook configuration
-ADD python/jupyter_server_config.py /srv/singleuser/jupyter_server_config.py
+ADD python/jupyter_server_config.py /home/${NB_USER}/jupyter_server_config.py
 
 # User session configuration scripts
 # Add scripts
@@ -105,7 +105,7 @@ USER root
 RUN chmod +x /usr/local/bin/before-notebook.d/*
 
 # Add python scripts
-ADD python/configure_kernels_and_terminal.py /srv/singleuser/configure_kernels_and_terminal.py
+ADD python/configure_kernels_and_terminal.py /home/${NB_USER}/.local/share/jupyter/configure_kernels_and_terminal.py
 
 # TODO: Confirm that we can remove the python script below
 ADD python/start_ipykernel.py /usr/local/bin/start_ipykernel.py

@@ -3,7 +3,7 @@
     "language": "python",
     "argv": [
      "python",
-     "/usr/local/bin/start_ipykernel.py",
+     "-s",
      "-f",
      "{connection_file}"
     ]

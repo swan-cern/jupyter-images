@@ -107,10 +107,6 @@ RUN chmod +x /usr/local/bin/before-notebook.d/*
 # Add python scripts
 ADD python/configure_kernels_and_terminal.py /home/${NB_USER}/.local/share/jupyter/configure_kernels_and_terminal.py
 
-# TODO: Confirm that we can remove the python script below
-ADD python/start_ipykernel.py /usr/local/bin/start_ipykernel.py
-RUN chmod 705 /usr/local/bin/start_ipykernel.py
-
 # Add kernel configuration
 ADD config/kernel.json /srv/singleuser/kernel.json
 

@@ -81,8 +81,9 @@ export KRB5CCNAME=$KRB5CCNAME_NB_TERM
 
 # As the LCG setup might set PYTHONHOME, run python with -I (Isolated Mode) to prevent
 # the lookup for modules in a Python 3 path and user site
-python -I /home/$USER/.local/share/jupyter/configure_kernels_and_terminal.py
+python -I /srv/singleuser/configure_kernels_and_terminal.py
 
 # Remove our extra paths (where we install our extensions) in the kernel (via SwanKernelEnv kernel extension), 
 # leaving the user env cleaned. It should be the last one called to allow the kernel to load our extensions correctly.
-#  echo "c.InteractiveShellApp.extensions.append('swankernelenv')" >>  $KERNEL_PROFILEPATH
+export KERNEL_PROFILEPATH=$PROFILEPATH/ipython_kernel_config.py
+echo "c.InteractiveShellApp.extensions.append('swankernelenv')" >>  $KERNEL_PROFILEPATH

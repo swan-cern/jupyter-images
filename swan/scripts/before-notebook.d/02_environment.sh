@@ -18,11 +18,11 @@ export JUPYTER_PATH=$LOCAL_HOME/.local/share/jupyter
 
 # Set other environment variables
 export KERNEL_DIR=$JUPYTER_PATH/kernels
-export PYTHON_KERNEL_DIR=$KERNEL_DIR/python3
 export SWAN_ENV_FILE=$LOCAL_HOME/.bash_profile
+export PROFILEPATH=$IPYTHONDIR/profile_default
 
 # Create missing directories
-mkdir -p $IPYTHONDIR $PYTHON_KERNEL_DIR
+mkdir -p $IPYTHONDIR $PROFILEPATH
 
 # Setup the LCG View on CVMFS
 _log "Setting up environment from CVMFS"

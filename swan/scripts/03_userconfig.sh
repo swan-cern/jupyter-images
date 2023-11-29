@@ -41,44 +41,6 @@ _log "user: $USER, host: ${SERVER_HOSTNAME%%.*}, metric: configure_user_env_cvmf
 # Add SWAN modules path to PYTHONPATH so that it picks them
 export PYTHONPATH=/usr/local/lib/swan/extensions/:$PYTHONPATH
 
-# Configure Dask.
-# DASK_LIB_DIR is necessary so that kernels and notebooks can use the loader
-# in swandaskcluster to create a default Security object for Dask clients, to
-# which we point with a Dask variable
-export PYTHONPATH=$PYTHONPATH:$DASK_LIB_DIR
-export DASK_DISTRIBUTED__CLIENT__SECURITY_LOADER="swandaskcluster.security.loader"
-
-# # Configure SparkMonitor
-# export KERNEL_PROFILEPATH=$PROFILEPATH/ipython_kernel_config.py 
-# echo "c.InteractiveShellApp.extensions.append('sparkmonitor.kernelextension')" >>  $KERNEL_PROFILEPATH
-
-# # Configure SparkConnector
-# if [[ $SPARK_CLUSTER_NAME ]]; 
-# then
-#  START_TIME_SETUP_SPARK=$( date +%s.%N )
-
-#  _log "Configuring environment for Spark cluster: $SPARK_CLUSTER_NAME"
-#  # detect Spark major version to choose different Spark configuration 
-#  # the second argument of $SPARK_CONFIG_SCRIPT is the classpath compatibility for yarn
-#  SPARK_MJR_VERSION=$(readlink -f `which pyspark` | awk -F\/ '{print substr($7,1,1)}')
-#  HADOOP_MJR_VERSION=$(readlink -f `which hdfs` | awk -F\/ '{print substr($7,1,1)}')
-#  if [[ $SPARK_MJR_VERSION == 3 ]]; then SPARKVERSION=spark3; fi
-#  if [[ $HADOOP_MJR_VERSION == 3 ]]; then HADOOPVERSION='3.2'; fi
-#  source $SPARK_CONFIG_SCRIPT $SPARK_CLUSTER_NAME ${HADOOPVERSION:-'2.7'} ${SPARKVERSION:-'spark2'}
-#  #to make sure we get the ipv4 addrress when in dual stack nodes
-#  export SPARK_LOCAL_IP=$(getent ahostsv4 | awk "/$HOSTNAME/ {print \$1}")
-#  echo "c.InteractiveShellApp.extensions.append('sparkconnector.connector')" >>  $KERNEL_PROFILEPATH
-#  if [[ $CONNECTOR_BUNDLED_CONFIGS ]]
-#   then
-#     ln -s $CONNECTOR_BUNDLED_CONFIGS/bundles.json $JUPYTER_CONFIG_DIR/nbconfig/sparkconnector_bundles.json
-#     ln -s $CONNECTOR_BUNDLED_CONFIGS/spark_options.json $JUPYTER_CONFIG_DIR/nbconfig/sparkconnector_spark_options.json
-#   fi
-#  _log "Completed Spark Configuration"
-
-#  SETUP_SPARK_TIME_SEC=$(echo $(date +%s.%N --date="$START_TIME_SETUP_SPARK seconds ago") | bc)
-#  _log "user: $USER, host: ${SERVER_HOSTNAME%%.*}, metric: configure_user_env_spark.${ROOT_LCG_VIEW_NAME:-none}.${SPARK_CLUSTER_NAME:-none}.duration_sec, value: $SETUP_SPARK_TIME_SEC"
-# fi
-
 # Run user startup script
 export JUPYTER_DATA_DIR=$LCG_VIEW/share/jupyter 
 TMP_SCRIPT=`mktemp`

@@ -77,21 +77,16 @@ RUN tlmgr install adjustbox \
 
 # Install all of our extensions
 # Ignore (almost all) dependencies because they have already been installed or come from CVMFS
-# RUN pip install --no-deps --no-cache-dir \
-#    jupyter-resource-usage==0.6.0 \
-#    swancontents==1.4.2 \
-#    swanhelp==2.0.2 \
-#    swanintro==1.0.0 \
-#    swankernelenv==1.0.0 \
-#    swannotebookviewer==1.2.0 \
-#    swannotifications==1.0.0 \
-#    swanoauthrenew==1.0.1 PyJWT \
-#    swanshare==1.1.1 \
-#    swanportallocator==1.0.1
+RUN pip install --no-deps --no-cache-dir \
+    swancontents==2.0.0 \
+    swanhelp==3.0.2 \
+    swankernelenv==1.0.0 \
+    swanoauthrenew==1.0.1  \
+    swanshare==2.0.0 \
+    swanportallocator==1.0.1
 
-# Python configuration
-# Add jupyter notebook configuration
-ADD python/jupyter_server_config.py /home/${NB_USER}/.jupyter/jupyter_server_config.py
+# pip install required deps
+RUN pip install PyJWT
 
 # User session configuration scripts
 # Add scripts

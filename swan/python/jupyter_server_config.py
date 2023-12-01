@@ -5,7 +5,7 @@ c.NotebookNotary.secret_file = os.environ.get("JUPYTER_PATH") + "/notebook_secre
 
 c.ServerApp.root_dir = os.environ.get("HOME")
 
-c.NotebookApp.contents_manager_class = "swancontents.filemanager.SwanEosFileManager"
+c.ServerApp.contents_manager_class = "swancontents.filemanager.SwanEosFileManager"
 
 root_data_dir = os.environ.get("ROOT_DATA_DIR")
 if root_data_dir is not None:

@@ -44,7 +44,7 @@ export PYTHONPATH=/usr/local/lib/swan/extensions/:$PYTHONPATH
 # Run user startup script
 export JUPYTER_DATA_DIR=$LCG_VIEW/share/jupyter 
 TMP_SCRIPT=`mktemp`
-if [ ! -n $USER_ENV_SCRIPT ]:
+if [[ ! -n $USER_ENV_SCRIPT ]];
 then
   _log "User did not set a script";
 elif [[ $USER_ENV_SCRIPT && -f `eval echo $USER_ENV_SCRIPT` ]];

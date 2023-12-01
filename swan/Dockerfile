@@ -3,7 +3,7 @@
 # This installs the SWAN packages to enable 
 # using Jupyter with EOS and CVMFS
 
-FROM gitlab-registry.cern.ch/pesteves/imageregistry:notebook
+FROM gitlab.cern.ch/swan/docker-images/jupyter:base
 
 LABEL maintainer="swan-admins@cern.ch"
 

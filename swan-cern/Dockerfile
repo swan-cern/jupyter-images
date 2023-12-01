@@ -29,7 +29,7 @@ RUN dnf install -y \
     time \
     xz-lzma-compat \
     # Required by Oracle
-    libaio \
+    libaio && \
     # Clear the dnf cache as we no longer need to install packages
     dnf clean all && \
     rm -rf /var/cache/dnf

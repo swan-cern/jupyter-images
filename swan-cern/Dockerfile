@@ -53,14 +53,20 @@ ENV DASK_DIR=/srv/dask
 ENV DASK_LIB_DIR=${DASK_DIR}/lib
 ENV DASK_TLS_DIR=${DASK_DIR}/tls
 
-RUN mkdir -p ${DASK_LIB_DIR} ${DASK_TLS_DIR}
+USER root
+
+RUN mkdir -p ${DASK_LIB_DIR} ${DASK_TLS_DIR} && \
+    fix-permissions ${DASK_LIB_DIR} && \
+    fix-permissions ${DASK_TLS_DIR}
+
+USER ${NB_UID}
 
 # Install swandaskcluster in its own lib dir so that we can add it individually
 # to the PYTHONPATH of notebooks and terminals, which need it to do automatic
 # TLS configuration for Dask clients
 RUN pip install --no-deps --no-cache-dir --target ${DASK_LIB_DIR} \
         swandaskcluster==2.0.1
-        
+
 # Dependency of swandaskcluster
 RUN ln -s /usr/local/lib/python3.9/site-packages/swanportallocator ${DASK_LIB_DIR}
 

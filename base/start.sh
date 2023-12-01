@@ -87,7 +87,6 @@ if [ "$(id -u)" == 0 ] ; then
             mkdir "/home/${NB_USER}"
             if cp -a /home/jovyan/. "/home/${NB_USER}/"; then
                 _log "Success!"
-                rm -rf /home/jovyan
             else
                 _log "Failed to copy data from /home/jovyan to /home/${NB_USER}!"
                 _log "Attempting to symlink /home/jovyan to /home/${NB_USER}..."

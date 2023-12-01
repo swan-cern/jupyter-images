@@ -59,7 +59,8 @@ RUN mamba install --yes \
 
 
 # Install TeX Live required packages
-RUN tlmgr install adjustbox \
+RUN tlmgr install \
+    adjustbox \
     tcolorbox \
     environ \
     trimspaces \
@@ -82,8 +83,9 @@ RUN pip install --no-deps --no-cache-dir \
     swanshare==2.0.0 \
     swanportallocator==1.0.1
 
-# pip install required deps
-RUN pip install PyJWT
+RUN pip install \ 
+    # Required dependency for swanoauthrenew
+    PyJWT
 
 # User session configuration scripts
 # Add scripts

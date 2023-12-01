@@ -94,6 +94,14 @@ COPY scripts/before-notebook.d/* /usr/local/bin/before-notebook.d
 RUN mkdir /srv/singleuser/scripts
 COPY scripts/others/* /srv/singleuser/scripts
 
+# Add Python 3 kernel configuration
+RUN mkdir -p /home/${NB_USER}/.local/share/jupyter/kernels/python3
+ADD config/kernel.json  /home/${NB_USER}/.local/share/jupyter/kernels/python3/kernel.json
+
+# Python configuration
+# Add jupyter notebook configuration
+ADD python/jupyter_server_config.py /home/${NB_USER}/.jupyter/jupyter_server_config.py
+
 USER root
 
 # Grant scripts execution permissions
@@ -104,11 +112,3 @@ ADD python/configure_kernels_and_terminal.py /srv/singleuser/configure_kernels_a
 
 # Switch back to jovyan to avoid accidental container runs as root
 USER ${NB_UID}
-
-# Add Python 3 kernel configuration
-RUN mkdir -p /home/${NB_USER}/.local/share/jupyter/kernels/python3
-ADD config/kernel.json  /home/${NB_USER}/.local/share/jupyter/kernels/python3/kernel.json
-
-# Python configuration
-# Add jupyter notebook configuration
-ADD python/jupyter_server_config.py /home/${NB_USER}/.jupyter/jupyter_server_config.py

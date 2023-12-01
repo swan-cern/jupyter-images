@@ -90,7 +90,9 @@ RUN pip install \
 # User session configuration scripts
 # Add scripts
 COPY scripts/before-notebook.d/* /usr/local/bin/before-notebook.d
-ADD scripts/03_userconfig.sh /srv/singleuser/03_userconfig.sh
+
+RUN mkdir /srv/singleuser/scripts
+COPY scripts/others/* /srv/singleuser/scripts
 
 USER root
 

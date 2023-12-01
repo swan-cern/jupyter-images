@@ -74,7 +74,7 @@ fi
 chown -R $NB_USER:$NB_GID $LOCAL_HOME
 
 _log "Running user configuration script for user $NB_USER."
-sudo -E -u $NB_USER bash /tmp/03_userconfig.sh
+sudo -E -u $NB_USER bash /srv/singleuser/03_userconfig.sh
 
 if [ $? -ne 0 ]
 then

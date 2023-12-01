@@ -1,5 +1,5 @@
 
-FROM FROM gitlab-registry.cern.ch/pesteves/imageregistry:swan-notebook.latest
+FROM gitlab-registry.cern.ch/pesteves/imageregistry:swan-notebook.latest
 
 LABEL maintainer="swan-admins@cern.ch"
 ARG NB_UID="1000"

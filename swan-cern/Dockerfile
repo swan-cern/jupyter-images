@@ -34,6 +34,8 @@ RUN dnf install -y \
     dnf clean all && \
     rm -rf /var/cache/dnf
 
+USER ${NB_UID}
+
 # Install all of our extensions required to access Spark, HDFS and Dask.
 # Ignore (almost all) dependencies because they have already been installed or come from CVMFS
 RUN pip install --no-deps --no-cache-dir \

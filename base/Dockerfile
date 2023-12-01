@@ -226,3 +226,15 @@ RUN pip install --no-cache-dir swanheader==2.0.1
 # This disables the Jupyter project communication warnings that appear in the UI.
 # Users cannot do anything about it (i.e update Jupyter), so it's better to hide it.
 RUN jupyter labextension disable "@jupyterlab/apputils-extension:announcements"
+USER root
+
+# This setting disables the creation of the home directory for
+# new users, which is enabled by default. It is needed, so that
+# the start.sh script is able to create the directory and copy
+# the files from jovyan to the new user home.
+# It is required because this is the default behaviour in ubuntu
+# but not in AlmaLinux 9.
+RUN sed -i 's/CREATE_HOME.*/CREATE_HOME 0/g' /etc/login.defs
+
+# Switch back to jovyan to avoid accidental container runs as root
+USER ${NB_UID}

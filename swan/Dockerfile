@@ -75,9 +75,6 @@ RUN tlmgr install adjustbox \
     cm-super \
     collection-fontsrecommended
 
-# Required by jupyter-resource-usage
-RUN pip install --no-deps --no-cache-dir psutil==5.8.0
-
 # Install all of our extensions
 # Ignore (almost all) dependencies because they have already been installed or come from CVMFS
 # RUN pip install --no-deps --no-cache-dir \

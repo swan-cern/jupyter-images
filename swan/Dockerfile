@@ -54,10 +54,12 @@ RUN mamba install --yes \
     'jupyter_nbextensions_configurator==0.6.1' \
     'voila==0.5.5' \
     'ipyparallel==8.6.1' \
+    'jupyter-server-proxy==4.1.0' \
+    'jupyter-resource-usage==1.0.1' \
     # Extensions required by jupyter server
-    'aiohttp==3.9.0' \
-    'panel==1.3.2' \
+    'panel==1.3.4' \
     'webio-jupyter-extension==0.1.0'
+
 
 # Install TeX Live required packages
 RUN tlmgr install adjustbox \

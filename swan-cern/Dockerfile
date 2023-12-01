@@ -43,5 +43,38 @@ RUN pip install --no-deps --no-cache-dir \
     sparkconnector==2.4.6 \
     sparkmonitor==2.1.1
 
-# swandask must be installed after its dependency dask-labextension to disable the server extension automatically
+# swandask must be installed after its dependency dask-labextension to disable
+# the server extension automatically
 RUN pip install --no-deps --no-cache-dir swandask==0.0.3
+
+# Configure Dask
+# Set Dask environment
+ENV DASK_DIR=/srv/dask
+ENV DASK_LIB_DIR=${DASK_DIR}/lib
+ENV DASK_TLS_DIR=${DASK_DIR}/tls
+
+RUN mkdir -p ${DASK_LIB_DIR} ${DASK_TLS_DIR}
+
+# Install swandaskcluster in its own lib dir so that we can add it individually
+# to the PYTHONPATH of notebooks and terminals, which need it to do automatic
+# TLS configuration for Dask clients
+RUN pip install --no-deps --no-cache-dir --target ${DASK_LIB_DIR} \
+        swandaskcluster==2.0.1
+        
+# Dependency of swandaskcluster
+RUN ln -s /usr/local/lib/python3.9/site-packages/swanportallocator ${DASK_LIB_DIR}
+
+# Add script to create dask secrets
+ADD scripts/others/create_dask_secrets.sh /srv/singleuser/create_dask_secrets.sh
+
+# User session configuration scripts
+# Add scripts to be run before the jupyter server starts
+COPY scripts/before-notebook.d/* /usr/local/bin/before-notebook.d
+
+USER root
+
+# Grant scripts execution permissions
+RUN chmod +x /usr/local/bin/before-notebook.d/*
+
+# Switch back to jovyan to avoid accidental container runs as root
+USER ${NB_UID}

@@ -1,10 +1,16 @@
 #!/bin/bash
 
-# Author: Danilo Piparo, Enric Tejedor, Pedro Maximino 2023
+# Author: Danilo Piparo, Enric Tejedor, Pedro Maximino, Diogo Castro 2023
 # Copyright CERN
-# The HT Condor environment is condfigured here.
+# The HT Condor environment is configured here.
 
 # HTCondor at CERN integration
+if [[ ! -n $CERN_HTCONDOR ]]
+then
+  _log "Skipping HTCondor configuration";
+  exit 0;
+fi
+
 if [[ $CERN_HTCONDOR ]]
 then
   export CONDOR_CONFIG=/eos/project/l/lxbatch/public/config-condor-swan/condor_config
@@ -14,9 +20,7 @@ then
   ln -s /eos/project/l/lxbatch/public/config-condor-swan/ngbauth-submit /etc/sysconfig/ngbauth-submit
 
   # Create self-signed certificate for Dask processes
-  log_info "Generating certificate for Dask"
-  export DASK_TLS_DIR=$DASK_DIR/tls
-  mkdir $DASK_TLS_DIR
+  _log "Generating certificate for Dask"
   chown -R $NB_USER:$NB_USER $DASK_TLS_DIR
   sudo -u $NB_USER sh /srv/singleuser/create_dask_certs.sh $DASK_TLS_DIR &
 

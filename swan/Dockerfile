@@ -19,7 +19,13 @@ USER root
 
 # Install required dnf packages
 RUN dnf install -y \
+    # Required by before-notebook scripts
+    bc \
+    # Required for key4hep
+    environment-modules \
     git \
+    # Useful to monitor resource consumption
+    htop \
     nano \
     patch \
     unzip \
@@ -27,26 +33,15 @@ RUN dnf install -y \
     # Texlive and fontconfig packages are used to convert 
     # notebooks into different formats
     texlive \
-    fontconfig
+    fontconfig && \
+    # Clear the dnf cache as we no longer need to install packages
+    dnf clean all && \
+    rm -rf /var/cache/dnf
 
 # Install HEP_OSlibs
 # This installs system packages for LCGs to work
 RUN dnf -y install https://linuxsoft.cern.ch/wlcg/el9/x86_64/wlcg-repo-1.0.0-1.el9.noarch.rpm
 RUN dnf -y install HEP_OSlibs-9.1.0-2.el9
-
-# TODO: Move spark related packages to the third image
-
-# Install required packages
-RUN dnf install -y \
-    # Required by before-notebook scripts.
-    bc \
-    # Useful to monitor resource consumption
-    htop \
-    # Required for key4hep
-    environment-modules && \
-    # Clear the dnf cache as we no longer need to install packages
-    dnf clean all && \
-    rm -rf /var/cache/dnf
 
 # Switch back to jovyan to avoid accidental container runs as root
 USER ${NB_UID}

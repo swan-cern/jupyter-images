@@ -24,6 +24,8 @@ RUN dnf install -y \
     patch \
     unzip \
     which \
+    # Texlive and fontconfig packages are used to convert 
+    # notebooks into different formats
     texlive \
     fontconfig
 

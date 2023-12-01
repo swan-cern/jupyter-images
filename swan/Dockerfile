@@ -91,7 +91,7 @@ RUN pip install PyJWT
 # User session configuration scripts
 # Add scripts
 COPY scripts/before-notebook.d/* /usr/local/bin/before-notebook.d
-ADD scripts/03_userconfig.sh /tmp
+ADD scripts/03_userconfig.sh /srv/singleuser/03_userconfig.sh
 
 USER root
 
@@ -101,9 +101,13 @@ RUN chmod +x /usr/local/bin/before-notebook.d/*
 # Add python scripts
 ADD python/configure_kernels_and_terminal.py /srv/singleuser/configure_kernels_and_terminal.py
 
+# Switch back to jovyan to avoid accidental container runs as root
+USER ${NB_UID}
+
 # Add Python 3 kernel configuration
 RUN mkdir -p /home/${NB_USER}/.local/share/jupyter/kernels/python3
 ADD config/kernel.json  /home/${NB_USER}/.local/share/jupyter/kernels/python3/kernel.json
 
-# Switch back to jovyan to avoid accidental container runs as root
-USER ${NB_UID}
+# Python configuration
+# Add jupyter notebook configuration
+ADD python/jupyter_server_config.py /home/${NB_USER}/.jupyter/jupyter_server_config.py

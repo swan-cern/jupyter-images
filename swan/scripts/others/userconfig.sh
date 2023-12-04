@@ -15,7 +15,6 @@ START_TIME_SETUP_SWAN_HOME=$( date +%s.%N )
 SETUP_SWAN_HOME_TIME_SEC=$(echo $(date +%s.%N --date="$START_TIME_SETUP_SWAN_HOME seconds ago") | bc)
 _log "user: $USER, host: ${SERVER_HOSTNAME%%.*}, metric: configure_user_env_swan_home.duration_sec, value: $SETUP_SWAN_HOME_TIME_SEC"
 
-# FIXME: Move to extensions.
 # Persist enabled notebook nbextensions
 SWAN_PROJECTS=$HOME/SWAN_projects
 NBCONFIG=$JPY_DIR/nbconfig

@@ -2,8 +2,8 @@
 
 # Author: Danilo Piparo, Enric Tejedor, Pedro Maximino, Diogo Castro 2023
 # Copyright CERN
-# Here the user session is configured, including the home directory and 
-# the terminal.
+# Here the software environment for notebooks and terminals is configured, 
+# using the LCG release as basis and (possibly) a user environment script.
 
 _log () {
     if [[ "$*" == "ERROR:"* ]] || [[ "$*" == "WARNING:"* ]] || [[ "${JUPYTER_DOCKER_STACKS_QUIET}" == "" ]]; then

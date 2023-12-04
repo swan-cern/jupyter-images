@@ -91,9 +91,6 @@ RUN pip install \
 # Add scripts
 COPY scripts/before-notebook.d/* /usr/local/bin/before-notebook.d
 
-RUN mkdir /srv/singleuser/scripts
-COPY scripts/others/* /srv/singleuser/scripts
-
 # Add Python 3 kernel configuration
 RUN mkdir -p /home/${NB_USER}/.local/share/jupyter/kernels/python3
 ADD config/kernel.json  /home/${NB_USER}/.local/share/jupyter/kernels/python3/kernel.json
@@ -109,6 +106,11 @@ RUN chmod +x /usr/local/bin/before-notebook.d/*
 
 # Add python scripts
 ADD python/configure_kernels_and_terminal.py /srv/singleuser/configure_kernels_and_terminal.py
+
+# Add scripts that are not executed automatically but are
+# instead called by our scripts internally
+RUN mkdir /srv/singleuser/scripts
+COPY scripts/others/* /srv/singleuser/scripts
 
 # Switch back to jovyan to avoid accidental container runs as root
 USER ${NB_UID}

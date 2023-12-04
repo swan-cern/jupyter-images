@@ -7,10 +7,6 @@ c.ServerApp.root_dir = os.environ.get("HOME")
 
 c.ServerApp.contents_manager_class = "swancontents.filemanager.SwanEosFileManager"
 
-root_data_dir = os.environ.get("ROOT_DATA_DIR")
-if root_data_dir is not None:
-  c.ServerApp.extra_static_paths = [root_data_dir + "/js"]
-
 # Convert the _xsrf cookie into a session cookie, to prevent it from having an expiration date of 30 days
 # Without this setting, _xsrf cookie could expire in the middle of a user editing a notebook, making it
 # impossible to save the notebook without refreshing the page and losing unsaved changes.

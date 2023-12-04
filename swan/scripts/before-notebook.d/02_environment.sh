@@ -30,8 +30,6 @@ export LCG_VIEW=$ROOT_LCG_VIEW_PATH/$ROOT_LCG_VIEW_NAME/$ROOT_LCG_VIEW_PLATFORM
 
 # symlink $LCG_VIEW/share/jupyter/nbextensions for the notebook extensions
 ln -s $LCG_VIEW/share/jupyter/nbextensions $JUPYTER_PATH
-#Creating a ROOT_DATA_DIR variable
-export ROOT_DATA_DIR=$(readlink $LCG_VIEW/bin/root | sed -e 's/\/bin\/root//g')
 
 cp -L -r $LCG_VIEW/etc/jupyter/* $JUPYTER_CONFIG_DIR
 

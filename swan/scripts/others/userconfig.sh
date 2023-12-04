@@ -31,6 +31,7 @@ rm -f $NBCONFIG/notebook.json
 ln -s $LOCAL_NB_NBEXTENSIONS $NBCONFIG/notebook.json
 
 START_TIME_SETUP_LCG=$( date +%s.%N )
+export JUPYTER_DATA_DIR=$LCG_VIEW/share/jupyter 
 
 # Setup LCG
 source $LCG_VIEW/setup.sh
@@ -42,7 +43,6 @@ _log "user: $USER, host: ${SERVER_HOSTNAME%%.*}, metric: configure_user_env_cvmf
 export PYTHONPATH=/usr/local/lib/swan/extensions/:$PYTHONPATH
 
 # Run user startup script
-export JUPYTER_DATA_DIR=$LCG_VIEW/share/jupyter 
 TMP_SCRIPT=`mktemp`
 if [[ ! -n $USER_ENV_SCRIPT ]];
 then

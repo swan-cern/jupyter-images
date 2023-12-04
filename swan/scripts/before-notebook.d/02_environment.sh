@@ -82,9 +82,6 @@ fi
 
 START_TIME_CONFIGURE_KERNEL_ENV=$( date +%s.%N )
 
-# Make sure we have a sane terminal
-printf "export TERM=xterm\n" >> $SWAN_ENV_FILE
-
 # If there, source users' .bashrc after the SWAN environment
 BASHRC_LOCATION=$HOME/.bashrc
 printf "if [[ -f $BASHRC_LOCATION ]];

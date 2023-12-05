@@ -80,8 +80,7 @@ RUN pip install --no-deps --no-cache-dir \
     swanhelp==3.0.2 \
     swankernelenv==1.0.0 \
     swanoauthrenew==1.0.1  \
-    swanshare==2.0.0 \
-    swanportallocator==1.0.1
+    swanshare==2.0.0
 
 RUN pip install \ 
     # Required dependency for swanoauthrenew

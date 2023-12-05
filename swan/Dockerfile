@@ -86,10 +86,6 @@ RUN pip install \
     # Required dependency for swanoauthrenew
     PyJWT
 
-# User session configuration scripts
-# Add scripts
-COPY scripts/before-notebook.d/* /usr/local/bin/before-notebook.d
-
 # Add Python 3 kernel configuration
 RUN mkdir -p /home/${NB_USER}/.local/share/jupyter/kernels/python3
 ADD config/kernel.json  /home/${NB_USER}/.local/share/jupyter/kernels/python3/kernel.json
@@ -99,6 +95,10 @@ ADD config/kernel.json  /home/${NB_USER}/.local/share/jupyter/kernels/python3/ke
 ADD python/jupyter_server_config.py /home/${NB_USER}/.jupyter/jupyter_server_config.py
 
 USER root
+
+# User session configuration scripts
+# Add scripts
+COPY scripts/before-notebook.d/* /usr/local/bin/before-notebook.d
 
 # Grant scripts execution permissions
 RUN chmod +x /usr/local/bin/before-notebook.d/*

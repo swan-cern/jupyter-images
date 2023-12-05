@@ -3,7 +3,7 @@
 # This installs the SWAN packages to enable 
 # using Jupyter with EOS and CVMFS
 
-FROM gitlab-registry.cern.ch/swan/docker-images/jupyter/base:v0.0.1
+FROM gitlab-registry.cern.ch/pesteves/imageregistry:notebook
 
 LABEL maintainer="swan-admins@cern.ch"
 
@@ -57,7 +57,6 @@ RUN mamba install --yes \
     'panel==1.3.4' \
     'webio-jupyter-extension==0.1.0'
 
-
 # Install TeX Live required packages
 RUN tlmgr install \
     adjustbox \
@@ -95,6 +94,12 @@ ADD config/kernel.json  /home/${NB_USER}/.local/share/jupyter/kernels/python3/ke
 ADD python/jupyter_server_config.py /home/${NB_USER}/.jupyter/jupyter_server_config.py
 
 USER root
+
+# Expose swankernelenv to the user environment in notebooks.
+# swankernelenv removes the swan/extensions directory from the PYTHONPATH
+# when the notebook starts. Check EOF of userconfig.sh
+RUN mkdir -p /usr/local/lib/swan/extensions && \
+    ln -s $(pip show swankernelenv | grep 'Location:' | awk '{print $2}')/swankernelenv /usr/local/lib/swan/extensions/
 
 # User session configuration scripts
 # Add scripts

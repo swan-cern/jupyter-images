@@ -7,16 +7,6 @@ c.ServerApp.root_dir = os.environ.get("HOME")
 
 c.ServerApp.contents_manager_class = "swancontents.filemanager.SwanEosFileManager"
 
-# Convert the _xsrf cookie into a session cookie, to prevent it from having an expiration date of 30 days
-# Without this setting, _xsrf cookie could expire in the middle of a user editing a notebook, making it
-# impossible to save the notebook without refreshing the page and losing unsaved changes.
-# c.NotebookApp.tornado_settings = {
-#   "xsrf_cookie_kwargs": {
-#     "expires_days": None,
-#     "expires": None
-#   }
-# }
-
 cernbox_oauth_id = os.environ.get("CERNBOX_OAUTH_ID", "cernbox-service")
 eos_oauth_id = os.environ.get("EOS_OAUTH_ID", "eos-service")
 oauth2_file = os.environ.get("OAUTH2_FILE", "")

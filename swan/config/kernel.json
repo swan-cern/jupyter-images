@@ -4,6 +4,8 @@
     "argv": [
      "python",
      "-s",
+     "-m",
+     "ipykernel",
      "-f",
      "{connection_file}"
     ]

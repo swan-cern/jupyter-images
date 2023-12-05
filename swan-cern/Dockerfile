@@ -65,13 +65,13 @@ USER ${NB_UID}
 # to the PYTHONPATH of notebooks and terminals, which need it to do automatic
 # TLS configuration for Dask clients
 RUN pip install --no-deps --no-cache-dir --target ${DASK_LIB_DIR} \
-        swandaskcluster==2.0.1
+    swandaskcluster==2.0.1
 
 # Dependency of swandaskcluster
 RUN ln -s /usr/local/lib/python3.9/site-packages/swanportallocator ${DASK_LIB_DIR}
 
 # Add script to create dask secrets
-ADD scripts/others/create_dask_secrets.sh /srv/singleuser/create_dask_secrets.sh
+ADD scripts/others/create_dask_certs.sh /srv/singleuser/create_dask_certs.sh
 
 # User session configuration scripts
 # Add scripts to be run before the jupyter server starts

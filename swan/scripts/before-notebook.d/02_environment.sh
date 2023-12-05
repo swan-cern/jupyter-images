@@ -67,7 +67,7 @@ then
   cp -rL $JULIA_KERNEL_PATH $KERNEL_DIR
 fi
 
-# Grant privileges to all files inside the created directories and subdirectoies
+# Grant privileges to all files inside the created directories and subdirectories
 # to the user
 chown -R $NB_USER:$NB_GID $LOCAL_HOME
 

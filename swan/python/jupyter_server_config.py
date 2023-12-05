@@ -3,6 +3,8 @@ import os
 c.NotebookNotary.db_file = os.environ.get("JUPYTER_PATH") + "/nbsignatures.db"
 c.NotebookNotary.secret_file = os.environ.get("JUPYTER_PATH") + "/notebook_secret"
 
+# Configure jupyter lab to start in the HOME of the user
+# which is usually EOS for CERN users.
 c.ServerApp.root_dir = os.environ.get("HOME")
 
 c.ServerApp.contents_manager_class = "swancontents.filemanager.SwanEosFileManager"

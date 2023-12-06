@@ -56,7 +56,7 @@ USER root
 
 RUN mkdir -p ${DASK_LIB_DIR} ${DASK_TLS_DIR} && \
     fix-permissions ${DASK_LIB_DIR} && \
-    fix-permissions ${DASK_TLS_DIR}
+    chown -R ${NB_USER}:${NB_GID} ${DASK_TLS_DIR}
 
 USER ${NB_UID}
 

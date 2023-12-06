@@ -8,6 +8,8 @@
 
 if [[ -n $SPARK_CLUSTER_NAME ]]
 then
+   _log "Configuring Spark";
+   
   # Jupyter server configuration path
   JPY_CONFIG=$JUPYTER_CONFIG_DIR/jupyter_server_config.py
   LOCAL_IP=`hostname -i`
@@ -31,7 +33,6 @@ then
       }
     }
   }' | jq '.' > /etc/jupyter/jupyter_notebook_config.json
-  _log "Configuring Spark";
 else
   # Disable spark jupyterlab extensions enabled by default if no cluster is selected
   mkdir -p /etc/jupyter/labconfig

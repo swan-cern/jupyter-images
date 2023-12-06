@@ -17,18 +17,6 @@ then
   _log "Generating certificate for Dask"
   chown -R $NB_USER:$NB_GID $DASK_TLS_DIR
   sudo -u $NB_USER sh /srv/singleuser/create_dask_certs.sh $DASK_TLS_DIR &
-
-  # Dask config: lab extension must use SwanHTCondorCluster
-  DASK_CONFIG_DIR=/etc/dask 
-  mkdir $DASK_CONFIG_DIR
-  echo "
-labextension:
-  factory:
-    module: 'swandaskcluster'
-    class: 'SwanHTCondorCluster'
-    args: []
-    kwargs: {}  
-  " > $DASK_CONFIG_DIR/labextension.yaml
 else
    _log "Skipping HTCondor configuration";
 fi

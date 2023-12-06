@@ -103,7 +103,7 @@ RUN mkdir -p /usr/local/lib/swan/extensions && \
 
 # User session configuration scripts
 # Add scripts
-COPY scripts/before-notebook.d/* /usr/local/bin/before-notebook.d
+COPY scripts/before-notebook.d/* /usr/local/bin/before-notebook.d/
 
 # Grant scripts execution permissions
 RUN chmod +x /usr/local/bin/before-notebook.d/*

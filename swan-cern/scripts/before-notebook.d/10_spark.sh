@@ -20,19 +20,13 @@ then
   # we don't want to persist the Spark extensions across sessions)
   mkdir -p /etc/jupyter/nbconfig
   _log "Globally enabling the Spark extensions"
-  echo '{
-    "load_extensions": {
-      "sparkconnector/extension": true
-    }
-  }' | jq '.' > /etc/jupyter/nbconfig/notebook.json
+  jq -n --argjson sparkconnector/extension true \
+        '{load_extensions: $ARGS.named}' > /etc/jupyter/nbconfig/notebook.json
 else
   # Disable spark jupyterlab extensions enabled by default if no cluster is selected
   mkdir -p /etc/jupyter/labconfig
-  echo "{
-    \"disabledExtensions\": {
-      \"sparkconnector\": true,
-      \"jupyterlab_sparkmonitor\": true
-    }
-  }" > /etc/jupyter/labconfig/page_config.json
+  jq -n --argjson sparkconnector true \
+        --argjson jupyterlab_sparkmonitor true \
+        '{disabledExtensions: $ARGS.named}' > /etc/jupyter/labconfig/page_config.json
   _log "Skipping Spark configuration";
 fi

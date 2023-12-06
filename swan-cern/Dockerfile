@@ -74,11 +74,18 @@ ADD scripts/others/create_dask_certs.sh /srv/singleuser/create_dask_certs.sh
 # Dask config: lab extension must use SwanHTCondorCluster
 ADD config/labextension.yaml /etc/dask/labextension.yaml
 
-# User session configuration scripts
-# Add scripts to be run before the jupyter server starts
-COPY scripts/before-notebook.d/* /usr/local/bin/before-notebook.d
-
 USER root
+
+# Dependency of swandaskcluster
+RUN ln -s $(pip show swanportallocator | grep -oP 'Location: \K.*')/swanportallocator ${DASK_LIB_DIR}
+
+# Create symlinks for the remaining swan extensions, because
+# they need to be accessible in the user environment
+RUN ln -s $(pip show sparkconnector | grep -oP 'Location: \K.*')/sparkconnector /usr/local/lib/swan/extensions/ && \
+    ln -s $(pip show sparkmonitor | grep -oP 'Location: \K.*')/sparkmonitor /usr/local/lib/swan/extensions/ && \
+    ln -s $(pip show swandask | grep -oP 'Location: \K.*')/swandask /usr/local/lib/swan/extensions/ && \
+    ln -s $(pip show dask-labextension | grep -oP 'Location: \K.*')/dask-labextension /usr/local/lib/swan/extensions/ && \
+    ln -s $(pip show jupyter-server-proxy | grep -oP 'Location: \K.*')/jupyter_server_proxy /usr/local/lib/swan/extensions/
 
 # Grant scripts execution permissions
 RUN chmod +x /usr/local/bin/before-notebook.d/*

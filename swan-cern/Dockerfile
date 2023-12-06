@@ -50,7 +50,8 @@ USER ${NB_UID}
 # Add scripts to be run before the jupyter server starts
 COPY scripts/before-notebook.d/* /usr/local/bin/before-notebook.d
 
-# dask-labextension is used to disable the server extension automatically
+# dask-labextension needs to be installed first so its lab extension
+# gets disabled automatically when installing swandask
 RUN  pip install --no-deps --no-cache-dir dask-labextension==7.0.0
 
 # Install all of our extensions required to access Spark, HDFS and Dask.

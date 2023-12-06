@@ -2,7 +2,8 @@
 
 # Author: Danilo Piparo, Enric Tejedor, Pedro Maximino, Diogo Castro 2023
 # Copyright CERN
-# The HT Condor environment is configured here.
+# The HT Condor environment is configured here. It creates the certificates
+# and sets additional configuration to access a dask cluster.
 
 # HTCondor at CERN integration
 if [[ $CERN_HTCONDOR ]]

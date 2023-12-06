@@ -2,7 +2,9 @@
 
 # Author: Danilo Piparo, Enric Tejedor, Pedro Maximino, Diogo Castro 2023
 # Copyright CERN
-# The environment for Spark is configured here.
+# The environment for Spark is configured here. It allows CERN users to
+# connect to spark clusters and use their computational resources
+# through SWAN.
 
 if [[ -n $SPARK_CLUSTER_NAME ]]
 then

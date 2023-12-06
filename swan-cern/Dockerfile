@@ -40,7 +40,8 @@ USER ${NB_UID}
 RUN pip install --no-deps --no-cache-dir \
     dask-labextension==7.0.0 \
     sparkconnector==2.4.6 \
-    sparkmonitor==2.1.1
+    sparkmonitor==2.1.1 \
+    swanportallocator==1.0.1
 
 # swandask must be installed after its dependency dask-labextension to disable
 # the server extension automatically

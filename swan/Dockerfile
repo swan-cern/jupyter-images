@@ -75,7 +75,7 @@ RUN tlmgr install \
 # Install all of our extensions
 # Ignore (almost all) dependencies because they have already been installed or come from CVMFS
 RUN pip install --no-deps --no-cache-dir \
-    swancontents==2.0.0 \
+    swancontents==2.1.0 \
     swanhelp==3.0.2 \
     swankernelenv==1.0.0 \
     swanoauthrenew==1.0.1  \

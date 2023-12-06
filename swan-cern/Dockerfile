@@ -15,7 +15,6 @@ RUN dnf install -y \
     # Install Cloudera dependencies - required by IT Spark clusters
     alsa-lib \
     at \
-    bc \
     cronie \
     cvs \
     file \

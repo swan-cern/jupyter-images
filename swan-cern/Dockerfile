@@ -1,12 +1,13 @@
+ARG VERSION_PARENT=v0.0.1
 
-FROM gitlab-registry.cern.ch/pesteves/imageregistry:swan-notebook.latest
+FROM gitlab-registry.cern.ch/swan/docker-images/jupyter/swan-cern:${VERSION_PARENT}
 
 LABEL maintainer="swan-admins@cern.ch"
 ARG NB_UID="1000"
 ARG BUILD_TAG=daily
 ENV VERSION_DOCKER_IMAGE=$BUILD_TAG
 
-RUN echo "Building swan-cern image with tag ${VERSION_DOCKER_IMAGE}"
+RUN echo "Building swan-cern image with tag ${VERSION_DOCKER_IMAGE} from parent tag ${VERSION_PARENT}."
 
 # Switch to superuser to install packages
 USER root

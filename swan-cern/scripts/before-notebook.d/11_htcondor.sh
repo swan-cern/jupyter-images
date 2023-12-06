@@ -18,6 +18,7 @@ then
   _log "Generating certificate for Dask"
   chown -R $NB_USER:$NB_GID $DASK_TLS_DIR
   sudo -u $NB_USER sh /srv/singleuser/create_dask_certs.sh $DASK_TLS_DIR &
+  _log "Configuring HTCondor";
 else
    _log "Skipping HTCondor configuration";
 fi

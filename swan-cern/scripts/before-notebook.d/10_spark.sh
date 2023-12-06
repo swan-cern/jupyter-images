@@ -9,7 +9,7 @@
 if [[ -n $SPARK_CLUSTER_NAME ]]
 then
    _log "Configuring Spark";
-   
+
   # Jupyter server configuration path
   JPY_CONFIG=$JUPYTER_CONFIG_DIR/jupyter_server_config.py
   LOCAL_IP=`hostname -i`
@@ -25,14 +25,6 @@ then
       "sparkconnector/extension": true
     }
   }' | jq '.' > /etc/jupyter/nbconfig/notebook.json
-
-  echo '{
-    "NotebookApp": {
-      "jpserver_extensions": {
-        "hdfsbrowser.serverextension": true
-      }
-    }
-  }' | jq '.' > /etc/jupyter/jupyter_notebook_config.json
 else
   # Disable spark jupyterlab extensions enabled by default if no cluster is selected
   mkdir -p /etc/jupyter/labconfig

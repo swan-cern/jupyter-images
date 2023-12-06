@@ -73,6 +73,10 @@ RUN ln -s /usr/local/lib/python3.9/site-packages/swanportallocator ${DASK_LIB_DI
 # Add script to create dask secrets
 ADD scripts/others/create_dask_certs.sh /srv/singleuser/create_dask_certs.sh
 
+# Add dask configuration file
+# Dask config: lab extension must use SwanHTCondorCluster
+ADD config/labextension.yaml /etc/dask/labextension.yaml
+
 # User session configuration scripts
 # Add scripts to be run before the jupyter server starts
 COPY scripts/before-notebook.d/* /usr/local/bin/before-notebook.d

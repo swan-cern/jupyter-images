@@ -35,17 +35,16 @@ RUN dnf install -y \
 
 USER ${NB_UID}
 
+# dask-labextension is used to disable the server extension automatically
+RUN  pip install --no-deps --no-cache-dir dask-labextension==7.0.0
+
 # Install all of our extensions required to access Spark, HDFS and Dask.
 # Ignore (almost all) dependencies because they have already been installed or come from CVMFS
 RUN pip install --no-deps --no-cache-dir \
-    dask-labextension==7.0.0 \
     sparkconnector==2.4.6 \
     sparkmonitor==2.1.1 \
-    swanportallocator==1.0.1
-
-# swandask must be installed after its dependency dask-labextension to disable
-# the server extension automatically
-RUN pip install --no-deps --no-cache-dir swandask==0.0.3
+    swanportallocator==1.0.1 \
+    swandask==0.0.3
 
 # Configure Dask
 # Set Dask environment

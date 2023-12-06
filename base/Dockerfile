@@ -236,5 +236,12 @@ USER root
 # but not in AlmaLinux 9.
 RUN sed -i 's/CREATE_HOME.*/CREATE_HOME 0/g' /etc/login.defs
 
+# TEMPORARY: apply a patch to the auth file in JupyterHub,
+# while we wait for the release of a new version with it
+ADD patches/log_patch.diff /tmp/log_patch.diff
+RUN dnf install -y patch
+RUN patch /opt/conda/lib/python${PYTHON_VERSION}/site-packages/jupyterhub/services/auth.py /tmp/log_patch.diff && \
+    rm -f /tmp/log_patch.diff
+
 # Switch back to jovyan to avoid accidental container runs as root
 USER ${NB_UID}

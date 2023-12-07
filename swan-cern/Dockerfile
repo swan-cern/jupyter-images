@@ -68,8 +68,8 @@ RUN pip install --no-deps --no-cache-dir \
 RUN pip install --no-deps --no-cache-dir --target ${DASK_LIB_DIR} \
     swandaskcluster==2.0.1
 
-# Add script to create dask secrets
-ADD scripts/others/create_dask_certs.sh /srv/singleuser/create_dask_certs.sh
+# Add helper scripts
+COPY scripts/others/* /srv/singleuser/
 
 # Add dask configuration file
 # Dask config: lab extension must use SwanHTCondorCluster

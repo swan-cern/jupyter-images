@@ -48,7 +48,7 @@ USER ${NB_UID}
 
 # User session configuration scripts
 # Add scripts to be run before the jupyter server starts
-COPY scripts/before-notebook.d/* /usr/local/bin/before-notebook.d
+COPY scripts/before-notebook.d/* /usr/local/bin/before-notebook.d/
 
 # dask-labextension needs to be installed first so its lab extension
 # gets disabled automatically when installing swandask

@@ -52,7 +52,7 @@ COPY scripts/before-notebook.d/* /usr/local/bin/before-notebook.d
 
 # dask-labextension needs to be installed first so its lab extension
 # gets disabled automatically when installing swandask
-RUN  pip install --no-deps --no-cache-dir dask-labextension==7.0.0
+RUN pip install --no-deps --no-cache-dir dask-labextension==7.0.0
 
 # Install all of our extensions required to access Spark, HDFS and Dask.
 # Ignore dependencies because they have already been installed or come from CVMFS

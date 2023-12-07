@@ -73,7 +73,7 @@ ADD scripts/others/create_dask_certs.sh /srv/singleuser/create_dask_certs.sh
 
 # Add dask configuration file
 # Dask config: lab extension must use SwanHTCondorCluster
-ADD config/labextension.yaml /etc/dask/labextension.yaml
+ADD config/dask-labextension.yaml /etc/dask/labextension.yaml
 
 USER root
 

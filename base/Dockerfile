@@ -234,7 +234,14 @@ USER root
 # the files from jovyan to the new user home.
 # It is required because this is the default behaviour in ubuntu
 # but not in AlmaLinux 9.
-RUN sed -i 's/CREATE_HOME.*/CREATE_HOME 0/g' /etc/login.defs
+RUN sed -i 's/^CREATE_HOME.*/CREATE_HOME 0/g' /etc/login.defs
+
+# Remove the warning when running `useradd` about the UID being 
+# outside of the allowed range
+RUN sed -i 's/^UID_MAX.*/UID_MAX 100000/g' /etc/login.defs
+
+# Remove warning about creation of the mailbox when running `useradd`
+RUN sed -i 's/^CREATE_MAIL_SPOOL.*/CREATE_MAIL_SPOOL=no/g' /etc/default/useradd
 
 # TEMPORARY: apply a patch to the auth file in JupyterHub,
 # while we wait for the release of a new version with it

@@ -116,5 +116,11 @@ ADD python/configure_kernels_and_terminal.py /srv/singleuser/configure_kernels_a
 RUN mkdir /srv/singleuser/scripts
 COPY scripts/others/* /srv/singleuser/scripts
 
+# TEMPORARY: apply a patch to the jupyter server proxy handlers,
+# while we wait for the release of a new version with it
+ADD patches/jupyter_server_proxy.diff /tmp/jupyter_server_proxy.diff
+RUN patch $(pip show jupyter-server-proxy | grep -oP 'Location: \K.*')/jupyter_server_proxy/handlers.py /tmp/jupyter_server_proxy.diff && \
+    rm -f /tmp/jupyter_server_proxy.diff
+
 # Switch back to jovyan to avoid accidental container runs as root
 USER ${NB_UID}

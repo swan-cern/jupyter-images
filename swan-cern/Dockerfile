@@ -85,7 +85,7 @@ RUN ln -s $(pip show swanportallocator | grep -oP 'Location: \K.*')/swanportallo
 RUN ln -s $(pip show sparkconnector | grep -oP 'Location: \K.*')/sparkconnector /usr/local/lib/swan/extensions/ && \
     ln -s $(pip show sparkmonitor | grep -oP 'Location: \K.*')/sparkmonitor /usr/local/lib/swan/extensions/ && \
     ln -s $(pip show swandask | grep -oP 'Location: \K.*')/swandask /usr/local/lib/swan/extensions/ && \
-    ln -s $(pip show dask-labextension | grep -oP 'Location: \K.*')/dask-labextension /usr/local/lib/swan/extensions/ && \
+    ln -s $(pip show dask-labextension | grep -oP 'Location: \K.*')/dask_labextension /usr/local/lib/swan/extensions/ && \
     ln -s $(pip show jupyter-server-proxy | grep -oP 'Location: \K.*')/jupyter_server_proxy /usr/local/lib/swan/extensions/
 
 # Grant scripts execution permissions

@@ -44,6 +44,8 @@ def configure_terminal():
         for key, val in dict(os.environ).items():
             if key == "SUDO_COMMAND":
                 continue
+            if key == "TERM": # prevent TERM=unknown from being injected in the env
+                continue
             if key == "PYTHONPATH":
                 val = re.sub("/usr/local/lib/swan/(extensions/)?:", "", val)
             terminal_environment_file.write(f'export {key}="{val}"\n')

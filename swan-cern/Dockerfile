@@ -80,6 +80,7 @@ RUN ln -s $(pip show sparkconnector | grep -oP 'Location: \K.*')/sparkconnector 
     ln -s $(pip show sparkmonitor | grep -oP 'Location: \K.*')/sparkmonitor ${SWAN_LIB_DIR}/extensions/ && \
     ln -s $(pip show swandask | grep -oP 'Location: \K.*')/swandask ${SWAN_LIB_DIR}/extensions/ && \
     ln -s $(pip show dask-labextension | grep -oP 'Location: \K.*')/dask_labextension ${SWAN_LIB_DIR}/extensions/ && \
+    # dependency of dask-labextension
     ln -s $(pip show jupyter-server-proxy | grep -oP 'Location: \K.*')/jupyter_server_proxy ${SWAN_LIB_DIR}/extensions/
 
 # Grant scripts execution permissions

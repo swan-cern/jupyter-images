@@ -34,14 +34,9 @@ RUN dnf install -y \
     dnf clean all && \
     rm -rf /var/cache/dnf
 
-# Configure Dask
-# Set Dask environment
-ENV DASK_DIR=/srv/dask
-ENV DASK_LIB_DIR=${DASK_DIR}/lib
-ENV DASK_TLS_DIR=${DASK_DIR}/tls
-
-RUN mkdir -p ${DASK_LIB_DIR} ${DASK_TLS_DIR} && \
-    fix-permissions ${DASK_LIB_DIR} && \
+# Create directory to store TLS certificates for Dask
+ENV DASK_TLS_DIR=/srv/dask/tls
+RUN mkdir -p ${DASK_TLS_DIR} && \
     chown -R ${NB_USER}:${NB_GID} ${DASK_TLS_DIR}
 
 USER ${NB_UID}
@@ -62,10 +57,9 @@ RUN pip install --no-deps --no-cache-dir \
     swanportallocator==1.0.1 \
     swandask==0.0.3
 
-# Install swandaskcluster in its own lib dir so that we can add it individually
-# to the PYTHONPATH of notebooks and terminals, which need it to do automatic
-# TLS configuration for Dask clients
-RUN pip install --no-deps --no-cache-dir --target ${DASK_LIB_DIR} \
+# Install swandaskcluster in the lib directory that is exposed to notebooks and
+# terminals, which need it to do automatic TLS configuration for Dask clients
+RUN pip install --no-deps --no-cache-dir --target ${SWAN_LIB_DIR}/nb_term_lib \
     swandaskcluster==2.0.1
 
 # Add helper scripts
@@ -78,15 +72,15 @@ ADD config/dask-labextension.yaml /etc/dask/labextension.yaml
 USER root
 
 # Dependency of swandaskcluster
-RUN ln -s $(pip show swanportallocator | grep -oP 'Location: \K.*')/swanportallocator ${DASK_LIB_DIR}
+RUN ln -s $(pip show swanportallocator | grep -oP 'Location: \K.*')/swanportallocator ${SWAN_LIB_DIR}/nb_term_lib
 
 # Create symlinks for the remaining swan extensions, because
 # they need to be accessible in the user environment
-RUN ln -s $(pip show sparkconnector | grep -oP 'Location: \K.*')/sparkconnector /usr/local/lib/swan/extensions/ && \
-    ln -s $(pip show sparkmonitor | grep -oP 'Location: \K.*')/sparkmonitor /usr/local/lib/swan/extensions/ && \
-    ln -s $(pip show swandask | grep -oP 'Location: \K.*')/swandask /usr/local/lib/swan/extensions/ && \
-    ln -s $(pip show dask-labextension | grep -oP 'Location: \K.*')/dask_labextension /usr/local/lib/swan/extensions/ && \
-    ln -s $(pip show jupyter-server-proxy | grep -oP 'Location: \K.*')/jupyter_server_proxy /usr/local/lib/swan/extensions/
+RUN ln -s $(pip show sparkconnector | grep -oP 'Location: \K.*')/sparkconnector ${SWAN_LIB_DIR}/extensions/ && \
+    ln -s $(pip show sparkmonitor | grep -oP 'Location: \K.*')/sparkmonitor ${SWAN_LIB_DIR}/extensions/ && \
+    ln -s $(pip show swandask | grep -oP 'Location: \K.*')/swandask ${SWAN_LIB_DIR}/extensions/ && \
+    ln -s $(pip show dask-labextension | grep -oP 'Location: \K.*')/dask_labextension ${SWAN_LIB_DIR}/extensions/ && \
+    ln -s $(pip show jupyter-server-proxy | grep -oP 'Location: \K.*')/jupyter_server_proxy ${SWAN_LIB_DIR}/extensions/
 
 # Grant scripts execution permissions
 RUN chmod +x /usr/local/bin/before-notebook.d/*

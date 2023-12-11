@@ -38,8 +38,13 @@ source $LCG_VIEW/setup.sh
 SETUP_LCG_TIME_SEC=$(echo $(date +%s.%N --date="$START_TIME_SETUP_LCG seconds ago") | bc)
 _log "user: $USER, host: ${SERVER_HOSTNAME%%.*}, metric: configure_user_env_cvmfs.${ROOT_LCG_VIEW_NAME:-none}.duration_sec, value: $SETUP_LCG_TIME_SEC"
 
-# Add SWAN modules path to PYTHONPATH so that it picks them
-export PYTHONPATH=/usr/local/lib/swan/extensions/:$PYTHONPATH
+# Prepend SWAN extensions path to PYTHONPATH to expose them
+# to the notebook processes
+export PYTHONPATH=$SWAN_LIB_DIR/extensions/:$PYTHONPATH
+
+# Append to PYTHONPATH a directory where to install libraries
+# to be exposed to the user environment (notebooks, terminals)
+export PYTHONPATH=$PYTHONPATH:$SWAN_LIB_DIR/nb_term_lib/
 
 # Run user startup script
 TMP_SCRIPT=`mktemp`

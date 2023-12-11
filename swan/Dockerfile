@@ -14,6 +14,9 @@ ENV VERSION_DOCKER_IMAGE=$BUILD_TAG
 
 RUN echo "Building swan image with tag ${VERSION_DOCKER_IMAGE}"
 
+# Directory to expose SWAN extensions and libraries
+ENV SWAN_LIB_DIR=/usr/local/lib/swan
+
 # Switch to superuser to install packages
 USER root
 
@@ -95,11 +98,18 @@ ADD python/jupyter_server_config.py /home/${NB_USER}/.jupyter/jupyter_server_con
 
 USER root
 
+# Create directories where we will store:
+# - SWAN Jupyter extensions
+# - Libraries to be exposed to notebooks and terminals
+RUN mkdir -p $SWAN_LIB_DIR/extensions && \
+    mkdir -p $SWAN_LIB_DIR/nb_term_lib && \
+    fix-permissions $SWAN_LIB_DIR && \
+    chown ${NB_USER}:${NB_GID} $SWAN_LIB_DIR/nb_term_lib
+
 # Expose swankernelenv to the user environment in notebooks.
-# swankernelenv removes the swan/extensions directory from the PYTHONPATH
+# swankernelenv removes the $SWAN_LIB_DIR/extensions directory from the PYTHONPATH
 # when the notebook starts. Check EOF of userconfig.sh
-RUN mkdir -p /usr/local/lib/swan/extensions && \
-    ln -s $(pip show swankernelenv | grep 'Location:' | awk '{print $2}')/swankernelenv /usr/local/lib/swan/extensions/
+RUN ln -s $(pip show swankernelenv | grep 'Location:' | awk '{print $2}')/swankernelenv $SWAN_LIB_DIR/extensions/
 
 # User session configuration scripts
 # Add scripts

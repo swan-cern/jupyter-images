@@ -34,11 +34,6 @@ RUN dnf install -y \
     dnf clean all && \
     rm -rf /var/cache/dnf
 
-# Create directory to store TLS certificates for Dask
-ENV DASK_TLS_DIR=/srv/dask/tls
-RUN mkdir -p ${DASK_TLS_DIR} && \
-    chown -R ${NB_USER}:${NB_GID} ${DASK_TLS_DIR}
-
 USER ${NB_UID}
 
 # User session configuration scripts

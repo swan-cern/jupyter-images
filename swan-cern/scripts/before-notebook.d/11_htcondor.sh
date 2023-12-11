@@ -17,6 +17,9 @@ then
   ln -s /eos/project/l/lxbatch/public/config-condor-swan/ngbauth-submit /etc/sysconfig/ngbauth-submit
 
   # Create self-signed certificate for Dask processes
+  export DASK_TLS_DIR=/srv/dask/tls # export so SwanHTCondorCluster finds the certs
+  mkdir -p $DASK_TLS_DIR
+  chown -R $NB_USER:$NB_GID $DASK_TLS_DIR
   _log "Generating certificate for Dask"
   sudo -u $NB_USER sh /srv/singleuser/create_dask_certs.sh $DASK_TLS_DIR &
 else

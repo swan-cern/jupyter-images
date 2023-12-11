@@ -56,8 +56,8 @@ def configure_terminal():
                 # Setting up colors
                 "alias ls='ls --color'\n",
                 "alias grep='grep --color'\n",
-                # FIXME: Fix this workaround and load the correct user home
-                # correctly
+                # There's no JupyterLab setting for the terminal directory, so we
+                # set it here to always be HOME
                 f"cd {HOME}\n"
             ]
         )

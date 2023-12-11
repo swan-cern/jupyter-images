@@ -81,7 +81,9 @@ RUN ln -s $(pip show sparkconnector | grep -oP 'Location: \K.*')/sparkconnector 
     ln -s $(pip show swandask | grep -oP 'Location: \K.*')/swandask ${SWAN_LIB_DIR}/extensions/ && \
     ln -s $(pip show dask-labextension | grep -oP 'Location: \K.*')/dask_labextension ${SWAN_LIB_DIR}/extensions/ && \
     # dependency of dask-labextension
-    ln -s $(pip show jupyter-server-proxy | grep -oP 'Location: \K.*')/jupyter_server_proxy ${SWAN_LIB_DIR}/extensions/
+    ln -s $(pip show jupyter-server-proxy | grep -oP 'Location: \K.*')/jupyter_server_proxy ${SWAN_LIB_DIR}/extensions/ && \
+    # dependency of jupyter-server-proxy
+    ln -s $(pip show simpervisor | grep -oP 'Location: \K.*')/simpervisor ${SWAN_LIB_DIR}/extensions/
 
 # Grant scripts execution permissions
 RUN chmod +x /usr/local/bin/before-notebook.d/*

@@ -250,5 +250,11 @@ RUN dnf install -y patch
 RUN patch /opt/conda/lib/python${PYTHON_VERSION}/site-packages/jupyterhub/services/auth.py /tmp/log_patch.diff && \
     rm -f /tmp/log_patch.diff
 
+# Prevent warning about not being able to debug frozen modules.
+# More information here:
+# - https://stackoverflow.com/questions/75114841/debugger-warning-from-ipython-frozen-modules
+# - https://discourse.jupyter.org/t/debugger-warning-it-seems-that-frozen-modules-are-being-used-python-3-11-0/16544/5
+ENV PYDEVD_DISABLE_FILE_VALIDATION=1
+
 # Switch back to jovyan to avoid accidental container runs as root
 USER ${NB_UID}

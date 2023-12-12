@@ -66,7 +66,8 @@ ADD config/dask-labextension.yaml /etc/dask/labextension.yaml
 
 USER root
 
-# Dependency of swandaskcluster
+# Import dependency of swandaskcluster, which is required by Dask clients
+# created from a notebook/terminal to create a Security object
 RUN ln -s $(pip show swanportallocator | grep -oP 'Location: \K.*')/swanportallocator ${SWAN_LIB_DIR}/nb_term_lib
 
 # Create symlinks for the remaining swan extensions, because

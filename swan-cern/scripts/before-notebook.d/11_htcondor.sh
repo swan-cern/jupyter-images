@@ -22,6 +22,9 @@ then
   chown -R $NB_USER:$NB_GID $DASK_TLS_DIR
   _log "Generating certificate for Dask"
   sudo -u $NB_USER sh /srv/singleuser/create_dask_certs.sh $DASK_TLS_DIR &
+
+  # Ensure Dask clients call us to create a default Security object
+  export DASK_DISTRIBUTED__CLIENT__SECURITY_LOADER="swandaskcluster.security.loader"
 else
    _log "Skipping HTCondor configuration";
 fi

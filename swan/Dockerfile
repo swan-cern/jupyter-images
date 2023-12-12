@@ -99,8 +99,10 @@ ADD python/jupyter_server_config.py /home/${NB_USER}/.jupyter/jupyter_server_con
 USER root
 
 # Create directories where we will store:
-# - SWAN Jupyter extensions
-# - Libraries to be exposed to notebooks and terminals
+# - SWAN extensions and their dependencies (this path gets removed from
+# notebooks by swankernelenv)
+# - Libraries to be exposed to notebooks and terminals and their
+# dependencies
 RUN mkdir -p $SWAN_LIB_DIR/extensions && \
     mkdir -p $SWAN_LIB_DIR/nb_term_lib && \
     fix-permissions $SWAN_LIB_DIR && \

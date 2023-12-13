@@ -91,6 +91,7 @@ RUN pip install \
 # Add Python 3 kernel configuration
 RUN mkdir -p /home/${NB_USER}/.local/share/jupyter/kernels/python3
 ADD config/kernel.json  /home/${NB_USER}/.local/share/jupyter/kernels/python3/kernel.json
+RUN cp /opt/conda/share/jupyter/kernels/python3/logo* /home/${NB_USER}/.local/share/jupyter/kernels/python3/
 
 # Python configuration
 # Add jupyter notebook configuration

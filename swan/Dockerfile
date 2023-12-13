@@ -26,11 +26,12 @@ RUN dnf install -y \
     bc \
     # Required for key4hep
     environment-modules \
-    git \
     # The R configuration of the LCG release requires
     # the en_US.UTF-8 encoding
     glibc-langpack-en \
-    # Useful to monitor resource consumption
+    # General utilities
+    file \
+    git \
     htop \
     nano \
     patch \

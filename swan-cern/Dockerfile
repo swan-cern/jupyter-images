@@ -9,33 +9,6 @@ ENV VERSION_DOCKER_IMAGE=$BUILD_TAG
 
 RUN echo "Building swan-cern image with tag ${VERSION_DOCKER_IMAGE} from parent tag ${VERSION_PARENT}."
 
-# Switch to superuser to install packages
-USER root
-
-RUN dnf install -y \
-    # Install Cloudera dependencies - required by IT Spark clusters
-    alsa-lib \
-    at \
-    cronie \
-    cvs \
-    file \
-    gdbm-devel \
-    gettext \
-    jpackage-utils \
-    libXtst \
-    man \
-    passwd \
-    rsyslog \
-    time \
-    xz-lzma-compat \
-    # Required by Oracle
-    libaio && \
-    # Clear the dnf cache as we no longer need to install packages
-    dnf clean all && \
-    rm -rf /var/cache/dnf
-
-USER ${NB_UID}
-
 # User session configuration scripts
 # Add scripts to be run before the jupyter server starts
 COPY scripts/before-notebook.d/* /usr/local/bin/before-notebook.d/

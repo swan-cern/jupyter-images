@@ -50,7 +50,7 @@ RUN pip install --no-deps --no-cache-dir \
     sparkconnector==2.4.6 \
     sparkmonitor==2.1.1 \
     swanportallocator==1.0.1 \
-    swandask==0.0.3
+    swandask==0.0.4
 
 # Install swandaskcluster in the lib directory that is exposed to notebooks and
 # terminals, which need it to do automatic TLS configuration for Dask clients

@@ -21,7 +21,7 @@ RUN pip install --no-deps --no-cache-dir dask-labextension==7.0.0
 # Ignore dependencies because they have already been installed or come from CVMFS
 RUN pip install --no-deps --no-cache-dir \
     sparkconnector==2.4.6 \
-    sparkmonitor==2.1.1 \
+    sparkmonitor==3.0.1 \
     swanportallocator==1.0.2 \
     swandask==0.0.4
 

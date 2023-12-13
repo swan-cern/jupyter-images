@@ -60,21 +60,6 @@ RUN mamba install --yes \
     'panel==1.3.4' \
     'webio-jupyter-extension==0.1.0'
 
-# Install TeX Live required packages
-RUN tlmgr install \
-    adjustbox \
-    tcolorbox \
-    environ \
-    trimspaces \
-    adjustbox \
-    collectbox \
-    ucs \
-    titling \
-    enumitem \
-    type1cm \
-    cm-super \
-    collection-fontsrecommended
-
 # Install all of our extensions
 # Ignore (almost all) dependencies because they have already been installed or come from CVMFS
 RUN pip install --no-deps --no-cache-dir \

@@ -48,6 +48,8 @@ RUN dnf install -y \
     perl-Sys-Syslog && \
     dnf clean all && \
     rm -rf /var/cache/dnf
+# Required for kerberos authentication to work
+ADD config/krb5.conf.no_rdns /etc/krb5.conf.no_rdns
 
 # Import dependency of swandaskcluster, which is required by Dask clients
 # created from a notebook/terminal to create a Security object

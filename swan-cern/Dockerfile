@@ -39,6 +39,16 @@ ADD config/dask-labextension.yaml /etc/dask/labextension.yaml
 
 USER root
 
+# HTCondor requirements
+RUN dnf install -y \
+    # required by condor_submit
+    perl-Archive-Tar \
+    perl-Authen-Krb5 \
+    perl-Sys-Hostname \
+    perl-Sys-Syslog && \
+    dnf clean all && \
+    rm -rf /var/cache/dnf
+
 # Import dependency of swandaskcluster, which is required by Dask clients
 # created from a notebook/terminal to create a Security object
 RUN ln -s $(pip show swanportallocator | grep -oP 'Location: \K.*')/swanportallocator ${SWAN_LIB_DIR}/nb_term_lib

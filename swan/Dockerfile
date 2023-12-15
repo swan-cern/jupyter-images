@@ -112,6 +112,15 @@ RUN mkdir -p $SWAN_LIB_DIR/extensions && \
 # when the notebook starts. Check EOF of userconfig.sh
 RUN ln -s $(pip show swankernelenv | grep 'Location:' | awk '{print $2}')/swankernelenv $SWAN_LIB_DIR/extensions/
 
+# Expose ipykernel and some of its dependencies to the user environment in
+# notebooks, to enforce an ipykernel version that comes from the image,
+# instead of from the LCG release. This ensures we run the Python kernels
+# with the same package versions as the Jupyter server.
+RUN ln -s $(pip show ipykernel | grep -oP 'Location: \K.*')/ipykernel ${SWAN_LIB_DIR}/extensions/
+RUN ln -s $(pip show jupyter_core | grep -oP 'Location: \K.*')/jupyter_core ${SWAN_LIB_DIR}/extensions/
+RUN ln -s $(pip show comm | grep -oP 'Location: \K.*')/comm ${SWAN_LIB_DIR}/extensions/
+RUN ln -s $(pip show debugpy | grep -oP 'Location: \K.*')/debugpy ${SWAN_LIB_DIR}/extensions/
+
 # User session configuration scripts
 # Add scripts
 COPY scripts/before-notebook.d/* /usr/local/bin/before-notebook.d/

@@ -40,6 +40,15 @@ RUN dnf install -y \
     # Texlive and fontconfig packages are used to convert 
     # notebooks into different formats
     texlive \
+    # Texlive packages necessary to convert notebooks
+    # into different formats that are not installed
+    # automatically as dependencies of texlive
+    texlive-adjustbox \
+    texlive-tcolorbox \
+    texlive-titling \
+    texlive-type1cm \
+    texlive-upquote \
+    texlive-ulem \
     fontconfig && \
     # Clear the dnf cache as we no longer need to install packages
     dnf clean all && \

@@ -28,7 +28,7 @@ RUN pip install --no-deps --no-cache-dir \
 # Install swandaskcluster in the lib directory that is exposed to notebooks and
 # terminals, which need it to do automatic TLS configuration for Dask clients
 RUN pip install --no-deps --no-cache-dir --target ${SWAN_LIB_DIR}/nb_term_lib \
-    swandaskcluster==2.0.1
+    swandaskcluster==3.0.0
 
 # Add helper scripts
 COPY scripts/others/* /srv/singleuser/

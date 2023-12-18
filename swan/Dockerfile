@@ -128,6 +128,9 @@ RUN jupyter nbclassic-extension install --py --system swanhelp && \
 RUN jupyter nbclassic-extension install --py --system swanshare && \
     jupyter nbclassic-extension enable --py --system swanshare
 
+# Temporary: disable options to switch to classic UI
+RUN jupyter labextension disable @swanclassic/lab-extension
+
 # User session configuration scripts
 # Add scripts
 COPY scripts/before-notebook.d/* /usr/local/bin/before-notebook.d/

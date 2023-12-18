@@ -122,6 +122,12 @@ RUN ln -s $(pip show jupyter_core | grep -oP 'Location: \K.*')/jupyter_core ${SW
 RUN ln -s $(pip show comm | grep -oP 'Location: \K.*')/comm ${SWAN_LIB_DIR}/extensions/
 RUN ln -s $(pip show debugpy | grep -oP 'Location: \K.*')/debugpy ${SWAN_LIB_DIR}/extensions/
 
+# Enable extensions for classic UI
+RUN jupyter nbclassic-extension install --py --system swanhelp && \
+    jupyter nbclassic-extension enable --py --system swanhelp
+RUN jupyter nbclassic-extension install --py --system swanshare && \
+    jupyter nbclassic-extension enable --py --system swanshare
+
 # User session configuration scripts
 # Add scripts
 COPY scripts/before-notebook.d/* /usr/local/bin/before-notebook.d/

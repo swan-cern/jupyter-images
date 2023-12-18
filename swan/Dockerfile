@@ -99,6 +99,9 @@ ADD python/jupyter_server_config.py /home/${NB_USER}/.jupyter/jupyter_server_con
 
 USER root
 
+RUN jupyter nbclassic-extension install --py --system swanhelp && \
+    jupyter nbclassic-extension enable --py --system swanhelp
+
 # Create directories where we will store:
 # - SWAN extensions and their dependencies (this path gets removed from
 # notebooks by swankernelenv)

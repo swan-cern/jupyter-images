@@ -72,7 +72,6 @@ RUN mamba install --yes \
     'jupyter-server-proxy==4.1.0' \
     'jupyter-resource-usage==1.0.1' \
     # Extensions required by jupyter server
-    'panel==1.3.4' \
     'webio-jupyter-extension==0.1.0'
 
 # Install all of our extensions

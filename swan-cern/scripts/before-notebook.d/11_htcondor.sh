@@ -6,7 +6,7 @@
 # and sets additional configuration to access a dask cluster.
 
 # HTCondor at CERN integration
-if [[ $CERN_HTCONDOR ]]
+if [[ "$CERN_HTCONDOR" = "true" ]]
 then
   _log "Configuring HTCondor";
   
@@ -26,5 +26,17 @@ then
   # Ensure Dask clients call us to create a default Security object
   export DASK_DISTRIBUTED__CLIENT__SECURITY_LOADER="swandaskcluster.security.loader"
 else
-   _log "Skipping HTCondor configuration";
+  _log "Skipping HTCondor configuration";
+  # Disable Dask lab extension
+  config_file="/etc/jupyter/labconfig/page_config.json"
+
+  if [[ ! -e "$config_file" ]]
+  then
+      mkdir -p "$(dirname $config_file)"
+      jq -n --argjson dask-labextension:plugin true \
+        '{disabledExtensions: $ARGS.named}' > $config_file
+  else
+      jq '.disabledExtensions["dask-labextension:plugin"]=true' $config_file > "/tmp/page_config.json"
+      mv "/tmp/page_config.json" $config_file
+  fi
 fi

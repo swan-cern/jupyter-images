@@ -22,6 +22,9 @@ then
   _log "Globally enabling the Spark extensions"
   jq -n --argjson sparkconnector/extension true \
         '{load_extensions: $ARGS.named}' > /etc/jupyter/nbconfig/notebook.json
+
+  sed -i "1s/^/c.InteractiveShellApp.extensions.append('sparkconnector.connector')\n/" \
+      /home/$NB_USER/.ipython/profile_default/ipython_kernel_config.py
 else
   # Disable spark jupyterlab extensions enabled by default if no cluster is selected
   mkdir -p /etc/jupyter/labconfig

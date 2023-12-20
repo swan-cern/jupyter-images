@@ -28,7 +28,7 @@ then
 else
   # Disable spark jupyterlab extensions enabled by default if no cluster is selected
   mkdir -p /etc/jupyter/labconfig
-  jq -n --argjson sparkconnector true \
+  jq -n --argjson @swan-cern/sparkconnector true \
         --argjson jupyterlab_sparkmonitor true \
         '{disabledExtensions: $ARGS.named}' > /etc/jupyter/labconfig/page_config.json
   _log "Skipping Spark configuration";

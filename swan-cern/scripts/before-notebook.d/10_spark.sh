@@ -25,6 +25,17 @@ then
 
   sed -i "1s/^/c.InteractiveShellApp.extensions.append('sparkconnector.connector')\n/" \
       /home/$NB_USER/.ipython/profile_default/ipython_kernel_config.py
+
+  # Source configuration for selected cluster
+  SPARKVERSION=spark3  # Spark major version
+  HADOOPVERSION='3.3'   # Classpath compatibility for YARN
+  source $SPARK_CONFIG_SCRIPT $SPARK_CLUSTER_NAME $HADOOPVERSION $SPARKVERSION
+
+  if [[ $CONNECTOR_BUNDLED_CONFIGS ]]
+  then
+    ln -s $CONNECTOR_BUNDLED_CONFIGS/bundles.json $JUPYTER_CONFIG_DIR/nbconfig/sparkconnector_bundles.json
+    ln -s $CONNECTOR_BUNDLED_CONFIGS/spark_options.json $JUPYTER_CONFIG_DIR/nbconfig/sparkconnector_spark_options.json
+  fi
 else
   # Disable spark jupyterlab extensions enabled by default if no cluster is selected
   mkdir -p /etc/jupyter/labconfig

@@ -22,7 +22,7 @@ RUN pip install --no-deps --no-cache-dir dask-labextension==7.0.0
 RUN pip install --no-deps --no-cache-dir \
     sparkconnector==2.4.6 \
     sparkmonitor==3.0.1 \
-    swanportallocator==1.0.2 \
+    swanportallocator==2.0.0 \
     swandask==0.0.5
 
 # Install swandaskcluster in the lib directory that is exposed to notebooks and

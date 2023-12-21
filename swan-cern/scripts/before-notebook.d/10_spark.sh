@@ -23,8 +23,11 @@ then
   jq -n --argjson sparkconnector/extension true \
         '{load_extensions: $ARGS.named}' > /etc/jupyter/nbconfig/notebook.json
 
+  IPYTHON_KERNEL_CONFIG=$IPYTHONDIR/profile_default/ipython_kernel_config.py
   sed -i "1s/^/c.InteractiveShellApp.extensions.append('sparkconnector.connector')\n/" \
-      /home/$NB_USER/.ipython/profile_default/ipython_kernel_config.py
+      $IPYTHON_KERNEL_CONFIG
+  sed -i "2s/^/c.InteractiveShellApp.extensions.append('sparkmonitor.kernelextension')\n/" \
+      $IPYTHON_KERNEL_CONFIG
 
   # Source configuration for selected cluster
   SPARKVERSION=spark3  # Spark major version

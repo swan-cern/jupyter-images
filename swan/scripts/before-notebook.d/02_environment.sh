@@ -31,8 +31,6 @@ export LCG_VIEW=$ROOT_LCG_VIEW_PATH/$ROOT_LCG_VIEW_NAME/$ROOT_LCG_VIEW_PLATFORM
 # symlink $LCG_VIEW/share/jupyter/nbextensions for the notebook extensions
 ln -s $LCG_VIEW/share/jupyter/nbextensions $JUPYTER_PATH
 
-cp -L -r $LCG_VIEW/etc/jupyter/* $JUPYTER_CONFIG_DIR
-
 # Configure kernels and terminal
 # The environment of the kernels and the terminal will combine the view and the user script (if any)
 _log "Configuring kernels and terminal"

@@ -127,6 +127,8 @@ RUN jupyter nbclassic-extension install --py --system swanhelp && \
     jupyter nbclassic-extension enable --py --system swanhelp
 RUN jupyter nbclassic-extension install --py --system swanshare && \
     jupyter nbclassic-extension enable --py --system swanshare
+RUN jupyter nbclassic-extension install --py --system jupyter_nbextensions_configurator && \
+    jupyter nbclassic-extension enable --py --system jupyter_nbextensions_configurator
 
 # Temporary: disable options to switch to classic UI
 RUN jupyter labextension disable @swanclassic/lab-extension

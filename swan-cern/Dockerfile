@@ -21,7 +21,6 @@ RUN pip install --no-deps --no-cache-dir dask-labextension==7.0.0
 # Ignore dependencies because they have already been installed or come from CVMFS
 RUN pip install --no-deps --no-cache-dir \
     sparkconnector==3.0.1 \
-    sparkmonitor==3.0.1 \
     swanportallocator==2.0.0 \
     swandask==0.0.5
 
@@ -58,7 +57,6 @@ RUN ln -s $(pip show swanportallocator | grep -oP 'Location: \K.*')/swanportallo
 # Create symlinks for the remaining swan extensions, because
 # they need to be accessible in the user environment
 RUN ln -s $(pip show sparkconnector | grep -oP 'Location: \K.*')/sparkconnector ${SWAN_LIB_DIR}/extensions/ && \
-    ln -s $(pip show sparkmonitor | grep -oP 'Location: \K.*')/sparkmonitor ${SWAN_LIB_DIR}/extensions/ && \
     ln -s $(pip show swandask | grep -oP 'Location: \K.*')/swandask ${SWAN_LIB_DIR}/extensions/ && \
     ln -s $(pip show dask-labextension | grep -oP 'Location: \K.*')/dask_labextension ${SWAN_LIB_DIR}/extensions/ && \
     # dependency of dask-labextension

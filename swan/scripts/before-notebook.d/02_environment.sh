@@ -11,10 +11,11 @@ LOCAL_HOME=/home/$NB_USER
 export IPYTHONDIR=$LOCAL_HOME/.ipython
 export JPY_DIR=$LOCAL_HOME/.jupyter
 
-# JUPYTER_CONFIG_DIR is set to point to the local user home (/home/$USER)
-# instead of the EOS path
+# The Jupyter environment variables below are set to point to the local user
+# home (/home/$USER), instead of the EOS path
 export JUPYTER_CONFIG_DIR=$JPY_DIR
 export JUPYTER_PATH=$LOCAL_HOME/.local/share/jupyter
+export JUPYTER_RUNTIME_DIR=$JUPYTER_PATH/runtime
 
 # Set other environment variables
 export KERNEL_DIR=$JUPYTER_PATH/kernels

@@ -16,6 +16,7 @@ export JPY_DIR=$LOCAL_HOME/.jupyter
 export JUPYTER_CONFIG_DIR=$JPY_DIR
 export JUPYTER_PATH=$LOCAL_HOME/.local/share/jupyter
 export JUPYTER_RUNTIME_DIR=$JUPYTER_PATH/runtime
+export JUPYTER_DATA_DIR=$JUPYTER_PATH
 
 # Set npm cache on the local user home, instead of the EOS path
 export NPM_CONFIG_CACHE=$LOCAL_HOME/.npm

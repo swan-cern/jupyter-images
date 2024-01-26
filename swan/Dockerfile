@@ -64,9 +64,13 @@ RUN dnf -y install HEP_OSlibs-9.1.0-2.el9
 # Switch back to jovyan to avoid accidental container runs as root
 USER ${NB_UID}
 
+# Pip is used to install this package because conda forge
+# does not contain the latest version (v0.6.3)
+RUN pip install --no-deps --no-cache-dir \
+    jupyter_nbextensions_configurator==0.6.3
+
 # Install python pip packages
 RUN mamba install --yes \
-    'jupyter_nbextensions_configurator==0.6.1' \
     'voila==0.5.5' \
     'ipyparallel==8.6.1' \
     'jupyter-server-proxy==4.1.0' \

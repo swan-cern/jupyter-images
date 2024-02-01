@@ -75,6 +75,7 @@ RUN mamba install --yes \
     'ipyparallel==8.6.1' \
     'jupyter-server-proxy==4.1.0' \
     'jupyter-resource-usage==1.0.1' \
+    'jupyterlab-git==0.50.0' \
     # Extensions required by jupyter server
     'webio-jupyter-extension==0.1.0'
 

@@ -66,6 +66,17 @@ RUN ln -s $(pip show sparkconnector | grep -oP 'Location: \K.*')/sparkconnector 
     # dependency of jupyter-server-proxy
     ln -s $(pip show simpervisor | grep -oP 'Location: \K.*')/simpervisor ${SWAN_LIB_DIR}/extensions/
 
+# Install slurm packages for HPC
+RUN dnf config-manager --add-repo https://linuxsoft.cern.ch/internal/repos/batch9al-stable/$(uname -m)/os && \
+    dnf install -y slurm && \
+    dnf clean all && \
+    rm -rf /var/cache/dnf
+
+# Add the necessary elements to be able to configure and use slurm for HPC
+RUN /sbin/adduser slurm && \
+    mkdir -p /etc/slurm/
+ADD config/slurm.conf /etc/slurm/
+
 # Grant scripts execution permissions
 RUN chmod +x /usr/local/bin/before-notebook.d/*
 

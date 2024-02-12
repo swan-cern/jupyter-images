@@ -6,6 +6,7 @@ LABEL maintainer="swan-admins@cern.ch"
 ARG NB_UID="1000"
 ARG BUILD_TAG=daily
 ENV VERSION_DOCKER_IMAGE=$BUILD_TAG
+ENV PATH="/srv/singleuser/bin:${PATH}"
 
 RUN echo "Building swan-cern image with tag ${VERSION_DOCKER_IMAGE} from parent tag ${VERSION_PARENT}."
 
@@ -38,6 +39,12 @@ COPY scripts/others/* /srv/singleuser/
 ADD config/dask-labextension.yaml /etc/dask/labextension.yaml
 
 USER root
+
+# Crate a new bin path for allowing the user to run it with an alias
+# Add script for virtual environment creation
+RUN mkdir /srv/singleuser/bin
+RUN mv /srv/singleuser/makenv.sh /srv/singleuser/bin/makenv
+RUN chmod u+x /srv/singleuser/bin/makenv
 
 # HTCondor requirements
 RUN dnf install -y \

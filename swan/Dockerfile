@@ -77,7 +77,10 @@ RUN mamba install --yes \
     'jupyter-resource-usage==1.0.1' \
     'jupyterlab-git==0.50.0' \
     # Extensions required by jupyter server
-    'webio-jupyter-extension==0.1.0'
+    'webio-jupyter-extension==0.1.0' \
+    # This version of pexpect is needed for
+    # jupyterlab-git (0.50.0) module to work properly
+    'pexpect==4.9.0'
 
 # Install all of our extensions
 # Ignore (almost all) dependencies because they have already been installed or come from CVMFS

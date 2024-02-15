@@ -21,6 +21,9 @@ export JUPYTER_DATA_DIR=$JUPYTER_PATH
 # Set npm cache on the local user home, instead of the EOS path
 export NPM_CONFIG_CACHE=$LOCAL_HOME/.npm
 
+# Set jupyterlab config directory
+export JUPYTERLAB_SETTINGS_DIR=$HOME/.local/lab/user-settings/
+
 # Set other environment variables
 export KERNEL_DIR=$JUPYTER_PATH/kernels
 export SWAN_ENV_FILE=$LOCAL_HOME/.bash_profile

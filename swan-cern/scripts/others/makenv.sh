@@ -10,69 +10,110 @@ _log () {
     fi
 }
 
-# This script gets two arguments:
-# $1 is the name of the virtualenv (or -h in case of help page)
-# $2 is the path to the requirements file to install in the virtualenv
-NAME_ENV=
-REQ_PATH=
-CLEAR_ENV=
+# Function to print the help page
+print_help() {
+    _log "Usage: makenv --name NAME --req REQUIREMENTS [--clear] [--help/-h]"
+    _log "Options:"
+    _log "  -n, --name NAME             Name of the custom virtual environment (mandatory)"
+    _log "  -r, --req REQUIREMENTS      Path to requirements.txt file or http link for a public repository (mandatory)"
+    _log "  -c, --clear                 Clear the current virtual environment if it exists"
+    _log "  -h, --help                  Print this help page"
+}
 
+# --------------------------------------------------------------------------------------------
+
+# Parse command line arguments
 while [[ $# -gt 0 ]]; do
-    case "$1" in
-        -h)
-            # Help page (passing -h as first argument)
-            _log "
-This script builds a virtual environment."
-            _log "Usage: makenv <virtualenv_name> <requirements_file>"
-            _log "Options:"
-            _log "  -h: Display this help message"
-            _log "  -c: Clear the virtual environment, if it exists (TBD)
-            "
-            exit 1
-            ;;
-        -c)
-            # If -c is found, shift to next argument and store its value
-            CLEAR_ENV="--clear"
+    key="$1"
+    case $key in
+        --name|-n)
+            NAME_ENV=$2
+            shift
             shift
             ;;
+        --req|-r)
+            requirements=$2
+            shift
+            shift
+            ;;
+        --clear|-c)
+            CLEAR_ENV=--clear
+            shift
+            ;;
+        --help|-h)
+            print_help
+            exit 0
+            ;;
         *)
-            case "requirements.txt" in
-                *$1*)
-                    REQ_PATH=$1
-                    shift
-                    ;;
-                *)
-                    NAME_ENV=$1
-                    shift
-                    ;;
-            esac
+            _log "Invalid argument: $1"
+            print_help
+            exit 1
+            ;;
     esac
 done
+
+# --------------------------------------------------------------------------------------------
 
 # Checks if a name for the environment is given
 if [ -z "$NAME_ENV" ]; then
     _log "ERROR: No virtual environment name provided."
+    print_help
     exit 1
 fi
 
 # Checks if a requirements file is given
-if [ -z "$REQ_PATH" ]; then
-    _log "ERROR: No requirements file provided."
+if [ -z "$requirements" ]; then
+    _log "ERROR: No requirements provided."
+    print_help
     exit 1
 fi
 
-# Checks if the requirements file is found
-if [ ! -f "$REQ_PATH" ]; then
-    _log "ERROR: Requirements file not found."
+
+# Checks if the provided requirements source is found
+if [[ -f $requirements ]]; then
+    REQ_PATH=$requirements
+elif [[ $requirements == http* ]]; then
+    # Extract the repository name from the URL
+    repo_name=$(basename $requirements)
+    repo_name=${repo_name%.*}
+
+    cd ~
+    # Checks if the repository already exists in the home directory
+    if [ -d $repo_name ]; then
+        if [ -z "$CLEAR_ENV" ]; then
+            _log "ERROR: $PWD/$repo_name already exists. Use --clear to recreate the environment."
+            exit 1
+        else
+            rm -rf $repo_name
+        fi
+    fi
+
+    # Clone the repository
+    git clone $requirements -q --template /usr/share/git-core/templates || { _log "Error: Failed to clone repository"; exit 1; }
+
+    # Check if requirements.txt exists in the repository
+    if [[ ! -f $repo_name/requirements.txt ]]; then
+        rm -rf $repo_name
+        _log "Error: requirements.txt not found in the repository"
+        exit 1
+    fi
+
+    # Set the requirements path to the cloned repository
+    REQ_PATH=$PWD/$repo_name/requirements.txt
+else
+    _log "ERROR: Requirements not found."
     exit 1
 fi
 
-# Checks if an environment with the same name was already created, if -c is not passed
+# Checks if an environment with the same name was already created, if --clear is not passed
 if [ -d "/home/$USER/${NAME_ENV}" ] && [ -z "$CLEAR_ENV" ]; then
     _log "ERROR: Virtual environment already exists."
     exit 1
 fi
 
+# --------------------------------------------------------------------------------------------
+
+# Migrate environment variables to the new bash session
 PATH=$PATH
 USER=$USER
 OAUTH2_FILE=$OAUTH2_FILE
@@ -80,6 +121,7 @@ OAUTH2_TOKEN=$OAUTH2_TOKEN
 KRB5CCNAME=$KRB5CCNAME
 KRB5CCNAME_NB_TERM=$KRB5CCNAME_NB_TERM
 JUPYTER_DOCKER_STACKS_QUIET=$JUPYTER_DOCKER_STACKS_QUIET
+
 
 # Create a new bash session to avoid conflicts with the current environment in the background
 env -i bash --noprofile --norc << EOF
@@ -92,11 +134,13 @@ export KRB5CCNAME=${KRB5CCNAME}
 export KRB5CCNAME_NB_TERM=${KRB5CCNAME_NB_TERM}
 
 # Create virtual environment using Python venv
-if [ -z "$CLEAR_ENV" ]; then
-    echo "Creating ${NAME_ENV} virtual environment..."
+# Echo creating or recreating the environment
+if [ -d "/home/$USER/${NAME_ENV}" ]; then
+    echo "Recreating virtual environment ${NAME_ENV}..."
 else
-    echo "Recreating (-c) ${NAME_ENV} virtual environment..."
+    echo "Creating virtual environment ${NAME_ENV}..."
 fi
+
 python3 -m venv /home/$USER/${NAME_ENV} --copies ${CLEAR_ENV}
 
 # Activate the created virtual environment
@@ -111,7 +155,11 @@ python3 -m pip install --upgrade -q pip
 pip install ipykernel -q
 
 # Install kernel (within the environment), so it can be ran in Jupyter 
-python3 -m ipykernel install --name ${NAME_ENV} --display-name "Python (${NAME_ENV})" --prefix /home/$USER/.local
+python3 -m ipykernel install --name ${NAME_ENV} --display-name "Python (${NAME_ENV})" --prefix /home/$USER/${NAME_ENV}
+
+# Create symlink from /home/$USER/${NAME_ENV}/share/jupyter/kernels/${NAME_ENV} to /home/$USER/.local/share/jupyter/kernels/${NAME_ENV}
+mkdir -p /home/$USER/.local/share/jupyter/kernels
+ln -s /home/$USER/${NAME_ENV}/share/jupyter/kernels/${NAME_ENV} /home/$USER/.local/share/jupyter/kernels/${NAME_ENV}
 
 # Install the given requirements
 echo "Installing packages from ${REQ_PATH}..."
@@ -121,6 +169,6 @@ pip install -q -r ${REQ_PATH}
 cp ${REQ_PATH} /home/$USER/${NAME_ENV}
 
 echo "Virtual environment ${NAME_ENV} created successfully."
-echo "WARNING: You may need to refresh the page to see the new kernel in Jupyter."
+echo "WARNING: You may need to refresh the page to be able to access the new kernel in Jupyter."
  
 EOF

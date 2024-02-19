@@ -22,7 +22,11 @@ Options:
 
 2. Share the repository URL with your collaborators.
 
-3. Your collaborators can create the environment with the following command:
+3. Your collaborators can build the environment with the following command:
     ```bash
     makenv --name <NAME> --req <REPOSITORY_URL>
     ```
+
+4. Your collaborators can also update the environment by adding, updating or removing packages from the requirements.txt file and pushing the changes to the repository. An **username** and **access token** may be **required**.
+
+5. Later, the `--clear` flag can be used for rebuilding the environment.

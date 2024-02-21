@@ -1,21 +1,21 @@
 ARG VERSION_PARENT=v0.0.4
 
-FROM gitlab-registry.cern.ch/swan/docker-images/jupyter/swan-cern:${VERSION_PARENT}
-# FROM registry.cern.ch/acc/acc-py_cc7_ci:2021.12
+#FROM gitlab-registry.cern.ch/swan/docker-images/jupyter/swan-cern:${VERSION_PARENT}
+FROM gitlab-registry.cern.ch/rhenriqu/test_image_registry:alma9-swan-cern
 
 LABEL maintainer="swan-admins@cern.ch"
-ARG NB_USER="jovyan"
 ARG NB_UID="1000"
 ARG BUILD_TAG=daily
 ENV VERSION_DOCKER_IMAGE=$BUILD_TAG
-ENV PACKAGES="bash bash-completion CERN-CA-certs coreutils iputils rootfiles vim-minimal yum yum-utils"
+ENV ACCPY_INSTALLER=acc-py-pro-installer
 
 RUN echo "Building swan-accpy image with tag ${VERSION_DOCKER_IMAGE} from parent tag ${VERSION_PARENT}."
 
-# Install the packages required by the acc-py
 USER root
-RUN dnf install -y $PACKAGES && \
-    dnf clean all && \
-    rm -rf /var/cache/dnf
+
+RUN wget http://bewww.cern.ch/ap/acc-py/installers/${ACCPY_INSTALLER}.sh -q && \
+    chmod +x ${ACCPY_INSTALLER}.sh && \
+    ./${ACCPY_INSTALLER}.sh --installation-root /opt/acc-py && \
+    rm -f ${ACCPY_INSTALLER}.sh &&
 
 USER ${NB_UID}

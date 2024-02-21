@@ -114,6 +114,9 @@ fi
 # --------------------------------------------------------------------------------------------
 
 # Migrate environment variables to the new bash session
+# TODO: Does the accpy gets updated every time a session is open through pro version? How to keep the path version updated?
+ACCPY_VERSION=2023.06
+ACCPY_PATH=/opt/accpy/base/${ACCPY_VERSION}/setup.sh
 PATH=$PATH
 USER=$USER
 OAUTH2_FILE=$OAUTH2_FILE
@@ -133,29 +136,29 @@ export OAUTH2_TOKEN=${OAUTH2_TOKEN}
 export KRB5CCNAME=${KRB5CCNAME}
 export KRB5CCNAME_NB_TERM=${KRB5CCNAME_NB_TERM}
 
-# Create virtual environment using Python venv
-# Echo creating or recreating the environment
 if [ -d "/home/$USER/${NAME_ENV}" ]; then
-    echo "Recreating virtual environment ${NAME_ENV}..."
+    echo "Recreating (--clear) virtual environment ${NAME_ENV}..."
 else
     echo "Creating virtual environment ${NAME_ENV}..."
 fi
 
-python3 -m venv /home/$USER/${NAME_ENV} --copies ${CLEAR_ENV}
+# Activate acc-py environment
+echo "Activating acc-py..."
+source ACCPY_PATH
+
+# Create the virtual environment
+python -m venv /home/$USER/${NAME_ENV} --copies ${CLEAR_ENV}
 
 # Activate the created virtual environment
 echo "Activating virtual environment..."
 source /home/$USER/${NAME_ENV}/bin/activate
 
-# Ensure pip is installed on venv so ipykernel and requirements can be installed
-# python3 -m ensurepip --upgrade
-
 # Install ipykernel so the kernel can be used in Jupyter
-python3 -m pip install --upgrade -q pip
+python -m pip install --upgrade -q pip
 pip install ipykernel -q
 
 # Install kernel (within the environment), so it can be ran in Jupyter 
-python3 -m ipykernel install --name ${NAME_ENV} --display-name "Python (${NAME_ENV})" --prefix /home/$USER/${NAME_ENV}
+python -m ipykernel install --name ${NAME_ENV} --display-name "Python (${NAME_ENV})" --prefix /home/$USER/${NAME_ENV}
 
 # Create symlink from /home/$USER/${NAME_ENV}/share/jupyter/kernels/${NAME_ENV} to /home/$USER/.local/share/jupyter/kernels/${NAME_ENV}
 mkdir -p /home/$USER/.local/share/jupyter/kernels

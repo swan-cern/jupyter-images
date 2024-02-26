@@ -118,7 +118,7 @@ if [ ! -f "/opt/acc-py/apps/acc-py-cli/latest/pyvenv.cfg" ]; then
     fi
 else
     ACCPY_PATH=$(grep -oP 'home = \K.*' /opt/acc-py/apps/acc-py-cli/latest/pyvenv.cfg)
-    ACCPY_PATH=${ACCPY_PATH%/bin}
+    ACCPY_PATH=${ACCPY_PATH%bin}
     ACCPY_PATH+="setup.sh"
 fi
 
@@ -150,7 +150,7 @@ if [ -d "/home/$USER/${NAME_ENV}" ]; then
     INFO_MESSAGE="Recreating (--clear) virtual environment ${NAME_ENV}"
 fi
 
-if [ -d ${ACCPY_PATH} ]; then
+if [ -f ${ACCPY_PATH} ]; then
     INFO_MESSAGE+=" using Acc-Py..."
     source ${ACCPY_PATH}
 else

@@ -150,14 +150,14 @@ if [ -d "/home/$USER/${NAME_ENV}" ]; then
     INFO_MESSAGE="Recreating (--clear) virtual environment ${NAME_ENV}"
 fi
 
-if [ -d $ACCPY_PATH ]; then
+if [ -d ${ACCPY_PATH} ]; then
     INFO_MESSAGE+=" using Acc-Py..."
-    source $ACCPY_PATH
+    source ${ACCPY_PATH}
 else
     INFO_MESSAGE+=" using standard Python..."
 fi
 
-echo $INFO_MESSAGE
+echo ${INFO_MESSAGE}
 
 # Create the virtual environment
 python -m venv /home/$USER/${NAME_ENV} --copies ${CLEAR_ENV}

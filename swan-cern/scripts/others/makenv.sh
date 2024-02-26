@@ -111,12 +111,21 @@ if [ -d "/home/$USER/${NAME_ENV}" ] && [ -z "$CLEAR_ENV" ]; then
     exit 1
 fi
 
+if [ ! -f "/opt/acc-py/apps/acc-py-cli/latest/pyvenv.cfg" ]; then
+    read -p "Acc-py not found in the system. Do you want to proceed with standard Python? (Y/n): " choice
+    if [[ $choice != "Y" && $choice != "y" && $choice != "" ]]; then
+        exit 1
+    fi
+else
+    ACCPY_PATH=$(grep -oP 'home = \K.*' /opt/acc-py/apps/acc-py-cli/latest/pyvenv.cfg)
+    ACCPY_PATH=${ACCPY_PATH%/bin}
+    ACCPY_PATH+="setup.sh"
+fi
+
 # --------------------------------------------------------------------------------------------
 
 # Migrate environment variables to the new bash session
 # TODO: Does the accpy gets updated every time a session is open through pro version? How to keep the path version updated?
-ACCPY_VERSION=2023.06
-ACCPY_PATH=/opt/accpy/base/${ACCPY_VERSION}/setup.sh
 PATH=$PATH
 USER=$USER
 OAUTH2_FILE=$OAUTH2_FILE
@@ -136,15 +145,19 @@ export OAUTH2_TOKEN=${OAUTH2_TOKEN}
 export KRB5CCNAME=${KRB5CCNAME}
 export KRB5CCNAME_NB_TERM=${KRB5CCNAME_NB_TERM}
 
+INFO_MESSAGE="Creating virtual environment ${NAME_ENV}"
 if [ -d "/home/$USER/${NAME_ENV}" ]; then
-    echo "Recreating (--clear) virtual environment ${NAME_ENV}..."
-else
-    echo "Creating virtual environment ${NAME_ENV}..."
+    INFO_MESSAGE="Recreating (--clear) virtual environment ${NAME_ENV}"
 fi
 
-# Activate acc-py environment
-echo "Activating acc-py..."
-source ACCPY_PATH
+if [ -d $ACCPY_PATH ]; then
+    INFO_MESSAGE+=" using Acc-Py..."
+    source $ACCPY_PATH
+else
+    INFO_MESSAGE+=" using standard Python..."
+fi
+
+echo $INFO_MESSAGE
 
 # Create the virtual environment
 python -m venv /home/$USER/${NAME_ENV} --copies ${CLEAR_ENV}

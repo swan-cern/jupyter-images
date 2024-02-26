@@ -1,7 +1,6 @@
 ARG VERSION_PARENT=v0.0.4
 
-#FROM gitlab-registry.cern.ch/swan/docker-images/jupyter/swan-cern:${VERSION_PARENT}
-FROM gitlab-registry.cern.ch/rhenriqu/test_image_registry:alma9-swan-cern
+FROM gitlab-registry.cern.ch/swan/docker-images/jupyter/swan-cern:${VERSION_PARENT}
 
 LABEL maintainer="swan-admins@cern.ch"
 ARG NB_UID="1000"

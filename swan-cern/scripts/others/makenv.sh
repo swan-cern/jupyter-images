@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Author: Rodrigo Sobral 2023
+# Author: Rodrigo Sobral 2024
 # Copyright CERN
 # Here the script is used to create a virtual environment and install the packages from a requirements file.
 
@@ -16,6 +16,7 @@ print_help() {
     _log "Options:"
     _log "  -n, --name NAME             Name of the custom virtual environment (mandatory)"
     _log "  -r, --req REQUIREMENTS      Path to requirements.txt file or http link for a public repository (mandatory)"
+    _log "  --no-accpy                  Use standard Python instead of Acc-Py"
     _log "  -c, --clear                 Clear the current virtual environment if it exists"
     _log "  -h, --help                  Print this help page"
 }
@@ -43,6 +44,10 @@ while [[ $# -gt 0 ]]; do
         --help|-h)
             print_help
             exit 0
+            ;;
+        --no-accpy)
+            AVOID_ACCPY=true
+            shift
             ;;
         *)
             _log "Invalid argument: $1"
@@ -111,15 +116,20 @@ if [ -d "/home/$USER/${NAME_ENV}" ] && [ -z "$CLEAR_ENV" ]; then
     exit 1
 fi
 
-if [ ! -f "/opt/acc-py/apps/acc-py-cli/latest/pyvenv.cfg" ]; then
-    read -p "Acc-py not found in the system. Do you want to proceed with standard Python? (Y/n): " choice
-    if [[ $choice != "Y" && $choice != "y" && $choice != "" ]]; then
-        exit 1
-    fi
+# Check if AVOID_ACCPY is set
+if [ -n "$AVOID_ACCPY" ]; then
+    ACCPY_PATH=""
 else
-    ACCPY_PATH=$(grep -oP 'home = \K.*' /opt/acc-py/apps/acc-py-cli/latest/pyvenv.cfg)
-    ACCPY_PATH=${ACCPY_PATH%bin}
-    ACCPY_PATH+="setup.sh"
+    if [ ! -f "/opt/acc-py/apps/acc-py-cli/latest/pyvenv.cfg" ]; then
+        read -p "Acc-py not found in the system. Do you want to proceed with standard Python? (Y/n): " choice
+        if [[ $choice != "Y" && $choice != "y" && $choice != "" ]]; then
+            exit 1
+        fi
+    else
+        ACCPY_PATH=$(grep -oP 'home = \K.*' /opt/acc-py/apps/acc-py-cli/latest/pyvenv.cfg)
+        ACCPY_PATH=${ACCPY_PATH%bin}
+        ACCPY_PATH+="setup.sh"
+    fi
 fi
 
 # --------------------------------------------------------------------------------------------
@@ -134,10 +144,25 @@ KRB5CCNAME=$KRB5CCNAME
 KRB5CCNAME_NB_TERM=$KRB5CCNAME_NB_TERM
 JUPYTER_DOCKER_STACKS_QUIET=$JUPYTER_DOCKER_STACKS_QUIET
 
+INFO_MESSAGE="Creating virtual environment ${NAME_ENV}"
+if [ -d "/home/$USER/${NAME_ENV}" ]; then
+    INFO_MESSAGE="Recreating (--clear) virtual environment ${NAME_ENV}"
+fi
+
+# Check if ACCPY_PATH is set and if the acc-py is available in the system
+if [ -n "$ACCPY_PATH" ] && [ -f $ACCPY_PATH ]; then
+    INFO_MESSAGE+=" using Acc-Py..."
+    
+else
+    INFO_MESSAGE+=" using standard Python..."
+fi
+
+echo $INFO_MESSAGE
 
 # Create a new bash session to avoid conflicts with the current environment in the background
 env -i bash --noprofile --norc << EOF
 
+export ACCPY_PATH=${ACCPY_PATH}
 export PATH=${PATH}
 export USER=${USER}
 export OAUTH2_FILE=${OAUTH2_FILE}
@@ -145,22 +170,12 @@ export OAUTH2_TOKEN=${OAUTH2_TOKEN}
 export KRB5CCNAME=${KRB5CCNAME}
 export KRB5CCNAME_NB_TERM=${KRB5CCNAME_NB_TERM}
 
-INFO_MESSAGE="Creating virtual environment ${NAME_ENV}"
-if [ -d "/home/$USER/${NAME_ENV}" ]; then
-    INFO_MESSAGE="Recreating (--clear) virtual environment ${NAME_ENV}"
+if [ -n "$ACCPY_PATH" ] && [ -f $ACCPY_PATH ]; then
+    source $ACCPY_PATH
 fi
-
-if [ -f ${ACCPY_PATH} ]; then
-    INFO_MESSAGE+=" using Acc-Py..."
-    source ${ACCPY_PATH}
-else
-    INFO_MESSAGE+=" using standard Python..."
-fi
-
-echo ${INFO_MESSAGE}
 
 # Create the virtual environment
-python -m venv /home/$USER/${NAME_ENV} --copies ${CLEAR_ENV}
+python -m venv /home/$USER/${NAME_ENV} ${CLEAR_ENV}
 
 # Activate the created virtual environment
 echo "Activating virtual environment..."

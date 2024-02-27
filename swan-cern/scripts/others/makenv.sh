@@ -2,10 +2,10 @@
 
 # Author: Rodrigo Sobral 2024
 # Copyright CERN
-# Here the script is used to create a virtual environment and install the packages from a requirements file.
+# Here the script is used to create a virtual environment and install the packages from a provided requirements file.
 
 _log () {
-    if [[ "$*" == "ERROR:"* ]] || [[ "$*" == "WARNING:"* ]] || [[ "${JUPYTER_DOCKER_STACKS_QUIET}" == "" ]]; then
+    if [ "$*" == "ERROR:"* ] || [ "$*" == "WARNING:"* ] || [ "${JUPYTER_DOCKER_STACKS_QUIET}" == "" ]; then
         echo "$@"
     fi
 }
@@ -16,15 +16,15 @@ print_help() {
     _log "Options:"
     _log "  -n, --name NAME             Name of the custom virtual environment (mandatory)"
     _log "  -r, --req REQUIREMENTS      Path to requirements.txt file or http link for a public repository (mandatory)"
-    _log "  --no-accpy                  Use standard Python instead of Acc-Py"
-    _log "  -c, --clear                 Clear the current virtual environment if it exists"
+    _log "  --no-accpy                  Use standard Python instead of Acc-Py (if available)"
+    _log "  -c, --clear                 Clear the current virtual environment, if it exists"
     _log "  -h, --help                  Print this help page"
 }
 
 # --------------------------------------------------------------------------------------------
 
 # Parse command line arguments
-while [[ $# -gt 0 ]]; do
+while [ $# -gt 0 ]; do
     key="$1"
     case $key in
         --name|-n)
@@ -66,18 +66,27 @@ if [ -z "$NAME_ENV" ]; then
     exit 1
 fi
 
+# Checks if an environment with the same name was already created, if --clear is not passed
+if [ -d "/home/$USER/${NAME_ENV}" ] && [ -z "$CLEAR_ENV" ]; then
+    _log "ERROR: Virtual environment already exists."
+    exit 1
+fi
+
 # Checks if a requirements file is given
 if [ -z "$requirements" ]; then
     _log "ERROR: No requirements provided."
     print_help
     exit 1
-fi
-
 
 # Checks if the provided requirements source is found
-if [[ -f $requirements ]]; then
+elif [ -f $requirements ]; then
+    if [ ${requirements##*.} != "txt" ]; then
+        _log "ERROR: Invalid requirements file."
+        exit 1
+    fi
     REQ_PATH=$requirements
-elif [[ $requirements == http* ]]; then
+
+elif [ $requirements == http* ]; then
     # Extract the repository name from the URL
     repo_name=$(basename $requirements)
     repo_name=${repo_name%.*}
@@ -94,12 +103,12 @@ elif [[ $requirements == http* ]]; then
     fi
 
     # Clone the repository
-    git clone $requirements -q --template /usr/share/git-core/templates || { _log "Error: Failed to clone repository"; exit 1; }
+    git clone $requirements -q --template /usr/share/git-core/templates || { _log "ERROR: Failed to clone repository"; exit 1; }
 
     # Check if requirements.txt exists in the repository
-    if [[ ! -f $repo_name/requirements.txt ]]; then
+    if [ ! -f $repo_name/requirements.txt ]; then
         rm -rf $repo_name
-        _log "Error: requirements.txt not found in the repository"
+        _log "ERROR: requirements.txt not found in the repository"
         exit 1
     fi
 
@@ -110,9 +119,9 @@ else
     exit 1
 fi
 
-# Checks if an environment with the same name was already created, if --clear is not passed
-if [ -d "/home/$USER/${NAME_ENV}" ] && [ -z "$CLEAR_ENV" ]; then
-    _log "ERROR: Virtual environment already exists."
+# Verify if the requirements file is not empty
+if [ ! -s ${REQ_PATH} ]; then
+    echo "ERROR: Requirements file is empty."
     exit 1
 fi
 
@@ -122,7 +131,7 @@ if [ -n "$AVOID_ACCPY" ]; then
 else
     if [ ! -f "/opt/acc-py/apps/acc-py-cli/latest/pyvenv.cfg" ]; then
         read -p "Acc-py not found in the system. Do you want to proceed with standard Python? (Y/n): " choice
-        if [[ $choice != "Y" && $choice != "y" && $choice != "" ]]; then
+        if [ $choice != "Y" && $choice != "y" && $choice != "" ]; then
             exit 1
         fi
     else
@@ -132,10 +141,22 @@ else
     fi
 fi
 
+
+INFO_MESSAGE="Creating virtual environment ${NAME_ENV}"
+if [ -d "/home/$USER/${NAME_ENV}" ]; then
+    INFO_MESSAGE="Recreating (--clear) virtual environment ${NAME_ENV}"
+fi
+if [ -n "$ACCPY_PATH" ] && [ -f $ACCPY_PATH ]; then
+    INFO_MESSAGE+=" using Acc-Py..."
+else
+    INFO_MESSAGE+=" using standard Python..."
+fi
+
+
 # --------------------------------------------------------------------------------------------
 
+
 # Migrate environment variables to the new bash session
-# TODO: Does the accpy gets updated every time a session is open through pro version? How to keep the path version updated?
 PATH=$PATH
 USER=$USER
 OAUTH2_FILE=$OAUTH2_FILE
@@ -143,21 +164,6 @@ OAUTH2_TOKEN=$OAUTH2_TOKEN
 KRB5CCNAME=$KRB5CCNAME
 KRB5CCNAME_NB_TERM=$KRB5CCNAME_NB_TERM
 JUPYTER_DOCKER_STACKS_QUIET=$JUPYTER_DOCKER_STACKS_QUIET
-
-INFO_MESSAGE="Creating virtual environment ${NAME_ENV}"
-if [ -d "/home/$USER/${NAME_ENV}" ]; then
-    INFO_MESSAGE="Recreating (--clear) virtual environment ${NAME_ENV}"
-fi
-
-# Check if ACCPY_PATH is set and if the acc-py is available in the system
-if [ -n "$ACCPY_PATH" ] && [ -f $ACCPY_PATH ]; then
-    INFO_MESSAGE+=" using Acc-Py..."
-    
-else
-    INFO_MESSAGE+=" using standard Python..."
-fi
-
-echo $INFO_MESSAGE
 
 # Create a new bash session to avoid conflicts with the current environment in the background
 env -i bash --noprofile --norc << EOF
@@ -173,6 +179,8 @@ export KRB5CCNAME_NB_TERM=${KRB5CCNAME_NB_TERM}
 if [ -n "$ACCPY_PATH" ] && [ -f $ACCPY_PATH ]; then
     source $ACCPY_PATH
 fi
+
+echo "${INFO_MESSAGE}"
 
 # Create the virtual environment
 python -m venv /home/$USER/${NAME_ENV} ${CLEAR_ENV}

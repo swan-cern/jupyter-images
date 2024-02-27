@@ -15,6 +15,6 @@ USER root
 RUN wget http://bewww.cern.ch/ap/acc-py/installers/${ACCPY_INSTALLER}.sh -q && \
     chmod +x ${ACCPY_INSTALLER}.sh && \
     ./${ACCPY_INSTALLER}.sh --installation-root /opt/acc-py && \
-    rm -f ${ACCPY_INSTALLER}.sh &&
+    rm -f ${ACCPY_INSTALLER}.sh
 
 USER ${NB_UID}

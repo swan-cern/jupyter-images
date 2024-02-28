@@ -80,13 +80,13 @@ if [ -z "$requirements" ]; then
 
 # Checks if the provided requirements source is found
 elif [ -f $requirements ]; then
-    if [ ${requirements##*.} != "txt" ]; then
+    if [[ ${requirements##*.} != "txt" ]]; then
         _log "ERROR: Invalid requirements file."
         exit 1
     fi
     REQ_PATH=$requirements
 
-elif [ $requirements == http* ]; then
+elif [[ $requirements == http* ]]; then
     # Extract the repository name from the URL
     repo_name=$(basename $requirements)
     repo_name=${repo_name%.*}
@@ -131,7 +131,7 @@ if [ -n "$AVOID_ACCPY" ]; then
 else
     if [ ! -f "/opt/acc-py/apps/acc-py-cli/latest/pyvenv.cfg" ]; then
         read -p "Acc-py not found in the system. Do you want to proceed with standard Python? (Y/n): " choice
-        if [ $choice != "Y" && $choice != "y" && $choice != "" ]; then
+        if [[ $choice != "Y" && $choice != "y" && $choice != "" ]]; then
             exit 1
         fi
     else
@@ -176,14 +176,14 @@ export OAUTH2_TOKEN=${OAUTH2_TOKEN}
 export KRB5CCNAME=${KRB5CCNAME}
 export KRB5CCNAME_NB_TERM=${KRB5CCNAME_NB_TERM}
 
+echo "${INFO_MESSAGE}"
+
 if [ -n "$ACCPY_PATH" ] && [ -f $ACCPY_PATH ]; then
     source $ACCPY_PATH
 fi
 
-echo "${INFO_MESSAGE}"
-
 # Create the virtual environment
-python -m venv /home/$USER/${NAME_ENV} ${CLEAR_ENV}
+python -m venv /home/$USER/${NAME_ENV} ${CLEAR_ENV} 2>/dev/null
 
 # Activate the created virtual environment
 echo "Activating virtual environment..."

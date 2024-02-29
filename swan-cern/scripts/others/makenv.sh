@@ -183,7 +183,7 @@ if [ -n "$ACCPY_PATH" ] && [ -f $ACCPY_PATH ]; then
 fi
 
 # Create the virtual environment
-python -m venv /home/$USER/${NAME_ENV} ${CLEAR_ENV} 2>/dev/null
+python -m venv /home/$USER/${NAME_ENV} ${CLEAR_ENV}
 
 # Activate the created virtual environment
 echo "Activating virtual environment..."

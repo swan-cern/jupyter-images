@@ -1,25 +1,22 @@
 stages:
   - build
 
-default:
-  image: docker:24.0.7-git
-  services:
-    - docker:24.0.7-dind
-  before_script:
-    - docker info
-
+# Based on https://gitlab.cern.ch/ci-tools/docker-image-builder
 build_image:
   stage: build
+  image:
+    name: gitlab-registry.cern.ch/ci-tools/docker-image-builder
+    entrypoint: [""]
   script:
+    # Get the image name and version to be built
     - IMAGE_NAME=$(echo $CI_COMMIT_TAG | cut -d / -f 1)
     - IMAGE_VERSION=$(echo $CI_COMMIT_TAG | cut -d / -f 2)
-    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
-    - docker build --compress --squash --rm -t $CI_REGISTRY_IMAGE/$IMAGE_NAME:$IMAGE_VERSION -f $IMAGE_NAME/Dockerfile --build-arg BUILD_TAG=$IMAGE_VERSION --no-cache $IMAGE_NAME
-    - docker push $CI_REGISTRY_IMAGE/$IMAGE_NAME:$IMAGE_VERSION
-    - docker logout
-  tags:
-    # This tag labels all the runners with privileged permissions, per the GitLab documentation:
-    # https://gitlab.docs.cern.ch/docs/Build%20your%20application/CI-CD/Runners/docker-privileged-runners/
-    - docker-privileged-xl
+    - IMAGE_DESTINATION=$CI_REGISTRY_IMAGE/$IMAGE_NAME:$IMAGE_VERSION
+    # Prepare Kaniko configuration file
+    - echo "{\"auths\":{\"$CI_REGISTRY\":{\"username\":\"$CI_REGISTRY_USER\",\"password\":\"$CI_REGISTRY_PASSWORD\"}}}" > /kaniko/.docker/config.json
+    # Build and push the image from the specified Dockerfile
+    - /kaniko/executor --context $CI_PROJECT_DIR/$IMAGE_NAME --dockerfile $CI_PROJECT_DIR/$IMAGE_NAME/Dockerfile --build-arg BUILD_TAG=$CI_COMMIT_TAG --destination $IMAGE_DESTINATION
+    # Print the full registry path of the pushed image
+    - echo "Image pushed successfully to ${IMAGE_DESTINATION}"
   only:
     - tags

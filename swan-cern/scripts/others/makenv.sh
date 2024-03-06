@@ -143,7 +143,7 @@ else
         ACCPY_PREFIX="/opt/acc-py"
     fi
     if [ ! -f "${ACCPY_PREFIX}/apps/acc-py-cli/latest/pyvenv.cfg" ]; then
-        read -p "Acc-py not found in the system. Do you want to proceed with standard Python? (Y/n): " choice
+        read -p "Acc-py (${ACCPY_PREFIX}) not found in the system. Do you want to proceed with standard Python? (Y/n): " choice
         if [[ $choice != "Y" && $choice != "y" && $choice != "" ]]; then
             exit 1
         fi

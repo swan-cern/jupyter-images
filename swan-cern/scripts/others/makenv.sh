@@ -12,10 +12,11 @@ _log () {
 
 # Function to print the help page
 print_help() {
-    _log "Usage: makenv --name NAME --req REQUIREMENTS [--clear] [--help/-h]"
+    _log "Usage: makenv --env/-e NAME --req/-r REQUIREMENTS [--path/-p ACCPY_PATH] [--clear] [--no-accpy] [--help/-h]"
     _log "Options:"
-    _log "  -n, --name NAME             Name of the custom virtual environment (mandatory)"
+    _log "  -e, --env NAME              Name of the custom virtual environment (mandatory)"
     _log "  -r, --req REQUIREMENTS      Path to requirements.txt file or http link for a public repository (mandatory)"
+    _log "  -p, --path ACCPY_PATH       Path to an alternative Acc-Py version (default: 'latest')"
     _log "  --no-accpy                  Use standard Python instead of Acc-Py (if available)"
     _log "  -c, --clear                 Clear the current virtual environment, if it exists"
     _log "  -h, --help                  Print this help page"
@@ -27,13 +28,18 @@ print_help() {
 while [ $# -gt 0 ]; do
     key="$1"
     case $key in
-        --name|-n)
+        --env|-e)
             NAME_ENV=$2
             shift
             shift
             ;;
         --req|-r)
             requirements=$2
+            shift
+            shift
+            ;;
+        --path|-p)
+            ACCPY_PREFIX=$2
             shift
             shift
             ;;
@@ -72,12 +78,17 @@ if [ -d "/home/$USER/${NAME_ENV}" ] && [ -z "$CLEAR_ENV" ]; then
     exit 1
 fi
 
+# If ACCPY_PREFIX and AVOID_ACCPY are both set, trigger an error
+if [ -n "$ACCPY_PREFIX" ] && [ -n "$AVOID_ACCPY" ]; then
+    _log "ERROR: --no-accpy and -p/--path are both set. Please choose only one of the options."
+    exit 1
+fi
+
 # Checks if a requirements file is given
 if [ -z "$requirements" ]; then
     _log "ERROR: No requirements provided."
     print_help
     exit 1
-
 # Checks if the provided requirements source is found
 elif [ -f $requirements ]; then
     if [[ ${requirements##*.} != "txt" ]]; then
@@ -85,7 +96,6 @@ elif [ -f $requirements ]; then
         exit 1
     fi
     REQ_PATH=$requirements
-
 elif [[ $requirements == http* ]]; then
     # Extract the repository name from the URL
     repo_name=$(basename $requirements)
@@ -129,13 +139,16 @@ fi
 if [ -n "$AVOID_ACCPY" ]; then
     ACCPY_PATH=""
 else
-    if [ ! -f "/opt/acc-py/apps/acc-py-cli/latest/pyvenv.cfg" ]; then
+    if [ -z "$ACCPY_PREFIX" ]; then
+        ACCPY_PREFIX="/opt/acc-py"
+    fi
+    if [ ! -f "${ACCPY_PREFIX}/apps/acc-py-cli/latest/pyvenv.cfg" ]; then
         read -p "Acc-py not found in the system. Do you want to proceed with standard Python? (Y/n): " choice
         if [[ $choice != "Y" && $choice != "y" && $choice != "" ]]; then
             exit 1
         fi
     else
-        ACCPY_PATH=$(grep -oP 'home = \K.*' /opt/acc-py/apps/acc-py-cli/latest/pyvenv.cfg)
+        ACCPY_PATH=$(grep -oP 'home = \K.*' ${ACCPY_PREFIX}/apps/acc-py-cli/latest/pyvenv.cfg)
         ACCPY_PATH=${ACCPY_PATH%bin}
         ACCPY_PATH+="setup.sh"
     fi
@@ -147,7 +160,7 @@ if [ -d "/home/$USER/${NAME_ENV}" ]; then
     INFO_MESSAGE="Recreating (--clear) virtual environment ${NAME_ENV}"
 fi
 if [ -n "$ACCPY_PATH" ] && [ -f $ACCPY_PATH ]; then
-    INFO_MESSAGE+=" using Acc-Py..."
+    INFO_MESSAGE+=" using Acc-Py (${ACCPY_PREFIX})..."
 else
     INFO_MESSAGE+=" using standard Python..."
 fi
@@ -186,7 +199,7 @@ fi
 python -m venv /home/$USER/${NAME_ENV} ${CLEAR_ENV}
 
 # Activate the created virtual environment
-echo "Activating virtual environment..."
+echo "Preparing virtual environment..."
 source /home/$USER/${NAME_ENV}/bin/activate
 
 # Install ipykernel so the kernel can be used in Jupyter
@@ -194,11 +207,7 @@ python -m pip install --upgrade -q pip
 pip install ipykernel -q
 
 # Install kernel (within the environment), so it can be ran in Jupyter 
-python -m ipykernel install --name ${NAME_ENV} --display-name "Python (${NAME_ENV})" --prefix /home/$USER/${NAME_ENV}
-
-# Create symlink from /home/$USER/${NAME_ENV}/share/jupyter/kernels/${NAME_ENV} to /home/$USER/.local/share/jupyter/kernels/${NAME_ENV}
-mkdir -p /home/$USER/.local/share/jupyter/kernels
-ln -s /home/$USER/${NAME_ENV}/share/jupyter/kernels/${NAME_ENV} /home/$USER/.local/share/jupyter/kernels/${NAME_ENV}
+python -m ipykernel install --name ${NAME_ENV} --display-name "Python (${NAME_ENV})" --prefix /home/$USER/.local 2> /dev/null
 
 # Install the given requirements
 echo "Installing packages from ${REQ_PATH}..."

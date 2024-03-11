@@ -11,15 +11,15 @@ The goal of ***makenv*** is to create a virtual environment and install packages
 Overall, this script simplifies the process of setting up a virtual environment and installing the required packages, making it easier to manage project dependencies and ensure consistent execution across different environments.
 
 ```bash
-Usage: makenv --env/-e NAME --req/-r REQUIREMENTS [--path/-p ACCPY_PATH] [--clear] [--no-accpy] [--help/-h]
+Usage: makenv --env/-e NAME --req/-r REQUIREMENTS [--accpy ACCPY_VERSION] [--clear] [--no-accpy] [--help/-h]
 
 Options:
   -e, --env NAME              Name of the custom virtual environment (mandatory)
   -r, --req REQUIREMENTS      Path to requirements.txt file or http link for a public repository (mandatory)
-  -p, --path ACCPY_PATH       Path to a specific Acc-Py version (default: 'latest')
-  --no-accpy                  Use standard Python instead of Acc-Py (if available)
   -c, --clear                 Clear the current virtual environment, if it exists
   -h, --help                  Print this help page
+  --accpy VERSION             Version of Acc-Py to be used
+  --no-accpy                  Use standard Python instead of Acc-Py
 ```
 
 ### Share your environment
@@ -38,4 +38,6 @@ Options:
 
 5. Later, the `--clear` flag can be used for rebuilding the environment.
 
-6. The `--no-accpy` flag can also be used to create a virtual environment using standard Python, instead of Acc-Py.
+6. The `--accpy`flag allows the user to specify the version of Acc-Py to be used. If not specified, the latest version will be used.
+
+7. The `--no-accpy` flag can also be used to create a virtual environment using standard Python, instead of Acc-Py.

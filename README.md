@@ -11,15 +11,15 @@ The goal of ***makenv*** is to create a virtual environment and install packages
 Overall, this script simplifies the process of setting up a virtual environment and installing the required packages, making it easier to manage project dependencies and ensure consistent execution across different environments.
 
 ```bash
-Usage: makenv --env/-e NAME --req/-r REQUIREMENTS [--accpy ACCPY_VERSION] [--clear] [--no-accpy] [--help/-h]
+Usage: makenv --env/-e NAME --req/-r REQUIREMENTS [--accpy ACCPY_VERSION] [--python PATH] [--clear/-c] [--help/-h]
 
 Options:
   -e, --env NAME              Name of the custom virtual environment (mandatory)
   -r, --req REQUIREMENTS      Path to requirements.txt file or http link for a public repository (mandatory)
   -c, --clear                 Clear the current virtual environment, if it exists
   -h, --help                  Print this help page
-  --accpy VERSION             Version of Acc-Py to be used
-  --no-accpy                  Use standard Python instead of Acc-Py
+  --accpy VERSION             Version of Acc-Py to be used (options: ${ACCPY_ALL_VERSIONS_STR})
+  --python PATH               Path to the Python interpreter to be used (default: ${PYTHON_DEFAULT_PATH})
 ```
 
 ### Share your environment
@@ -41,3 +41,17 @@ Options:
 6. The `--accpy`flag allows the user to specify the version of Acc-Py to be used. If not specified, the latest version will be used.
 
 7. The `--no-accpy` flag can also be used to create a virtual environment using standard Python, instead of Acc-Py.
+
+---
+
+## TODO
+
+
+- [ ] Install ipykernel on the 3 versions of accpy during build time
+
+- [ ] No need to isolate the environment from the host system when using cvmfs python
+
+  - [ ] In this case, reuse ipykernel provided by the cvmfs release
+
+- [ ] When using custom python, make sure ipykernel is installed (and pip, before that)
+

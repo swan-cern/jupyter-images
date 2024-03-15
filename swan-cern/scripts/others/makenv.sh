@@ -10,29 +10,24 @@ _log () {
     fi
 }
 
-ACCPY_DEFAULT_VERSION="?"
 ACCPY_ALL_VERSIONS_STR="?"
+PYTHON_DEFAULT_PATH=$(which python)
 if [ -d "/opt/acc-py" ]; then
     ACCPY_ALL_VERSIONS=$(ls -tr /opt/acc-py/base)
-    ACCPY_DEFAULT_VERSION=$(ls -t /opt/acc-py/base | head -n 1)
     ACCPY_ALL_VERSIONS_STR=$(echo $ACCPY_ALL_VERSIONS | tr ' ' ', ')
-else 
-    _log "WARNING: Acc-Py not found in the system. Using standard Python."
 fi
 
-# JDK_DEFAULT_VERSION=11
 
 # Function to print the help page
 print_help() {
-    _log "Usage: makenv --env/-e NAME --req/-r REQUIREMENTS [--accpy ACCPY_VERSION] [--clear] [--no-accpy] [--help/-h]"
+    _log "Usage: makenv --env/-e NAME --req/-r REQUIREMENTS [--accpy ACCPY_VERSION] [--python PATH] [--clear/-c] [--help/-h]"
     _log "Options:"
     _log "  -e, --env NAME              Name of the custom virtual environment (mandatory)"
     _log "  -r, --req REQUIREMENTS      Path to requirements.txt file or http link for a public repository (mandatory)"
     _log "  -c, --clear                 Clear the current virtual environment, if it exists"
     _log "  -h, --help                  Print this help page"
-    _log "  --accpy VERSION             Version of Acc-Py to be used (options: ${ACCPY_ALL_VERSIONS_STR}) (default: ${ACCPY_DEFAULT_VERSION})"
-    # _log "  --jdk VERSION               Version of Java Development Kit to be used (options: 8, 11, 17, 21) (default: ${JDK_DEFAULT_VERSION})"
-    _log "  --no-accpy                  Use standard Python instead of Acc-Py"
+    _log "  --accpy VERSION             Version of Acc-Py to be used (options: ${ACCPY_ALL_VERSIONS_STR})"
+    _log "  --python PATH               Path to the Python interpreter to be used (default: ${PYTHON_DEFAULT_PATH})"
 }
 
 # --------------------------------------------------------------------------------------------
@@ -59,18 +54,8 @@ while [ $# -gt 0 ]; do
             print_help
             exit 0
             ;;
-        # --jdk)
-        #     JDK_CUSTOM_VERSION=$2
-        #     if [[ $JDK_CUSTOM_VERSION != "8" && $JDK_CUSTOM_VERSION != "11" && $JDK_CUSTOM_VERSION != "17" && $JDK_CUSTOM_VERSION != "21" ]]; then
-        #         _log "ERROR: Invalid JDK version. Options: 8, 11, 17, 21"
-        #         exit 1
-        #     fi
-        #     shift
-        #     shift
-        #     ;;
         --accpy)
             ACCPY_CUSTOM_VERSION=$2
-            # verify if the given version belongs to the available versions
             if [[ ! $ACCPY_ALL_VERSIONS[@] =~ $ACCPY_CUSTOM_VERSION ]]; then
                 _log "ERROR: Invalid Acc-Py version. Options: ${ACCPY_ALL_VERSIONS_STR}"
                 exit 1
@@ -78,13 +63,17 @@ while [ $# -gt 0 ]; do
             shift
             shift
             ;;
-        --no-accpy)
-            AVOID_ACCPY=true
+        --python)
+            PYTHON_CUSTOM_PATH=$2
+            if [ ! -f $PYTHON_CUSTOM_PATH ]; then
+                _log "ERROR: Python interpreter not found."
+                exit 1
+            fi
+            shift
             shift
             ;;
         *)
-            _log "ERROR: Invalid argument: $1"
-            _log
+            _log "ERROR: Invalid argument: $1" && _log
             print_help
             exit 1
             ;;
@@ -95,8 +84,7 @@ done
 
 # Checks if a name for the environment is given
 if [ -z "$NAME_ENV" ]; then
-    _log "ERROR: No virtual environment name provided."
-    _log
+    _log "ERROR: No virtual environment name provided." && _log
     print_help
     exit 1
 fi
@@ -107,16 +95,15 @@ if [ -d "/home/$USER/${NAME_ENV}" ] && [ -z "$CLEAR_ENV" ]; then
     exit 1
 fi
 
-# If ACCPY_CUSTOM_VERSION and AVOID_ACCPY are both set, trigger an error
-if [ -n "$ACCPY_CUSTOM_VERSION" ] && [ -n "$AVOID_ACCPY" ]; then
-    _log "ERROR: --no-accpy and --accpy are both set. Please choose only one of the options."
+# If AccPy and Python are both set, trigger an error
+if [ -n "$ACCPY_CUSTOM_VERSION" ] && [ -n "$PYTHON_CUSTOM_PATH" ]; then
+    _log "ERROR: --python and --accpy are both set. Please choose only one of the options."
     exit 1
 fi
 
 # Checks if a requirements file is given
 if [ -z "$requirements" ]; then
-    _log "ERROR: No requirements provided."
-    _log
+    _log "ERROR: No requirements provided." && _log
     print_help
     exit 1
 # Checks if the provided requirements source is found
@@ -152,7 +139,6 @@ elif [[ $requirements == http* ]]; then
         exit 1
     fi
 
-    # Set the requirements path to the cloned repository
     REQ_PATH=$PWD/$repo_name/requirements.txt
 else
     _log "ERROR: Requirements not found."
@@ -165,89 +151,66 @@ if [ ! -s ${REQ_PATH} ]; then
     exit 1
 fi
 
-ACCPY_PATH=""
-if [ -z "$AVOID_ACCPY" ]; then
-    ACCPY_VERSION=$ACCPY_DEFAULT_VERSION
-    if [ -n "$ACCPY_CUSTOM_VERSION" ]; then
-        ACCPY_VERSION=$ACCPY_CUSTOM_VERSION
-    fi
-    ACCPY_PATH="/opt/acc-py/base/${ACCPY_VERSION}/setup.sh"
-    # if [ ! -f "$ACCPY_PATH" ]; then
-    #     read -p "Acc-py (${ACCPY_VERSION}) not found in the system. Do you want to proceed with standard Python? (Y/n): " choice
-    #     if [[ $choice != "Y" && $choice != "y" && $choice != "" ]]; then
-    #         exit 1
-    #     fi
-    # fi
-fi
 
-# JDK_VERSION=$JDK_DEFAULT_VERSION
-# if [ -n "$JDK_CUSTOM_VERSION" ]; then
-#     JDK_VERSION=$JDK_CUSTOM_VERSION
-# fi
+PYTHON_PATH=$PYTHON_DEFAULT_PATH
+if [ -n "$PYTHON_CUSTOM_PATH" ]; then
+    PYTHON_PATH=$PYTHON_CUSTOM_PATH
+fi
 
 INFO_MESSAGE="Creating virtual environment ${NAME_ENV}"
 if [ -d "/home/$USER/${NAME_ENV}" ]; then
     INFO_MESSAGE="Recreating (--clear) virtual environment ${NAME_ENV}"
 fi
-if [ -n "$ACCPY_PATH" ] && [ -f $ACCPY_PATH ]; then
-    INFO_MESSAGE+=" using Acc-Py (${ACCPY_VERSION})..."
-else
-    INFO_MESSAGE+=" using standard Python..."
-fi
+
 
 # --------------------------------------------------------------------------------------------
 
 
-# Migrate environment variables to the new bash session
+ENV_PATH="/home/$USER/${NAME_ENV}"
+ACCPY_PATH="/opt/acc-py/base/${ACCPY_CUSTOM_VERSION}"
+
 PATH=$PATH
-USER=$USER
+# Credentials for the bash process to have access to EOS
 OAUTH2_FILE=$OAUTH2_FILE
 OAUTH2_TOKEN=$OAUTH2_TOKEN
 KRB5CCNAME=$KRB5CCNAME
 KRB5CCNAME_NB_TERM=$KRB5CCNAME_NB_TERM
-JUPYTER_DOCKER_STACKS_QUIET=$JUPYTER_DOCKER_STACKS_QUIET
-# JAVA_HOME="/var/lib/alternatives/java_${JDK_VERSION}_openjdk"
 
-# Create a new bash session to avoid conflicts with the current environment in the background
+# Create a new bash session to avoid conflicts with the current environment in the background, in case the user chooses Acc-Py
 env -i bash --noprofile --norc << EOF
 
-export ACCPY_PATH=${ACCPY_PATH}
 export PATH=${PATH}
-export USER=${USER}
 export OAUTH2_FILE=${OAUTH2_FILE}
 export OAUTH2_TOKEN=${OAUTH2_TOKEN}
 export KRB5CCNAME=${KRB5CCNAME}
 export KRB5CCNAME_NB_TERM=${KRB5CCNAME_NB_TERM}
-# export JAVA_HOME=${JAVA_HOME}
 
-echo "${INFO_MESSAGE}"
+if [ -n "$ACCPY_CUSTOM_VERSION" ]; then
+    echo "${INFO_MESSAGE} using Acc-Py (${ACCPY_CUSTOM_VERSION})..."
 
-if [ -n "$ACCPY_PATH" ] && [ -f $ACCPY_PATH ]; then
-    source $ACCPY_PATH
+    source ${ACCPY_PATH}/setup.sh
+    python -m venv ${ENV_PATH} ${CLEAR_ENV}
+else
+    echo "${INFO_MESSAGE} using Python (${PYTHON_PATH})..."
+    ${PYTHON_PATH} -m venv ${ENV_PATH} ${CLEAR_ENV} --copies
 fi
 
-# Create the virtual environment
-python -m venv /home/$USER/${NAME_ENV} ${CLEAR_ENV}
+echo "Setting up the virtual environment..."
+source ${ENV_PATH}/bin/activate
 
-# Activate the created virtual environment
-echo "Preparing virtual environment..."
-source /home/$USER/${NAME_ENV}/bin/activate
+python -m pip install -q --upgrade pip
+pip install -q ipykernel
 
-# Install ipykernel so the kernel can be used in Jupyter
-python -m pip install --upgrade -q pip
-pip install ipykernel -q
+python -m ipykernel install --name ${NAME_ENV} --display-name "Python (${NAME_ENV})" --prefix ${ENV_PATH}
+mkdir -p /home/$USER/.local/share/jupyter/kernels
+ln -f -s ${ENV_PATH}/share/jupyter/kernels/${NAME_ENV} /home/$USER/.local/share/jupyter/kernels/${NAME_ENV}
 
-# Install kernel (within the environment), so it can be ran in Jupyter 
-python -m ipykernel install --name ${NAME_ENV} --display-name "Python (${NAME_ENV})" --prefix /home/$USER/.local 2> /dev/null
-
-# Install the given requirements
 echo "Installing packages from ${REQ_PATH}..."
 pip install -q -r ${REQ_PATH}
 
 # Copy the requirements file to the virtual environment
-cp ${REQ_PATH} /home/$USER/${NAME_ENV}
+cp ${REQ_PATH} ${ENV_PATH}
 
 echo "Virtual environment ${NAME_ENV} created successfully."
 echo "WARNING: You may need to refresh the page to be able to access the new kernel in Jupyter."
- 
 EOF

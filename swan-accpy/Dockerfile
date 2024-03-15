@@ -6,19 +6,23 @@ LABEL maintainer="swan-admins@cern.ch"
 ARG NB_UID="1000"
 ARG BUILD_TAG=daily
 ENV VERSION_DOCKER_IMAGE=$BUILD_TAG
-ENV ACCPY_INSTALLER_2020=acc-py-2020.11-installer.sh
-ENV ACCPY_INSTALLER_2021=acc-py-2021.12-installer.sh
-ENV ACCPY_INSTALLER_2023=acc-py-2023.06-installer.sh
-ENV INSTALLATION_ARGS="--installation-root /opt/acc-py"
+ENV ACCPY_PATH="/opt/acc-py"
 
 RUN echo "Building swan-accpy image with tag ${VERSION_DOCKER_IMAGE} from parent tag ${VERSION_PARENT}."
 
 USER root
 
-RUN wget http://bewww.cern.ch/ap/acc-py/installers/${ACCPY_INSTALLER_2020} http://bewww.cern.ch/ap/acc-py/installers/${ACCPY_INSTALLER_2021} http://bewww.cern.ch/ap/acc-py/installers/${ACCPY_INSTALLER_2023} -q && \
-    chmod +x ${ACCPY_INSTALLER_2020} ${ACCPY_INSTALLER_2021} ${ACCPY_INSTALLER_2023} && \
-    ./${ACCPY_INSTALLER_2020} ${INSTALLATION_ARGS} && ./${ACCPY_INSTALLER_2021} ${INSTALLATION_ARGS} && ./${ACCPY_INSTALLER_2023} ${INSTALLATION_ARGS} && \
-    rm -f ${ACCPY_INSTALLER_2020} ${ACCPY_INSTALLER_2021} ${ACCPY_INSTALLER_2023}
+RUN for version in "2020.11" "2021.12" "2023.06"; do \
+        wget http://bewww.cern.ch/ap/acc-py/installers/acc-py-${version}-installer.sh && \
+        chmod +x acc-py-${version}-installer.sh && \
+        ./acc-py-${version}-installer.sh --installation-root ${ACCPY_PATH} && \
+        rm -f acc-py-${version}-installer.sh && \
+        python -m pip install ipykernel && \
+        source ${ACCPY_PATH}/base/${version}/setup.sh && \
+        ${ACCPY_PATH}/base/${version}/bin/python -m ensurepip --upgrade && \
+        ${ACCPY_PATH}/base/${version}/bin/pip3 install ipykernel && \
+        deactivate; \
+    done
 
 RUN dnf install -y \
     # java-1.8.0-openjdk.x86_64 \

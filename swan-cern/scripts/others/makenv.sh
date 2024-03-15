@@ -82,6 +82,10 @@ done
 
 # --------------------------------------------------------------------------------------------
 
+ENV_PATH="/home/$USER/${NAME_ENV}"
+ACCPY_PATH="/opt/acc-py/base/${ACCPY_CUSTOM_VERSION}"
+PYTHON_PATH=$PYTHON_DEFAULT_PATH
+
 # Checks if a name for the environment is given
 if [ -z "$NAME_ENV" ]; then
     _log "ERROR: No virtual environment name provided." && _log
@@ -90,7 +94,7 @@ if [ -z "$NAME_ENV" ]; then
 fi
 
 # Checks if an environment with the same name was already created, if --clear is not passed
-if [ -d "/home/$USER/${NAME_ENV}" ] && [ -z "$CLEAR_ENV" ]; then
+if [ -d "$ENV_PATH" ] && [ -z "$CLEAR_ENV" ]; then
     _log "ERROR: Virtual environment already exists."
     exit 1
 fi
@@ -146,19 +150,20 @@ else
 fi
 
 # Verify if the requirements file is not empty
-if [ ! -s ${REQ_PATH} ]; then
+if [ ! -s "$REQ_PATH" ]; then
     echo "ERROR: Requirements file is empty."
     exit 1
 fi
 
 
-PYTHON_PATH=$PYTHON_DEFAULT_PATH
 if [ -n "$PYTHON_CUSTOM_PATH" ]; then
     PYTHON_PATH=$PYTHON_CUSTOM_PATH
+elif [ -n "$ACCPY_CUSTOM_VERSION" ]; then
+    PYTHON_PATH="${ACCPY_PATH}/bin/python"
 fi
 
 INFO_MESSAGE="Creating virtual environment ${NAME_ENV}"
-if [ -d "/home/$USER/${NAME_ENV}" ]; then
+if [ -d "$ENV_PATH" ]; then
     INFO_MESSAGE="Recreating (--clear) virtual environment ${NAME_ENV}"
 fi
 
@@ -166,10 +171,7 @@ fi
 # --------------------------------------------------------------------------------------------
 
 
-ENV_PATH="/home/$USER/${NAME_ENV}"
-ACCPY_PATH="/opt/acc-py/base/${ACCPY_CUSTOM_VERSION}"
 
-PATH=$PATH
 # Credentials for the bash process to have access to EOS
 OAUTH2_FILE=$OAUTH2_FILE
 OAUTH2_TOKEN=$OAUTH2_TOKEN
@@ -179,7 +181,6 @@ KRB5CCNAME_NB_TERM=$KRB5CCNAME_NB_TERM
 # Create a new bash session to avoid conflicts with the current environment in the background, in case the user chooses Acc-Py
 env -i bash --noprofile --norc << EOF
 
-export PATH=${PATH}
 export OAUTH2_FILE=${OAUTH2_FILE}
 export OAUTH2_TOKEN=${OAUTH2_TOKEN}
 export KRB5CCNAME=${KRB5CCNAME}
@@ -187,13 +188,12 @@ export KRB5CCNAME_NB_TERM=${KRB5CCNAME_NB_TERM}
 
 if [ -n "$ACCPY_CUSTOM_VERSION" ]; then
     echo "${INFO_MESSAGE} using Acc-Py (${ACCPY_CUSTOM_VERSION})..."
-
     source ${ACCPY_PATH}/setup.sh
-    python -m venv ${ENV_PATH} ${CLEAR_ENV}
 else
     echo "${INFO_MESSAGE} using Python (${PYTHON_PATH})..."
-    ${PYTHON_PATH} -m venv ${ENV_PATH} ${CLEAR_ENV} --copies
 fi
+
+${PYTHON_PATH} -m venv ${ENV_PATH} ${CLEAR_ENV}
 
 echo "Setting up the virtual environment..."
 source ${ENV_PATH}/bin/activate

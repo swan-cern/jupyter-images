@@ -162,14 +162,8 @@ elif [ -n "$ACCPY_CUSTOM_VERSION" ]; then
     PYTHON_PATH="${ACCPY_PATH}/bin/python"
 fi
 
-INFO_MESSAGE="Creating virtual environment ${NAME_ENV}"
-if [ -d "$ENV_PATH" ]; then
-    INFO_MESSAGE="Recreating (--clear) virtual environment ${NAME_ENV}"
-fi
-
 
 # --------------------------------------------------------------------------------------------
-
 
 
 # Credentials for the bash process to have access to EOS
@@ -177,6 +171,10 @@ OAUTH2_FILE=$OAUTH2_FILE
 OAUTH2_TOKEN=$OAUTH2_TOKEN
 KRB5CCNAME=$KRB5CCNAME
 KRB5CCNAME_NB_TERM=$KRB5CCNAME_NB_TERM
+if [ ! -n "$ACCPY_CUSTOM_VERSION" ]; then
+    LD_LIBRARY_PATH=$LD_LIBRARY_PATH
+    PYTHONPATH=$PYTHONPATH
+fi
 
 # Create a new bash session to avoid conflicts with the current environment in the background, in case the user chooses Acc-Py
 env -i bash --noprofile --norc << EOF
@@ -187,26 +185,39 @@ export KRB5CCNAME=${KRB5CCNAME}
 export KRB5CCNAME_NB_TERM=${KRB5CCNAME_NB_TERM}
 
 if [ -n "$ACCPY_CUSTOM_VERSION" ]; then
-    echo "${INFO_MESSAGE} using Acc-Py (${ACCPY_CUSTOM_VERSION})..."
     source ${ACCPY_PATH}/setup.sh
+    if [ -d "${ENV_PATH}" ] && [ -n "${CLEAR_ENV}" ]; then
+        rm -rf ${ENV_PATH}
+    fi
+    acc-py venv ${ENV_PATH}
 else
-    echo "${INFO_MESSAGE} using Python (${PYTHON_PATH})..."
+    if [ -d "${ENV_PATH}" ]; then
+        echo "Recreating (--clear) virtual environment ${NAME_ENV} using Python (${PYTHON_PATH})..."
+    else
+        echo "Creating virtual environment ${NAME_ENV} using Python (${PYTHON_PATH})..."
+    fi
+    ${PYTHON_PATH} -m venv ${ENV_PATH} ${CLEAR_ENV} --copies
 fi
 
-${PYTHON_PATH} -m venv ${ENV_PATH} ${CLEAR_ENV}
+mkdir -p /home/$USER/.local/share/jupyter/kernels
+ln -f -s ${ENV_PATH}/share/jupyter/kernels/${NAME_ENV} /home/$USER/.local/share/jupyter/kernels/${NAME_ENV}
 
 echo "Setting up the virtual environment..."
 source ${ENV_PATH}/bin/activate
 
-python -m pip install -q --upgrade pip
-pip install -q ipykernel
-
-python -m ipykernel install --name ${NAME_ENV} --display-name "Python (${NAME_ENV})" --prefix ${ENV_PATH}
-mkdir -p /home/$USER/.local/share/jupyter/kernels
-ln -f -s ${ENV_PATH}/share/jupyter/kernels/${NAME_ENV} /home/$USER/.local/share/jupyter/kernels/${NAME_ENV}
+if [ -n "$ACCPY_CUSTOM_VERSION" ]; then
+    python -m ipykernel install --name ${NAME_ENV} --display-name "Python (${NAME_ENV})" --prefix ${ENV_PATH}
+else
+    export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}
+    export PYTHONPATH=${PYTHONPATH}
+    ${PYTHON_PATH} -m ipykernel install --name ${NAME_ENV} --display-name "Python (${NAME_ENV})" --prefix ${ENV_PATH}
+    sed -i 's#${PYTHON_PATH}#${ENV_PATH}/bin/python#' ${ENV_PATH}/share/jupyter/kernels/${NAME_ENV}/kernel.json
+    unset PYTHONPATH
+    unset LD_LIBRARY_PATH
+fi
 
 echo "Installing packages from ${REQ_PATH}..."
-pip install -q -r ${REQ_PATH}
+python -m pip install -q -r ${REQ_PATH}
 
 # Copy the requirements file to the virtual environment
 cp ${REQ_PATH} ${ENV_PATH}

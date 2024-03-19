@@ -56,19 +56,11 @@ while [ $# -gt 0 ]; do
             ;;
         --accpy)
             ACCPY_CUSTOM_VERSION=$2
-            if [[ ! $ACCPY_ALL_VERSIONS[@] =~ $ACCPY_CUSTOM_VERSION ]]; then
-                _log "ERROR: Invalid Acc-Py version. Options: ${ACCPY_ALL_VERSIONS_STR}"
-                exit 1
-            fi
             shift
             shift
             ;;
         --python)
             PYTHON_CUSTOM_PATH=$2
-            if [ ! -f $PYTHON_CUSTOM_PATH ]; then
-                _log "ERROR: Python interpreter not found."
-                exit 1
-            fi
             shift
             shift
             ;;
@@ -83,8 +75,10 @@ done
 # --------------------------------------------------------------------------------------------
 
 ENV_PATH="/home/$USER/${NAME_ENV}"
-ACCPY_PATH="/opt/acc-py/base/${ACCPY_CUSTOM_VERSION}"
 PYTHON_PATH=$PYTHON_DEFAULT_PATH
+if [ -n "$PYTHON_CUSTOM_PATH" ]; then
+    PYTHON_PATH=$PYTHON_CUSTOM_PATH
+fi
 
 # Checks if a name for the environment is given
 if [ -z "$NAME_ENV" ]; then
@@ -99,9 +93,21 @@ if [ -d "$ENV_PATH" ] && [ -z "$CLEAR_ENV" ]; then
     exit 1
 fi
 
-# If AccPy and Python are both set, trigger an error
+# Checks if AccPy and Python are both set, trigger an error
 if [ -n "$ACCPY_CUSTOM_VERSION" ] && [ -n "$PYTHON_CUSTOM_PATH" ]; then
     _log "ERROR: --python and --accpy are both set. Please choose only one of the options."
+    exit 1
+fi
+
+# Checks if the provided Python interpreter is found
+if [ ! -f $PYTHON_CUSTOM_PATH ]; then
+    _log "ERROR: Python interpreter not found."
+    exit 1
+fi
+
+# Checks if the provided Acc-Py version is valid
+if [[ ! $ACCPY_ALL_VERSIONS[@] =~ $ACCPY_CUSTOM_VERSION ]]; then
+    _log "ERROR: Invalid Acc-Py version. Options: ${ACCPY_ALL_VERSIONS_STR}"
     exit 1
 fi
 
@@ -149,18 +155,12 @@ else
     exit 1
 fi
 
-# Verify if the requirements file is not empty
+# Checks if the requirements file is not empty
 if [ ! -s "$REQ_PATH" ]; then
     echo "ERROR: Requirements file is empty."
     exit 1
 fi
 
-
-if [ -n "$PYTHON_CUSTOM_PATH" ]; then
-    PYTHON_PATH=$PYTHON_CUSTOM_PATH
-elif [ -n "$ACCPY_CUSTOM_VERSION" ]; then
-    PYTHON_PATH="${ACCPY_PATH}/bin/python"
-fi
 
 
 # --------------------------------------------------------------------------------------------
@@ -171,10 +171,6 @@ OAUTH2_FILE=$OAUTH2_FILE
 OAUTH2_TOKEN=$OAUTH2_TOKEN
 KRB5CCNAME=$KRB5CCNAME
 KRB5CCNAME_NB_TERM=$KRB5CCNAME_NB_TERM
-if [ ! -n "$ACCPY_CUSTOM_VERSION" ]; then
-    LD_LIBRARY_PATH=$LD_LIBRARY_PATH
-    PYTHONPATH=$PYTHONPATH
-fi
 
 # Create a new bash session to avoid conflicts with the current environment in the background, in case the user chooses Acc-Py
 env -i bash --noprofile --norc << EOF
@@ -185,7 +181,7 @@ export KRB5CCNAME=${KRB5CCNAME}
 export KRB5CCNAME_NB_TERM=${KRB5CCNAME_NB_TERM}
 
 if [ -n "$ACCPY_CUSTOM_VERSION" ]; then
-    source ${ACCPY_PATH}/setup.sh
+    source /opt/acc-py/base/${ACCPY_CUSTOM_VERSION}/setup.sh
     if [ -d "${ENV_PATH}" ] && [ -n "${CLEAR_ENV}" ]; then
         rm -rf ${ENV_PATH}
     fi
@@ -205,19 +201,22 @@ ln -f -s ${ENV_PATH}/share/jupyter/kernels/${NAME_ENV} /home/$USER/.local/share/
 echo "Setting up the virtual environment..."
 source ${ENV_PATH}/bin/activate
 
-if [ -n "$ACCPY_CUSTOM_VERSION" ]; then
-    python -m ipykernel install --name ${NAME_ENV} --display-name "Python (${NAME_ENV})" --prefix ${ENV_PATH}
-else
-    export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}
-    export PYTHONPATH=${PYTHONPATH}
-    ${PYTHON_PATH} -m ipykernel install --name ${NAME_ENV} --display-name "Python (${NAME_ENV})" --prefix ${ENV_PATH}
-    sed -i 's#${PYTHON_PATH}#${ENV_PATH}/bin/python#' ${ENV_PATH}/share/jupyter/kernels/${NAME_ENV}/kernel.json
-    unset PYTHONPATH
-    unset LD_LIBRARY_PATH
+# Check if ACCPY_CUSTOM_VERSION is not set and if ipykernel is on the requirements file, if not, add the latest version
+if [ -z "$ACCPY_CUSTOM_VERSION" ]; then
+    if ! grep -q "ipykernel" ${REQ_PATH}; then
+        echo "ipykernel" >> ${REQ_PATH}
+    fi
 fi
 
 echo "Installing packages from ${REQ_PATH}..."
-python -m pip install -q -r ${REQ_PATH}
+pip install -r ${REQ_PATH}
+
+python -m ipykernel install --name ${NAME_ENV} --display-name "Python (${NAME_ENV})" --prefix ${ENV_PATH}
+
+# Remove ipykernel package from the requirements file, if it was added
+if [ -z "$ACCPY_CUSTOM_VERSION" ]; then
+    sed -i '/ipykernel/d' ${REQ_PATH}
+fi
 
 # Copy the requirements file to the virtual environment
 cp ${REQ_PATH} ${ENV_PATH}

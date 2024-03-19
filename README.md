@@ -18,8 +18,8 @@ Options:
   -r, --req REQUIREMENTS      Path to requirements.txt file or http link for a public repository (mandatory)
   -c, --clear                 Clear the current virtual environment, if it exists
   -h, --help                  Print this help page
-  --accpy VERSION             Version of Acc-Py to be used (options: ${ACCPY_ALL_VERSIONS_STR})
-  --python PATH               Path to the Python interpreter to be used (default: ${PYTHON_DEFAULT_PATH})
+  --accpy VERSION             Version of Acc-Py to be used (options: 2020.11, 2021.12, 2023.06)
+  --python PATH               Path to the Python interpreter to be used (default: CVMFS Python (LCG 105))
 ```
 
 ### Share your environment

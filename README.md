@@ -36,9 +36,8 @@ Options:
 
 4. Your collaborators can also update the environment by adding, updating or removing packages from the requirements.txt file and pushing the changes to the repository. An **username** and **access token** may be **required**.
 
-5. Later, the `--clear` flag can be used for rebuilding the environment.
+5. Later, the `-c/--clear` flag can be used for rebuilding the environment.
 
-6. The `--accpy`flag allows the user to specify the version of Acc-Py to be used. If not specified, the latest version will be used.
+6. The `--accpy` flag allows the user to specify the version of Acc-Py to be used.
 
-7. The `--no-accpy` flag can also be used to create a virtual environment using standard Python, instead of Acc-Py.
-
+7. The `--python` flag allows the user to specify the path to an alternative Python interpreter to be used. If not specified, the default CVMFS Python (LCG 105) will be used.

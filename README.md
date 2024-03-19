@@ -42,16 +42,3 @@ Options:
 
 7. The `--no-accpy` flag can also be used to create a virtual environment using standard Python, instead of Acc-Py.
 
----
-
-## TODO
-
-
-- [ ] Install ipykernel on the 3 versions of accpy during build time
-
-- [ ] No need to isolate the environment from the host system when using cvmfs python
-
-  - [ ] In this case, reuse ipykernel provided by the cvmfs release
-
-- [ ] When using custom python, make sure ipykernel is installed (and pip, before that)
-

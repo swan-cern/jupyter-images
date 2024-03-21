@@ -201,11 +201,9 @@ ln -f -s ${ENV_PATH}/share/jupyter/kernels/${NAME_ENV} /home/$USER/.local/share/
 echo "Setting up the virtual environment..."
 source ${ENV_PATH}/bin/activate
 
-# Check if ACCPY_CUSTOM_VERSION is not set and if ipykernel is on the requirements file, if not, add the latest version
-if [ -z "$ACCPY_CUSTOM_VERSION" ]; then
-    if ! grep -q "ipykernel" ${REQ_PATH}; then
-        echo "ipykernel" >> ${REQ_PATH}
-    fi
+# Check if ACCPY_CUSTOM_VERSION is not set and ipykernel is on the requirements file, if not, add the latest version
+if [ -z "$ACCPY_CUSTOM_VERSION" ] && [ -z "$(grep -i 'ipykernel' ${REQ_PATH})" ]; then
+    echo "ipykernel" >> ${REQ_PATH}
 fi
 
 echo "Installing packages from ${REQ_PATH}..."
@@ -214,7 +212,7 @@ pip install -r ${REQ_PATH}
 python -m ipykernel install --name ${NAME_ENV} --display-name "Python (${NAME_ENV})" --prefix ${ENV_PATH}
 
 # Remove ipykernel package from the requirements file, if it was added
-if [ -z "$ACCPY_CUSTOM_VERSION" ]; then
+if [ -z "$ACCPY_CUSTOM_VERSION" ] && [ -z "$(grep -i 'ipykernel' ${REQ_PATH})" ]; then
     sed -i '/ipykernel/d' ${REQ_PATH}
 fi
 

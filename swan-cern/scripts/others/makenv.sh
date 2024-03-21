@@ -203,7 +203,7 @@ source ${ENV_PATH}/bin/activate
 
 # Check if ACCPY_CUSTOM_VERSION is not set and ipykernel is on the requirements file, if not, add the latest version
 if [ -z "$ACCPY_CUSTOM_VERSION" ] && [ -z "$(grep -i 'ipykernel' ${REQ_PATH})" ]; then
-    echo "ipykernel" >> ${REQ_PATH}
+    echo -e "\nipykernel" >> ${REQ_PATH}
 fi
 
 echo "Installing packages from ${REQ_PATH}..."

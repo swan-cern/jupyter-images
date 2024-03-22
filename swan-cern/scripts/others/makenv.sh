@@ -10,10 +10,11 @@ _log () {
     fi
 }
 
+ACCPY_BASE=/opt/acc-py/base
 ACCPY_ALL_VERSIONS_STR="?"
 PYTHON_DEFAULT_PATH=$(which python)
 if [ -d "/opt/acc-py" ]; then
-    ACCPY_ALL_VERSIONS=$(ls -tr /opt/acc-py/base)
+    ACCPY_ALL_VERSIONS=$(ls -tr $ACCPY_BASE)
     ACCPY_ALL_VERSIONS_STR=$(echo $ACCPY_ALL_VERSIONS | tr ' ' ', ')
 fi
 
@@ -37,7 +38,7 @@ while [ $# -gt 0 ]; do
     key="$1"
     case $key in
         --env|-e)
-            NAME_ENV=$2
+            ENV_NAME=$2
             shift
             shift
             ;;
@@ -74,14 +75,14 @@ done
 
 # --------------------------------------------------------------------------------------------
 
-ENV_PATH="/home/$USER/${NAME_ENV}"
+ENV_PATH="/home/$USER/${ENV_NAME}"
 PYTHON_PATH=$PYTHON_DEFAULT_PATH
 if [ -n "$PYTHON_CUSTOM_PATH" ]; then
     PYTHON_PATH=$PYTHON_CUSTOM_PATH
 fi
 
 # Checks if a name for the environment is given
-if [ -z "$NAME_ENV" ]; then
+if [ -z "$ENV_NAME" ]; then
     _log "ERROR: No virtual environment name provided." && _log
     print_help
     exit 1
@@ -106,7 +107,7 @@ if [ ! -f $PYTHON_CUSTOM_PATH ]; then
 fi
 
 # Checks if the provided Acc-Py version is valid
-if [[ ! $ACCPY_ALL_VERSIONS[@] =~ $ACCPY_CUSTOM_VERSION ]]; then
+if [ ! -e "$ACCPY_BASE/$ACCPY_CUSTOM_VERSION" ]; then
     _log "ERROR: Invalid Acc-Py version. Options: ${ACCPY_ALL_VERSIONS_STR}"
     exit 1
 fi
@@ -181,22 +182,22 @@ export KRB5CCNAME=${KRB5CCNAME}
 export KRB5CCNAME_NB_TERM=${KRB5CCNAME_NB_TERM}
 
 if [ -n "$ACCPY_CUSTOM_VERSION" ]; then
-    source /opt/acc-py/base/${ACCPY_CUSTOM_VERSION}/setup.sh
+    source ${ACCPY_BASE}/${ACCPY_CUSTOM_VERSION}/setup.sh
     if [ -d "${ENV_PATH}" ] && [ -n "${CLEAR_ENV}" ]; then
         rm -rf ${ENV_PATH}
     fi
     acc-py venv ${ENV_PATH}
 else
     if [ -d "${ENV_PATH}" ]; then
-        echo "Recreating (--clear) virtual environment ${NAME_ENV} using Python (${PYTHON_PATH})..."
+        echo "Recreating (--clear) virtual environment ${ENV_NAME} using Python (${PYTHON_PATH})..."
     else
-        echo "Creating virtual environment ${NAME_ENV} using Python (${PYTHON_PATH})..."
+        echo "Creating virtual environment ${ENV_NAME} using Python (${PYTHON_PATH})..."
     fi
     ${PYTHON_PATH} -m venv ${ENV_PATH} ${CLEAR_ENV} --copies
 fi
 
 mkdir -p /home/$USER/.local/share/jupyter/kernels
-ln -f -s ${ENV_PATH}/share/jupyter/kernels/${NAME_ENV} /home/$USER/.local/share/jupyter/kernels/${NAME_ENV}
+ln -f -s ${ENV_PATH}/share/jupyter/kernels/${ENV_NAME} /home/$USER/.local/share/jupyter/kernels/${ENV_NAME}
 
 echo "Setting up the virtual environment..."
 source ${ENV_PATH}/bin/activate
@@ -209,7 +210,7 @@ fi
 echo "Installing packages from ${REQ_PATH}..."
 pip install -r ${REQ_PATH}
 
-python -m ipykernel install --name ${NAME_ENV} --display-name "Python (${NAME_ENV})" --prefix ${ENV_PATH}
+python -m ipykernel install --name ${ENV_NAME} --display-name "Python (${ENV_NAME})" --prefix ${ENV_PATH}
 
 # Remove ipykernel package from the requirements file, if it was added
 if [ -z "$ACCPY_CUSTOM_VERSION" ] && [ -z "$(grep -i 'ipykernel' ${REQ_PATH})" ]; then
@@ -219,6 +220,6 @@ fi
 # Copy the requirements file to the virtual environment
 cp ${REQ_PATH} ${ENV_PATH}
 
-echo "Virtual environment ${NAME_ENV} created successfully."
+echo "Virtual environment ${ENV_NAME} created successfully."
 echo "WARNING: You may need to refresh the page to be able to access the new kernel in Jupyter."
 EOF

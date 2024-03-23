@@ -172,6 +172,83 @@ OAUTH2_FILE=$OAUTH2_FILE
 OAUTH2_TOKEN=$OAUTH2_TOKEN
 KRB5CCNAME=$KRB5CCNAME
 KRB5CCNAME_NB_TERM=$KRB5CCNAME_NB_TERM
+ACTIVATE_BIN_TEMPLATE="
+# This file must be used with \"source bin/activate\" *from bash*
+# you cannot run it directly
+
+deactivate () {
+    # reset old environment variables
+    if [ -n \"\${_OLD_VIRTUAL_PATH:-}\" ] ; then
+        PATH=\"\${_OLD_VIRTUAL_PATH:-}\"
+        export PATH
+        unset _OLD_VIRTUAL_PATH
+    fi
+    if [ -n \"\${_OLD_VIRTUAL_PYTHONHOME:-}\" ] ; then
+        PYTHONHOME=\"\${_OLD_VIRTUAL_PYTHONHOME:-}\"
+        export PYTHONHOME
+        unset _OLD_VIRTUAL_PYTHONHOME
+    fi
+    if [ -n \"\${_OLD_VIRTUAL_PYTHONPATH:-}\" ] ; then # added line
+        PYTHONPATH=\"\${_OLD_VIRTUAL_PYTHONPATH:-}\" # added line
+        export PYTHONPATH # added line
+        unset _OLD_VIRTUAL_PYTHONPATH # added line
+    fi
+
+    # This should detect bash and zsh, which have a hash command that must
+    # be called to get it to forget past commands.  Without forgetting
+    # past commands the \$PATH changes we made may not be respected
+    if [ -n \"\${BASH:-}\" -o -n \"\${ZSH_VERSION:-}\" ] ; then
+        hash -r 2> /dev/null
+    fi
+
+    if [ -n \"\${_OLD_VIRTUAL_PS1:-}\" ] ; then
+        PS1=\"\${_OLD_VIRTUAL_PS1:-}\"
+        export PS1
+        unset _OLD_VIRTUAL_PS1
+    fi
+
+    unset VIRTUAL_ENV
+    if [ ! \"\${1:-}\" = \"nondestructive\" ] ; then
+    # Self destruct!
+        unset -f deactivate
+    fi
+}
+
+# unset irrelevant variables
+deactivate nondestructive
+
+VIRTUAL_ENV=\"${ENV_PATH}\"
+export VIRTUAL_ENV
+
+_OLD_VIRTUAL_PATH=\"\$PATH\"
+PATH=\"\$VIRTUAL_ENV/bin:\$PATH\"
+export PATH
+
+# unset PYTHONHOME if set
+# this will fail if PYTHONHOME is set to the empty string (which is bad anyway)
+# could use \`if (set -u; : \$PYTHONHOME) ;\` in bash
+if [ -n \"\${PYTHONHOME:-}\" ] ; then
+    _OLD_VIRTUAL_PYTHONHOME=\"\${PYTHONHOME:-}\"
+    unset PYTHONHOME
+fi
+if [ -n \"\${PYTHONPATH:-}\" ] ; then # added line
+    _OLD_VIRTUAL_PYTHONPATH=\"\${PYTHONPATH:-}\" # added line
+    unset PYTHONPATH # added line
+fi # added line
+
+if [ -z \"\${VIRTUAL_ENV_DISABLE_PROMPT:-}\" ] ; then
+    _OLD_VIRTUAL_PS1=\"\${PS1:-}\"
+    PS1=\"(${ENV_NAME}) \${PS1:-}\"
+    export PS1
+fi
+
+# This should detect bash and zsh, which have a hash command that must
+# be called to get it to forget past commands.  Without forgetting
+# past commands the \$PATH changes we made may not be respected
+if [ -n \"\${BASH:-}\" -o -n \"\${ZSH_VERSION:-}\" ] ; then
+    hash -r 2> /dev/null
+fi
+"
 
 # Create a new bash session to avoid conflicts with the current environment in the background, in case the user chooses Acc-Py
 env -i bash --noprofile --norc << EOF
@@ -219,6 +296,11 @@ fi
 
 # Copy the requirements file to the virtual environment
 cp ${REQ_PATH} ${ENV_PATH}
+
+# Get (de)activate script to be independent from the PYTHONPATH, only if ACCPY_CUSTOM_VERSION is not set
+if [ -z "$ACCPY_CUSTOM_VERSION" ]; then
+    echo '${ACTIVATE_BIN_TEMPLATE}' > ${ENV_PATH}/bin/activate
+fi
 
 echo "Virtual environment ${ENV_NAME} created successfully."
 echo "WARNING: You may need to refresh the page to be able to access the new kernel in Jupyter."

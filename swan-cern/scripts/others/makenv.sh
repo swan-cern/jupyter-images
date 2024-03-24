@@ -297,8 +297,10 @@ fi
 # Copy the requirements file to the virtual environment
 cp ${REQ_PATH} ${ENV_PATH}
 
-# Get (de)activate script to be independent from the PYTHONPATH
-echo '${ACTIVATE_BIN_TEMPLATE}' > ${ENV_PATH}/bin/activate
+# Get (de)activate script to be independent from the PYTHONPATH, only if ACCPY_CUSTOM_VERSION is not set
+if [ -z "$ACCPY_CUSTOM_VERSION" ]; then
+    echo '${ACTIVATE_BIN_TEMPLATE}' > ${ENV_PATH}/bin/activate
+fi
 
 echo "Virtual environment ${ENV_NAME} created successfully."
 echo "WARNING: You may need to refresh the page to be able to access the new kernel in Jupyter."

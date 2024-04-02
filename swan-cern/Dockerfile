@@ -49,7 +49,8 @@ RUN dnf install -y \
     perl-Archive-Tar \
     perl-Authen-Krb5 \
     perl-Sys-Hostname \
-    perl-Sys-Syslog && \
+    perl-Sys-Syslog \
+    voms-clients-java && \
     dnf clean all && \
     rm -rf /var/cache/dnf
 # Required for kerberos authentication to work

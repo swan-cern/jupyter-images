@@ -25,6 +25,13 @@ then
 
   # Ensure Dask clients call us to create a default Security object
   export DASK_DISTRIBUTED__CLIENT__SECURITY_LOADER="swandaskcluster.security.loader"
+
+  # add support for VOMS
+  if [[ -d /cvmfs/grid.cern.ch/etc ]]
+  then
+    ln -s /cvmfs/grid.cern.ch/etc/grid-security /etc/grid-security
+    ln -s /cvmfs/grid.cern.ch/etc/grid-security/vomses /etc/vomses
+  fi
 else
   _log "Skipping HTCondor configuration";
   # Disable Dask lab extension

@@ -314,9 +314,7 @@ echo "WARNING: You may need to refresh the page to be able to access the new ker
 EOF
 
 # Check if the virtual environment was created successfully
-if [ -d "${ENV_PATH}" ] && [ -z "${CLEAR_ENV}" ]; then
-    echo "yasss"
-    # Increment the number of created custom environments
+if [ -f "${ENV_PATH}/bin/activate" ]; then
     echo "export TOTAL_CUSTOMENVS=$((TOTAL_CUSTOMENVS+1))" >> ~/.bashrc
     source ~/.bashrc
 fi

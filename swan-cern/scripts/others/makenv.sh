@@ -10,6 +10,7 @@ _log () {
     fi
 }
 
+CUSTOMENVS_LIMIT=1
 ACCPY_BASE=/opt/acc-py/base
 ACCPY_ALL_VERSIONS_STR="?"
 PYTHON_DEFAULT_PATH=$(which python)
@@ -81,6 +82,12 @@ if [ -n "$PYTHON_CUSTOM_PATH" ]; then
     PYTHON_PATH=$PYTHON_CUSTOM_PATH
 fi
 
+
+# Check if the maximum number of created custom environments is reached
+if [ ! -d "$ENV_PATH" ] && [ -n "$TOTAL_CUSTOMENVS" ] && [ $TOTAL_CUSTOMENVS -ge $CUSTOMENVS_LIMIT ]; then
+    _log "ERROR: Maximum number of custom environments reached."
+    exit 1
+fi
 # Checks if a name for the environment is given
 if [ -z "$ENV_NAME" ]; then
     _log "ERROR: No virtual environment name provided." && _log
@@ -305,3 +312,11 @@ fi
 echo "Virtual environment ${ENV_NAME} created successfully."
 echo "WARNING: You may need to refresh the page to be able to access the new kernel in Jupyter."
 EOF
+
+# Check if the virtual environment was created successfully
+if [ -d "${ENV_PATH}" ] && [ -z "${CLEAR_ENV}" ]; then
+    echo "yasss"
+    # Increment the number of created custom environments
+    echo "export TOTAL_CUSTOMENVS=$((TOTAL_CUSTOMENVS+1))" >> ~/.bashrc
+    source ~/.bashrc
+fi

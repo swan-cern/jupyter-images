@@ -314,7 +314,7 @@ echo "WARNING: You may need to refresh the page to be able to access the new ker
 EOF
 
 # Check if the virtual environment was created successfully
-if [ -f "$ENV_PATH/bin/activate" ] && [ -z "$CLEAR_ENV" ]; then
+if [ -f "${ENV_PATH}/bin/activate" ] && [ -z "${CLEAR_ENV}" ]; then
     echo "export TOTAL_CUSTOMENVS=$((TOTAL_CUSTOMENVS+1))" >> /home/$USER/.bashrc
     source /home/$USER/.bashrc
 fi

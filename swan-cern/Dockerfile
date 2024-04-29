@@ -39,12 +39,6 @@ ADD config/dask-labextension.yaml /etc/dask/labextension.yaml
 
 USER root
 
-# Crate a new bin path for allowing the user to run it with an alias
-# Add script for virtual environment creation
-RUN mkdir /srv/singleuser/bin && \
-    mv /srv/singleuser/makenv.sh /srv/singleuser/bin/makenv && \
-    chmod +x /srv/singleuser/bin/makenv
-
 # HTCondor requirements
 RUN dnf install -y \
     # required by condor_submit

@@ -51,6 +51,8 @@ RUN dnf install -y \
     texlive-type1cm \
     texlive-upquote \
     texlive-ulem \
+    # Added to allow tex outputs to be converted to png
+    texlive-dvipng \
     fontconfig && \
     # Clear the dnf cache as we no longer need to install packages
     dnf clean all && \

@@ -32,9 +32,6 @@ ln -s $LOCAL_NB_NBEXTENSIONS $NBCONFIG/notebook.json
 START_TIME_SETUP_LCG=$( date +%s.%N )
 export JUPYTER_DATA_DIR=$LCG_VIEW/share/jupyter 
 
-# Path for scripts to build custom user environments (e.g. makenv.sh)
-export PATH="${PATH}:/srv/singleuser/bin"
-
 # Setup LCG
 source $LCG_VIEW/setup.sh
 

@@ -39,6 +39,10 @@ ADD config/dask-labextension.yaml /etc/dask/labextension.yaml
 
 USER root
 
+# Install Spark extensions for classic UI
+RUN jupyter nbclassic-extension install --py --system sparkconnector && \
+    jupyter nbclassic-extension install --py --system sparkmonitor
+
 # HTCondor requirements
 RUN dnf install -y \
     # required by condor_submit

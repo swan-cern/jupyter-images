@@ -30,8 +30,6 @@ USER root
 # Install all OS dependencies and additional packages for Server that starts
 # but lacks all features (e.g., download as all possible file formats)
 RUN dnf update -y && \
-    # - dnf upgrade is run to patch known vulnerabilities in dnf packages
-    dnf upgrade -y && \
     # - enable Extra Packages for Enterprise Linux (EPEL) repository (CRB) 
     #   to be able to install additional packages
     dnf install -y 'dnf-command(config-manager)' && \

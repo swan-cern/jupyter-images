@@ -21,6 +21,7 @@ then
   mkdir -p /etc/jupyter/nbconfig
   _log "Globally enabling the Spark extensions"
   jq -n --argjson sparkconnector/extension true \
+        --argjson sparkmonitor/extension true \
         '{load_extensions: $ARGS.named}' > /etc/jupyter/nbconfig/notebook.json
 
   IPYTHON_KERNEL_CONFIG=$IPYTHONDIR/profile_default/ipython_kernel_config.py

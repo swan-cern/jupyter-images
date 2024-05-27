@@ -5,7 +5,7 @@ stages:
 build_image:
   stage: build
   image:
-    name: gitlab-registry.cern.ch/ci-tools/docker-image-builder
+    name: gcr.io/kaniko-project/executor:debug
     entrypoint: [""]
   script:
     # Get the image name and version to be built

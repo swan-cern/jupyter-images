@@ -60,8 +60,8 @@ RUN dnf install -y \
 
 # Install HEP_OSlibs
 # This installs system packages for LCGs to work
-RUN dnf -y install https://linuxsoft.cern.ch/wlcg/el9/x86_64/wlcg-repo-1.0.0-1.el9.noarch.rpm
-RUN dnf -y install HEP_OSlibs-9.1.0-2.el9
+RUN dnf --repofrompath=wlcg,'https://linuxsoft.cern.ch/wlcg/el9/$basearch/' \
+        install -y HEP_OSlibs-9.1.0-2.el9
 
 # Switch back to jovyan to avoid accidental container runs as root
 USER ${NB_UID}

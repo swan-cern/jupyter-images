@@ -93,7 +93,7 @@ then
   chown -R $NB_USER:$NB_GID $LOCAL_HOME
 
   _log "Running user configuration script for user $NB_USER."
-  sudo -E -u $NB_USER bash /srv/singleuser/scripts/userconfig.sh
+  run_as_user bash /srv/singleuser/scripts/userconfig.sh
 
   # Since the jupyter server is started with --preserve-env (in start.sh)
   # other variables exported from this point on are also visible in the

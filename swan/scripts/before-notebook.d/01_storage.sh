@@ -23,7 +23,7 @@ then
     chmod 600 $OAUTH2_FILE
 fi
 
-sudo -E -u $NB_USER sh -c 'if [[ ! -d "$HOME" || ! -x "$HOME" ]]; then exit 1; fi'
+run_as_user 'if [[ ! -d "$HOME" || ! -x "$HOME" ]]; then exit 1; fi'
 if [ $? -ne 0 ]
 then
     _log "Error setting notebook working directory, $HOME not accessible by user $NB_USER."
@@ -37,6 +37,6 @@ then
 fi
 
 # Make sure the user has the SWAN_projects folder
-sudo -E -u $NB_USER sh -c 'mkdir -p $HOME/SWAN_projects'
+run_as_user mkdir -p $HOME/SWAN_projects
 
 _log "Finished setting up user session storage"

@@ -1,11 +1,14 @@
 import os
 
-c.NotebookNotary.db_file = os.environ.get("JUPYTER_PATH") + "/nbsignatures.db"
-c.NotebookNotary.secret_file = os.environ.get("JUPYTER_PATH") + "/notebook_secret"
+home = os.environ.get("HOME")
+jupyter_path = os.environ.get("JUPYTER_PATH", f"{home}/.local/share/jupyter")
+
+c.NotebookNotary.db_file = f"{jupyter_path}/nbsignatures.db"
+c.NotebookNotary.secret_file = f"{jupyter_path}/notebook_secret"
 
 # Configure jupyter lab to start in the HOME of the user
 # which is usually EOS for CERN users.
-c.ServerApp.root_dir = os.environ.get("HOME")
+c.ServerApp.root_dir = home
 
 c.ServerApp.contents_manager_class = "swancontents.filemanager.SwanEosFileManager"
 # To allow deleting Projects, which are never empty because of .swancontents

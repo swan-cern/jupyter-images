@@ -6,8 +6,9 @@
 # launched as regular user as it's this entity which is able to access 
 # eos and not the super user.
 
-# Executes the script if $LCG_ENVIRONMENT variable is set to true (LCG environment or custom environment built on top of CVMFS Python)
-if [ "$SOURCE_TYPE" == "lcg" ]; then
+# Doesn't execute the script if the software source is explicitly set to customenv
+# No LCG needed, the user is responsible for providing the environment
+if [ "$SOFTWARE_SOURCE" != "customenv" ]; then
 
   # Set environment for the Jupyter process
   LOCAL_HOME=/home/$NB_USER

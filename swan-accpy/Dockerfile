@@ -32,4 +32,11 @@ RUN dnf install -y \
     dnf clean all && \
     rm -rf /var/cache/dnf
 
+# Eventually, this need to be moved to swan-cern
+COPY SwanCustomEnvironments /tmp/SwanCustomEnvironments
+RUN pip install /tmp/SwanCustomEnvironments && \
+    rm -rf /tmp/SwanCustomEnvironments
+
+RUN echo -e '\nc.ServerApp.extra_template_paths = ["/opt/conda/lib/python3.11/site-packages/swancustomenvironments/templates/"]' >> /home/${NB_USER}/.jupyter/jupyter_server_config.py
+    
 USER ${NB_UID}

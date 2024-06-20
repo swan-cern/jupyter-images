@@ -47,6 +47,10 @@ mkdir -p $NBCONFIG
 jq -n --argjson jupyter-matplotlib/extension true \
       '{load_extensions: $ARGS.named}' > $NBCONFIG/jupyter-matplotlib.json
 
+# Enable widgets extension for classic UI
+jq -n --argjson jupyter-js-widgets/extension true \
+      '{load_extensions: $ARGS.named}' > $NBCONFIG/widgetsnbextension.json
+
 # Configure kernels and terminal
 # The environment of the kernels and the terminal will combine the view and the user script (if any)
 _log "Configuring kernels and terminal"

@@ -39,6 +39,14 @@ export LCG_VIEW=$ROOT_LCG_VIEW_PATH/$ROOT_LCG_VIEW_NAME/$ROOT_LCG_VIEW_PLATFORM
 # symlink $LCG_VIEW/share/jupyter/nbextensions for the notebook extensions
 ln -s $LCG_VIEW/share/jupyter/nbextensions $JUPYTER_PATH
 
+# Create directory for nb configuration
+NBCONFIG=/etc/jupyter/nbconfig/notebook.d
+mkdir -p $NBCONFIG
+
+# Enable jupyter-matplotlib extension for classic UI
+jq -n --argjson jupyter-matplotlib/extension true \
+      '{load_extensions: $ARGS.named}' > $NBCONFIG/jupyter-matplotlib.json
+
 # Configure kernels and terminal
 # The environment of the kernels and the terminal will combine the view and the user script (if any)
 _log "Configuring kernels and terminal"

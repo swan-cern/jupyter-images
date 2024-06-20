@@ -24,11 +24,14 @@ then
   # Enable the extensions in Jupyter global path to avoid having to maintain this information 
   # in the user scratch json file (specially because now we persist this file in the user directory and
   # we don't want to persist the Spark extensions across sessions)
-  mkdir -p /etc/jupyter/nbconfig
   _log "Globally enabling the Spark extensions"
+  # Ensure nb configuration directory is created.
+  NBCONFIG=/etc/jupyter/nbconfig/notebook.d
+  mkdir -p $NBCONFIG
+
   jq -n --argjson sparkconnector/extension true \
         --argjson sparkmonitor/extension true \
-        '{load_extensions: $ARGS.named}' > /etc/jupyter/nbconfig/notebook.json
+        '{load_extensions: $ARGS.named}' > $NBCONFIG/spark.json
 
   IPYTHON_KERNEL_CONFIG=$IPYTHONDIR/profile_default/ipython_kernel_config.py
   sed -i "1s/^/c.InteractiveShellApp.extensions.append('sparkconnector.connector')\n/" \

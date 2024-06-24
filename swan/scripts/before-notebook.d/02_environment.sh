@@ -121,4 +121,3 @@ fi
 echo "source $LOCAL_HOME/.bash_profile" > /etc/profile.d/swan.sh
 
 _log "Finished setting up CVMFS and user environment"
-

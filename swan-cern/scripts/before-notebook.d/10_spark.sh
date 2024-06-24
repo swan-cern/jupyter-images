@@ -10,14 +10,6 @@ if [[ -n $SPARK_CLUSTER_NAME ]]
 then
    _log "Configuring Spark";
 
-  # Jupyter server configuration path
-  JPY_CONFIG=$JUPYTER_CONFIG_DIR/jupyter_server_config.py
-
-  # Temporary change:
-  # Redirect user to the old UI if they select a Spark cluster on Alma9.
-  echo "" >> $JPY_CONFIG
-  echo "c.ServerApp.default_url = '/projects'" >> $JPY_CONFIG
-
   LOCAL_IP=`hostname -i`
   echo "$LOCAL_IP $SERVER_HOSTNAME" >> /etc/hosts
 

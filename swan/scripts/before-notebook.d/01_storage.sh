@@ -23,12 +23,14 @@ then
     chmod 600 $OAUTH2_FILE
 fi
 
+set +e
 run_as_user 'if [[ ! -d "$HOME" || ! -x "$HOME" ]]; then exit 1; fi'
 if [ $? -ne 0 ]
 then
     _log "Error setting notebook working directory, $HOME not accessible by user $NB_USER."
     exit 1
 fi
+set -e
 
 # Change the user home to point to EOS.
 if [[ ! -z "$CERNBOX_HOME" && ! $(usermod --home $HOME $NB_USER 2>&1 | grep "no changes" > /dev/null) ]]; 

@@ -93,6 +93,8 @@ then
   chown -R $NB_USER:$NB_GID $LOCAL_HOME
 
   _log "Running user configuration script for user $NB_USER."
+
+  set +e
   run_as_user bash /srv/singleuser/scripts/userconfig.sh
 
   # Since the jupyter server is started with --preserve-env (in start.sh)
@@ -105,6 +107,7 @@ then
     _log "Error configuring user environment"
     exit 1
   fi
+  set -e
 
   START_TIME_CONFIGURE_KERNEL_ENV=$( date +%s.%N )
 

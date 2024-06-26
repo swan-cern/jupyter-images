@@ -34,7 +34,7 @@ mkdir -p $IPYTHONDIR $PROFILEPATH
 
 # Doesn't execute the script if the software source is explicitly set to customenv
 # No LCG needed, the user is responsible for providing the environment
-if [[ -n "$ROOT_LCG_VIEW_NAME" ]] && [[ -n "$ROOT_LCG_VIEW_PLATFORM" ]] && [[ -n "$ROOT_LCG_VIEW_PATH" ]]; then
+if [ -n "$ROOT_LCG_VIEW_NAME" ] && [ -n "$ROOT_LCG_VIEW_PLATFORM" ] && [ -n "$ROOT_LCG_VIEW_PATH" ]; then
 
   # Setup the LCG View on CVMFS
   _log "Setting up environment from CVMFS"

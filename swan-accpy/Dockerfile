@@ -25,10 +25,7 @@ RUN for version in "2020.11" "2021.12" "2023.06"; do \
     done
 
 RUN dnf install -y \
-    # java-1.8.0-openjdk.x86_64 \
     java-11-openjdk.x86_64 && \
-    # java-17-openjdk.x86_64 \
-    # java-21-openjdk.x86_64 && \
     dnf clean all && \
     rm -rf /var/cache/dnf
 
@@ -38,5 +35,5 @@ RUN pip install /tmp/SwanCustomEnvironments && \
     rm -rf /tmp/SwanCustomEnvironments
 
 RUN echo -e '\nc.ServerApp.extra_template_paths = ["/opt/conda/lib/python3.11/site-packages/swancustomenvironments/templates/"]' >> /home/${NB_USER}/.jupyter/jupyter_server_config.py
-    
+
 USER ${NB_UID}

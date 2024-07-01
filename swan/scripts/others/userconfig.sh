@@ -46,6 +46,13 @@ export PYTHONPATH=$SWAN_LIB_DIR/extensions/:$PYTHONPATH
 # to be exposed to the user environment (notebooks, terminals)
 export PYTHONPATH=$PYTHONPATH:$SWAN_LIB_DIR/nb_term_lib/
 
+# Append the packages installed by the user in their local path
+# automatically to PYTHONPATH
+if [ "$SWAN_INCLUDE_MODULES" == "true" ]; then
+  PYTHON_MODULES_LOCAL_PATH=$(python -m site --user-site)
+  export PYTHONPATH=$PYTHON_MODULES_LOCAL_PATH:$PYTHONPATH
+fi
+
 # Run user startup script
 TMP_SCRIPT=`mktemp`
 if [[ ! -n $USER_ENV_SCRIPT ]];

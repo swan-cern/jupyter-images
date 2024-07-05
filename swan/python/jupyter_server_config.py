@@ -8,7 +8,7 @@ c.NotebookNotary.secret_file = os.environ.get("JUPYTER_PATH") + "/notebook_secre
 c.ServerApp.root_dir = os.environ.get("HOME")
 
 c.ServerApp.contents_manager_class = "swancontents.filemanager.SwanEosFileManager"
-# To allow deleting Projects (that are not empty, because of .swancontents)
+# To allow deleting Projects, which are never empty because of .swancontents
 c.FileContentsManager.always_delete_dir = True
 
 cernbox_oauth_id = os.environ.get("CERNBOX_OAUTH_ID", "cernbox-service")

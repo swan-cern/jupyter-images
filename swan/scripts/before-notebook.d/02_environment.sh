@@ -32,57 +32,71 @@ export PROFILEPATH=$IPYTHONDIR/profile_default
 # Create missing directories
 mkdir -p $IPYTHONDIR $PROFILEPATH
 
-# Setup the LCG View on CVMFS
-_log "Setting up environment from CVMFS"
-export LCG_VIEW=$ROOT_LCG_VIEW_PATH/$ROOT_LCG_VIEW_NAME/$ROOT_LCG_VIEW_PLATFORM
+# Doesn't execute the script if the software source is explicitly set to customenv
+# No LCG needed, the user is responsible for providing the environment
+if [ -n "$ROOT_LCG_VIEW_NAME" ] && [ -n "$ROOT_LCG_VIEW_PLATFORM" ] && [ -n "$ROOT_LCG_VIEW_PATH" ]; then
 
-# symlink $LCG_VIEW/share/jupyter/nbextensions for the notebook extensions
-ln -s $LCG_VIEW/share/jupyter/nbextensions $JUPYTER_PATH
+  # Setup the LCG View on CVMFS
+  _log "Setting up environment from CVMFS"
+  export LCG_VIEW=$ROOT_LCG_VIEW_PATH/$ROOT_LCG_VIEW_NAME/$ROOT_LCG_VIEW_PLATFORM
 
-# Create directory for nb configuration
-NBCONFIG=/etc/jupyter/nbconfig/notebook.d
-mkdir -p $NBCONFIG
+  # symlink $LCG_VIEW/share/jupyter/nbextensions for the notebook extensions
+  ln -s $LCG_VIEW/share/jupyter/nbextensions $JUPYTER_PATH
 
-# Enable jupyter-matplotlib extension for classic UI
-jq -n --argjson jupyter-matplotlib/extension true \
-      '{load_extensions: $ARGS.named}' > $NBCONFIG/jupyter-matplotlib.json
+  # Setup the LCG View on CVMFS
+  _log "Setting up environment from CVMFS"
+  export LCG_VIEW=$ROOT_LCG_VIEW_PATH/$ROOT_LCG_VIEW_NAME/$ROOT_LCG_VIEW_PLATFORM
 
-# Enable widgets extension for classic UI
-jq -n --argjson jupyter-js-widgets/extension true \
-      '{load_extensions: $ARGS.named}' > $NBCONFIG/widgetsnbextension.json
+  # symlink $LCG_VIEW/share/jupyter/nbextensions for the notebook extensions
+  ln -s $LCG_VIEW/share/jupyter/nbextensions $JUPYTER_PATH
 
-# Configure kernels and terminal
-# The environment of the kernels and the terminal will combine the view and the user script (if any)
-_log "Configuring kernels and terminal"
+  # Create directory for nb configuration
+  NBCONFIG=/etc/jupyter/nbconfig/notebook.d
+  mkdir -p $NBCONFIG
 
-# ROOT
-ROOT_KERNEL_PATH=$LCG_VIEW/etc/notebook/kernels/root
-if [ -d $ROOT_KERNEL_PATH ];
-then
-  cp -rL $ROOT_KERNEL_PATH $KERNEL_DIR
-fi
+  # Enable jupyter-matplotlib extension for classic UI
+  jq -n --argjson jupyter-matplotlib/extension true \
+        '{load_extensions: $ARGS.named}' > $NBCONFIG/jupyter-matplotlib.json
 
-# R
-R_KERNEL_PATH=$LCG_VIEW/share/jupyter/kernels/ir
-if [ -d $R_KERNEL_PATH ];
-then
-  cp -rL $R_KERNEL_PATH $KERNEL_DIR
-  sed -i "s/IRkernel::main()/options(bitmapType='cairo');IRkernel::main()/g" $KERNEL_DIR/ir/kernel.json # Force cairo for graphics
-fi
+  # Enable widgets extension for classic UI
+  jq -n --argjson jupyter-js-widgets/extension true \
+        '{load_extensions: $ARGS.named}' > $NBCONFIG/widgetsnbextension.json
 
-# Octave
-OCTAVE_KERNEL_PATH=$LCG_VIEW/share/jupyter/kernels/octave
-if [[ -d $OCTAVE_KERNEL_PATH ]];
-then
-   cp -rL $OCTAVE_KERNEL_PATH $KERNEL_DIR
-   export OCTAVE_KERNEL_JSON=$KERNEL_DIR/octave/kernel.json
-fi
+  # Configure kernels and terminal
+  # The environment of the kernels and the terminal will combine the view and the user script (if any)
+  _log "Configuring kernels and terminal"
 
-# Julia
-JULIA_KERNEL_PATH=$LCG_VIEW/share/jupyter/kernels/julia-*
-if [ -d $JULIA_KERNEL_PATH ];
-then
-  cp -rL $JULIA_KERNEL_PATH $KERNEL_DIR
+  # ROOT
+  ROOT_KERNEL_PATH=$LCG_VIEW/etc/notebook/kernels/root
+  if [ -d $ROOT_KERNEL_PATH ];
+  then
+    cp -rL $ROOT_KERNEL_PATH $KERNEL_DIR
+  fi
+
+  # R
+  R_KERNEL_PATH=$LCG_VIEW/share/jupyter/kernels/ir
+  if [ -d $R_KERNEL_PATH ];
+  then
+    cp -rL $R_KERNEL_PATH $KERNEL_DIR
+    sed -i "s/IRkernel::main()/options(bitmapType='cairo');IRkernel::main()/g" $KERNEL_DIR/ir/kernel.json # Force cairo for graphics
+  fi
+
+  # Octave
+  OCTAVE_KERNEL_PATH=$LCG_VIEW/share/jupyter/kernels/octave
+  if [[ -d $OCTAVE_KERNEL_PATH ]];
+  then
+    cp -rL $OCTAVE_KERNEL_PATH $KERNEL_DIR
+    export OCTAVE_KERNEL_JSON=$KERNEL_DIR/octave/kernel.json
+  fi
+
+  # Julia
+  JULIA_KERNEL_PATH=$LCG_VIEW/share/jupyter/kernels/julia-*
+  if [ -d $JULIA_KERNEL_PATH ];
+  then
+    cp -rL $JULIA_KERNEL_PATH $KERNEL_DIR
+  fi
+else
+  ROOT_LCG_VIEW_NAME="customenv"
 fi
 
 # Grant privileges to all files inside the created directories and subdirectories

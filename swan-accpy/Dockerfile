@@ -17,7 +17,6 @@ RUN for version in "2020.11" "2021.12" "2023.06"; do \
         chmod +x acc-py-${version}-installer.sh && \
         ./acc-py-${version}-installer.sh --installation-root ${ACCPY_PATH} && \
         rm -f acc-py-${version}-installer.sh && \
-        python -m pip install ipykernel && \
         source ${ACCPY_PATH}/base/${version}/setup.sh && \
         ${ACCPY_PATH}/base/${version}/bin/python -m ensurepip --upgrade && \
         ${ACCPY_PATH}/base/${version}/bin/pip3 install ipykernel && \
@@ -28,11 +27,6 @@ RUN dnf install -y \
     java-11-openjdk.x86_64 && \
     dnf clean all && \
     rm -rf /var/cache/dnf
-
-# Eventually, this need to be moved to swan-cern
-COPY SwanCustomEnvironments /tmp/SwanCustomEnvironments
-RUN pip install /tmp/SwanCustomEnvironments && \
-    rm -rf /tmp/SwanCustomEnvironments
 
 RUN echo -e '\nc.ServerApp.extra_template_paths = ["/opt/conda/lib/python3.11/site-packages/swancustomenvironments/templates/"]' >> /home/${NB_USER}/.jupyter/jupyter_server_config.py
 

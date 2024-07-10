@@ -95,8 +95,6 @@ if [ "$SOFTWARE_SOURCE" == "lcg" ]; then
   then
     cp -rL $JULIA_KERNEL_PATH $KERNEL_DIR
   fi
-else
-  ROOT_LCG_VIEW_NAME="customenv"
 fi
 
 # Grant privileges to all files inside the created directories and subdirectories
@@ -132,7 +130,12 @@ then
   exit 1
 else
   CONFIGURE_KERNEL_ENV_TIME_SEC=$(echo $(date +%s.%N --date="$START_TIME_CONFIGURE_KERNEL_ENV seconds ago") | bc)
-  _log "user: $NB_USER, host: ${SERVER_HOSTNAME%%.*}, metric: configure_kernel_env.${ROOT_LCG_VIEW_NAME:-none}.${SPARK_CLUSTER_NAME:-none}.duration_sec, value: $CONFIGURE_KERNEL_ENV_TIME_SEC"
+  software_source_name="customenv"
+  if [ "$SOFTWARE_SOURCE" == "lcg" ]; then
+    software_source_name=${ROOT_LCG_VIEW_NAME:-none}
+  fi
+
+  _log "user: $NB_USER, host: ${SERVER_HOSTNAME%%.*}, metric: configure_kernel_env.${software_source_name}.${SPARK_CLUSTER_NAME:-none}.duration_sec, value: $CONFIGURE_KERNEL_ENV_TIME_SEC"
 fi
 
 # Set the terminal environment

@@ -1,4 +1,4 @@
-ARG VERSION_PARENT=v0.0.15
+ARG VERSION_PARENT=v0.0.18
 
 FROM gitlab-registry.cern.ch/swan/docker-images/jupyter/swan-cern:${VERSION_PARENT}
 
@@ -28,6 +28,7 @@ RUN dnf install -y \
     dnf clean all && \
     rm -rf /var/cache/dnf
 
-RUN echo -e '\nc.ServerApp.extra_template_paths = ["/opt/conda/lib/python3.11/site-packages/swancustomenvironments/templates/"]' >> /home/${NB_USER}/.jupyter/jupyter_server_config.py
+RUN pip install --no-deps --no-cache-dir \
+    swancustomenvironments==0.0.1
 
 USER ${NB_UID}

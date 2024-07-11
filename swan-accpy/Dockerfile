@@ -31,4 +31,7 @@ RUN dnf install -y \
 RUN pip install --no-deps --no-cache-dir \
     swancustomenvironments==0.0.1
 
+# Jupyter notebook configuration - Add extension templates to jupyter
+RUN echo -e '\nc.ServerApp.extra_template_paths = ["/opt/conda/lib/python3.11/site-packages/swancustomenvironments/templates/"]' >> /home/${NB_USER}/.jupyter/jupyter_server_config.py
+
 USER ${NB_UID}

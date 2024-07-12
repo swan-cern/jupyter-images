@@ -36,7 +36,7 @@ export JUPYTER_DATA_DIR=$LCG_VIEW/share/jupyter
 source $LCG_VIEW/setup.sh
 
 SETUP_LCG_TIME_SEC=$(echo $(date +%s.%N --date="$START_TIME_SETUP_LCG seconds ago") | bc)
-_log "user: $USER, host: ${SERVER_HOSTNAME%%.*}, metric: configure_user_env_cvmfs.${ROOT_LCG_VIEW_NAME:-none}.duration_sec, value: $SETUP_LCG_TIME_SEC"
+_log "user: $USER, host: ${SERVER_HOSTNAME%%.*}, metric: configure_user_env_cvmfs.${software_source_name}.duration_sec, value: $SETUP_LCG_TIME_SEC"
 
 # Prepend SWAN extensions path to PYTHONPATH to expose them
 # to the notebook processes

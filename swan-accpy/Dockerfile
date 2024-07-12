@@ -29,6 +29,7 @@ RUN dnf install -y \
     java-11-openjdk.x86_64 && \
     dnf clean all && \
     rm -rf /var/cache/dnf
+
 # Install and configure SwanCustomEnvironments extension
 RUN pip install --no-deps --no-cache-dir \
     swancustomenvironments==0.0.1 && \

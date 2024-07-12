@@ -6,26 +6,96 @@
 # launched as regular user as it's this entity which is able to access 
 # eos and not the super user.
 
-if [ -n "${ROOT_LCG_VIEW_PATH}" ] && [ -n "${ROOT_LCG_VIEW_NAME}" ] && [ -n "${ROOT_LCG_VIEW_PLATFORM}" ];
-then
-  _log "Setting up CVMFS";
-  # Set environment for the Jupyter process
-  LOCAL_HOME=/home/$NB_USER
-  export IPYTHONDIR=$LOCAL_HOME/.ipython
-  export JPY_DIR=$LOCAL_HOME/.jupyter
+# Set environment for the Jupyter process
+LOCAL_HOME=/home/$NB_USER
+export IPYTHONDIR=$LOCAL_HOME/.ipython
+export JPY_DIR=$LOCAL_HOME/.jupyter
 
-  # The Jupyter environment variables below are set to point to the local user
-  # home (/home/$USER), instead of the EOS path
-  export JUPYTER_CONFIG_DIR=$JPY_DIR
-  export JUPYTER_PATH=$LOCAL_HOME/.local/share/jupyter
-  export JUPYTER_RUNTIME_DIR=$JUPYTER_PATH/runtime
-  export JUPYTER_DATA_DIR=$JUPYTER_PATH
+# The Jupyter environment variables below are set to point to the local user
+# home (/home/$USER), instead of the EOS path
+export JUPYTER_CONFIG_DIR=$JPY_DIR
+export JUPYTER_PATH=$LOCAL_HOME/.local/share/jupyter
+export JUPYTER_RUNTIME_DIR=$JUPYTER_PATH/runtime
+export JUPYTER_DATA_DIR=$JUPYTER_PATH
 
-  # Set npm cache on the local user home, instead of the EOS path
-  export NPM_CONFIG_CACHE=$LOCAL_HOME/.npm
+# Set npm cache on the local user home, instead of the EOS path
+export NPM_CONFIG_CACHE=$LOCAL_HOME/.npm
 
-  # Set jupyterlab config directory
-  export JUPYTERLAB_SETTINGS_DIR=$HOME/.local/lab/user-settings/
+# Set jupyterlab config directory
+export JUPYTERLAB_SETTINGS_DIR=$HOME/.local/lab/user-settings/
+
+# Set other environment variables
+export KERNEL_DIR=$JUPYTER_PATH/kernels
+export SWAN_ENV_FILE=$LOCAL_HOME/.bash_profile
+export PROFILEPATH=$IPYTHONDIR/profile_default
+
+# Create missing directories
+mkdir -p $IPYTHONDIR $PROFILEPATH
+
+# Doesn't execute the script if the software source is explicitly set to customenv
+# No LCG needed, the user is responsible for providing the environment
+if [ "$SOFTWARE_SOURCE" == "lcg" ]; then
+
+  # Setup the LCG View on CVMFS
+  _log "Setting up environment from CVMFS"
+  export LCG_VIEW=$ROOT_LCG_VIEW_PATH/$ROOT_LCG_VIEW_NAME/$ROOT_LCG_VIEW_PLATFORM
+
+  # symlink $LCG_VIEW/share/jupyter/nbextensions for the notebook extensions
+  ln -s $LCG_VIEW/share/jupyter/nbextensions $JUPYTER_PATH
+
+  # Setup the LCG View on CVMFS
+  _log "Setting up environment from CVMFS"
+  export LCG_VIEW=$ROOT_LCG_VIEW_PATH/$ROOT_LCG_VIEW_NAME/$ROOT_LCG_VIEW_PLATFORM
+
+  # symlink $LCG_VIEW/share/jupyter/nbextensions for the notebook extensions
+  ln -s $LCG_VIEW/share/jupyter/nbextensions $JUPYTER_PATH
+
+  # Create directory for nb configuration
+  NBCONFIG=/etc/jupyter/nbconfig/notebook.d
+  mkdir -p $NBCONFIG
+
+  # Enable jupyter-matplotlib extension for classic UI
+  jq -n --argjson jupyter-matplotlib/extension true \
+        '{load_extensions: $ARGS.named}' > $NBCONFIG/jupyter-matplotlib.json
+
+  # Enable widgets extension for classic UI
+  jq -n --argjson jupyter-js-widgets/extension true \
+        '{load_extensions: $ARGS.named}' > $NBCONFIG/widgetsnbextension.json
+
+  # Configure kernels and terminal
+  # The environment of the kernels and the terminal will combine the view and the user script (if any)
+  _log "Configuring kernels and terminal"
+
+  # ROOT
+  ROOT_KERNEL_PATH=$LCG_VIEW/etc/notebook/kernels/root
+  if [ -d $ROOT_KERNEL_PATH ];
+  then
+    cp -rL $ROOT_KERNEL_PATH $KERNEL_DIR
+  fi
+
+  # R
+  R_KERNEL_PATH=$LCG_VIEW/share/jupyter/kernels/ir
+  if [ -d $R_KERNEL_PATH ];
+  then
+    cp -rL $R_KERNEL_PATH $KERNEL_DIR
+    sed -i "s/IRkernel::main()/options(bitmapType='cairo');IRkernel::main()/g" $KERNEL_DIR/ir/kernel.json # Force cairo for graphics
+  fi
+
+  # Octave
+  OCTAVE_KERNEL_PATH=$LCG_VIEW/share/jupyter/kernels/octave
+  if [[ -d $OCTAVE_KERNEL_PATH ]];
+  then
+    cp -rL $OCTAVE_KERNEL_PATH $KERNEL_DIR
+    export OCTAVE_KERNEL_JSON=$KERNEL_DIR/octave/kernel.json
+  fi
+
+  # Julia
+  JULIA_KERNEL_PATH=$LCG_VIEW/share/jupyter/kernels/julia-*
+  if [ -d $JULIA_KERNEL_PATH ];
+  then
+    cp -rL $JULIA_KERNEL_PATH $KERNEL_DIR
+  fi
+fi
 
   # Set other environment variables
   export KERNEL_DIR=$JUPYTER_PATH/kernels
@@ -134,5 +204,19 @@ then
 
   _log "Finished setting up CVMFS and user environment"
 else
-  _log "CVMFS variables not provided. Skiping."
+  CONFIGURE_KERNEL_ENV_TIME_SEC=$(echo $(date +%s.%N --date="$START_TIME_CONFIGURE_KERNEL_ENV seconds ago") | bc)
+  software_source_name="none"
+  if [ "$SOFTWARE_SOURCE" == "lcg" ]; then
+    software_source_name=${ROOT_LCG_VIEW_NAME:-none}
+  elif [ "$SOFTWARE_SOURCE" == "customenv" ]; then
+    software_source_name="customenv"
+  fi
+
+  _log "user: $NB_USER, host: ${SERVER_HOSTNAME%%.*}, metric: configure_kernel_env.${software_source_name}.${SPARK_CLUSTER_NAME:-none}.duration_sec, value: $CONFIGURE_KERNEL_ENV_TIME_SEC"
 fi
+
+# Set the terminal environment
+#in jupyter 6.0.0 login shell (jupyter/notebook#4112) is set by default and /etc/profile.d is respected
+echo "source $LOCAL_HOME/.bash_profile" > /etc/profile.d/swan.sh
+
+_log "Finished setting up CVMFS and user environment"

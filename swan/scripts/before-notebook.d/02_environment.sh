@@ -130,9 +130,11 @@ then
   exit 1
 else
   CONFIGURE_KERNEL_ENV_TIME_SEC=$(echo $(date +%s.%N --date="$START_TIME_CONFIGURE_KERNEL_ENV seconds ago") | bc)
-  software_source_name="customenv"
+  software_source_name="none"
   if [ "$SOFTWARE_SOURCE" == "lcg" ]; then
     software_source_name=${ROOT_LCG_VIEW_NAME:-none}
+  elif [ "$SOFTWARE_SOURCE" == "customenv" ]; then
+    software_source_name="customenv"
   fi
 
   _log "user: $NB_USER, host: ${SERVER_HOSTNAME%%.*}, metric: configure_kernel_env.${software_source_name}.${SPARK_CLUSTER_NAME:-none}.duration_sec, value: $CONFIGURE_KERNEL_ENV_TIME_SEC"

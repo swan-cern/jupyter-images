@@ -39,8 +39,9 @@ then
   _log "Setting up environment from CVMFS"
   export LCG_VIEW=$ROOT_LCG_VIEW_PATH/$ROOT_LCG_VIEW_NAME/$ROOT_LCG_VIEW_PLATFORM
 
-  # symlink $LCG_VIEW/share/jupyter/nbextensions for the notebook extensions
+  # Configure nb and lab extensions from the LCG release
   ln -s $LCG_VIEW/share/jupyter/nbextensions $JUPYTER_PATH
+  ln -s $LCG_VIEW/share/jupyter/labextensions $JUPYTER_PATH
 
   # Create directory for nb configuration
   NBCONFIG=/etc/jupyter/nbconfig/notebook.d

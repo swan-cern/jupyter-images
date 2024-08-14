@@ -39,6 +39,9 @@ ADD config/dask-labextension.yaml /etc/dask/labextension.yaml
 
 USER root
 
+# For CVMFS prefetcher container
+RUN dnf install -y cronie
+
 # Install Spark extensions for classic UI
 RUN jupyter nbclassic-extension install --py --system sparkconnector && \
     jupyter nbclassic-extension install --py --system sparkmonitor

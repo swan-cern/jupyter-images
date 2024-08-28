@@ -1,0 +1,70 @@
+name: Update Child Images
+
+on:
+  push:
+    tags:
+      - '*'
+
+jobs:
+  update-dockerfiles:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v2
+
+    - name: Set Up Git
+      run: |
+        git config --global user.name "github-actions"
+        git config --global user.email "github-actions@github.com"
+
+    - name: Detect Parent Image Tag
+      id: detect-tag
+      run: |
+        if [[ "${{ github.ref }}" == refs/tags/base/* ]]; then
+          echo "PARENT_IMAGE=base" >> $GITHUB_ENV
+          VERSION=${{ github.ref_name#base/ }}
+        elif [[ "${{ github.ref }}" == refs/tags/swan/* ]]; then
+          echo "PARENT_IMAGE=swan" >> $GITHUB_ENV
+          VERSION=${{ github.ref_name#swan/ }}
+        elif [[ "${{ github.ref }}" == refs/tags/swan-cern/* ]]; then
+          echo "PARENT_IMAGE=swan-cern" >> $GITHUB_ENV
+          VERSION=${{ github.ref_name#swan-cern/ }}
+        else
+          echo "No matching parent image found."
+          exit 0
+        fi
+        echo "VERSION=$VERSION" >> $GITHUB_ENV
+        echo "PARENT_PATH=gitlab-registry.cern.ch/swan/docker-images/jupyter" >> $GITHUB_ENV
+
+    - name: Update swan Dockerfile
+      if: env.PARENT_IMAGE == 'base'
+      run: |
+        sed -i "s|^FROM ${PARENT_PATH}/base:.*|FROM ${PARENT_PATH}/base:${VERSION}|" swan/Dockerfile
+        git add swan/Dockerfile
+
+    - name: Update swan-cern Dockerfile
+      if: env.PARENT_IMAGE == 'swan'
+      run: |
+        sed -i "s|^FROM ${PARENT_PATH}/swan:.*|FROM ${PARENT_PATH}/swan:${VERSION}|" swan-cern/Dockerfile
+        git add swan-cern/Dockerfile
+
+    - name: Update prefetcher Dockerfile
+      if: env.PARENT_IMAGE == 'swan-cern'
+      run: |
+        sed -i "s|^FROM ${PARENT_PATH}/swan-cern:.*|FROM ${PARENT_PATH}/swan-cern:${VERSION}|" prefetcher/Dockerfile
+        git add prefetcher/Dockerfile
+
+    - name: Commit Changes
+      run: |
+        git commit -m "Update images to use new ${PARENT_IMAGE} image version ${VERSION}"
+
+    - name: Push Changes and Create PR
+      uses: peter-evans/create-pull-request@v6
+      with:
+        branch: update-${{ env.PARENT_IMAGE }}-${VERSION}
+        title: "Update images to use new ${{ env.PARENT_IMAGE }} image version ${VERSION}"
+        body: "This PR updates the Dockerfiles in the repository to use the new ${{ env.PARENT_IMAGE }} image version ${VERSION}."
+        commit-message: "Update Dockerfiles to use new ${{ env.PARENT_IMAGE }} image version ${VERSION}"
+        token: ${{ secrets.GITHUB_TOKEN }}
+        delete-branch: true

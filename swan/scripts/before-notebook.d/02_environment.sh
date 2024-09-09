@@ -129,9 +129,9 @@ if [ "$SOFTWARE_SOURCE" == "lcg" ]; then
     _log "user: $NB_USER, host: ${SERVER_HOSTNAME%%.*}, metric: configure_kernel_env.${ROOT_LCG_VIEW_NAME:-none}.${SPARK_CLUSTER_NAME:-none}.duration_sec, value: $CONFIGURE_KERNEL_ENV_TIME_SEC"
   fi
 
-  # Set the terminal environment
-  #in jupyter 6.0.0 login shell (jupyter/notebook#4112) is set by default and /etc/profile.d is respected
-  echo "source $LOCAL_HOME/.bash_profile" > /etc/profile.d/swan.sh
-
   _log "Finished setting up CVMFS and user environment"
 fi
+
+# Set the terminal environment
+#in jupyter 6.0.0 login shell (jupyter/notebook#4112) is set by default and /etc/profile.d is respected
+echo "source $LOCAL_HOME/.bash_profile" > /etc/profile.d/swan.sh

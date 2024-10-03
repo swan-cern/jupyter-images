@@ -7,6 +7,7 @@ ARG NB_UID="1000"
 ARG BUILD_TAG=daily
 ENV VERSION_DOCKER_IMAGE=$BUILD_TAG
 ENV ACCPY_PATH="/opt/acc-py"
+ENV JAVA_HOME="/usr"
 
 RUN echo "Building swan-accpy image with tag ${VERSION_DOCKER_IMAGE} from parent tag ${VERSION_PARENT}."
 
@@ -30,9 +31,12 @@ RUN dnf install -y \
     dnf clean all && \
     rm -rf /var/cache/dnf
 
+# Install UV package manager for Python (faster that pip)
+RUN HOME=/home/${NB_USER} curl -LsSf https://astral.sh/uv/install.sh | sh
+
 # Install and configure SwanCustomEnvironments extension
 RUN pip install --no-deps --no-cache-dir \
-    swancustomenvironments==0.0.11
+    swancustomenvironments==0.0.12
 RUN echo -e '\nc.ServerApp.extra_template_paths = ["/opt/conda/lib/python3.11/site-packages/swancustomenvironments/templates/"]' >> /home/${NB_USER}/.jupyter/jupyter_server_config.py
 
 USER ${NB_UID}

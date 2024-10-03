@@ -130,6 +130,28 @@ if [ "$SOFTWARE_SOURCE" == "lcg" ]; then
   fi
 
   _log "Finished setting up CVMFS and user environment"
+else
+  # Configure NXCALS for customenvs
+  export SPARK_HOME=/cvmfs/sft.cern.ch/lcg/releases/spark/3.5.1-dfe72/x86_64-el9-gcc13-opt
+
+  # Configure necessary settings (it doesn't run without this)
+  NBCONFIG=$JPY_DIR/nbconfig
+  mkdir -p $NBCONFIG
+  LOCAL_NB_NBEXTENSIONS=$SWAN_PROJECTS/.notebook_nbextensions
+  if [ ! -f $LOCAL_NB_NBEXTENSIONS ]; then 
+    echo "{
+      \"load_extensions\": {
+      }
+    }" > $LOCAL_NB_NBEXTENSIONS
+  fi
+  rm -f $NBCONFIG/notebook.json
+  ln -s $LOCAL_NB_NBEXTENSIONS $NBCONFIG/notebook.json
+
+  export KRB5CCNAME=$KRB5CCNAME_NB_TERM
+  
+  # Configure NXCALs extensions
+  export SPARK_DIST_CLASSPATH=/cvmfs/sft.cern.ch/lcg/views/LCG_105a_nxcals_pro/x86_64-el9-gcc13-opt/nxcals/nxcals_java
+  export SPARK_CONF_DIR=/cvmfs/sft.cern.ch/lcg/etc/hadoop-confext/conf/etc/hadoop-nxcals/spark.hadoop-nxcals
 fi
 
 # Set the terminal environment

@@ -26,10 +26,9 @@ then
         '{load_extensions: $ARGS.named}' > $NBCONFIG/spark.json
 
   IPYTHON_KERNEL_CONFIG=$IPYTHONDIR/profile_default/ipython_kernel_config.py
-  sed -i "1s/^/c.InteractiveShellApp.extensions.append('sparkconnector.connector')\n/" \
-      $IPYTHON_KERNEL_CONFIG
-  sed -i "2s/^/c.InteractiveShellApp.extensions.append('sparkmonitor.kernelextension')\n/" \
-      $IPYTHON_KERNEL_CONFIG
+
+  echo -e "c.InteractiveShellApp.extensions.append('sparkmonitor.kernelextension')\n$( [ -f ${IPYTHON_KERNEL_CONFIG} ] && cat ${IPYTHON_KERNEL_CONFIG})" > ${IPYTHON_KERNEL_CONFIG}
+  echo -e "c.InteractiveShellApp.extensions.append('sparkconnector.connector')\n$( [ -f ${IPYTHON_KERNEL_CONFIG} ] && cat ${IPYTHON_KERNEL_CONFIG})" > ${IPYTHON_KERNEL_CONFIG}
 
   # Source configuration for selected cluster
   SPARKVERSION=spark3  # Spark major version

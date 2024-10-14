@@ -130,6 +130,8 @@ if [ "$SOFTWARE_SOURCE" == "lcg" ]; then
   fi
 
   _log "Finished setting up CVMFS and user environment"
+else
+  export KRB5CCNAME=$KRB5CCNAME_NB_TERM
 fi
 
 # Set the terminal environment

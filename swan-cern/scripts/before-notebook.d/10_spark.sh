@@ -37,8 +37,8 @@ then
 
   if [[ $CONNECTOR_BUNDLED_CONFIGS ]]
   then
-    ln -s $CONNECTOR_BUNDLED_CONFIGS/bundles.json $JUPYTER_CONFIG_DIR/nbconfig/sparkconnector_bundles.json
-    ln -s $CONNECTOR_BUNDLED_CONFIGS/spark_options.json $JUPYTER_CONFIG_DIR/nbconfig/sparkconnector_spark_options.json
+    ln -s $CONNECTOR_BUNDLED_CONFIGS/bundles.json $NBCONFIG/sparkconnector_bundles.json
+    ln -s $CONNECTOR_BUNDLED_CONFIGS/spark_options.json $NBCONFIG/sparkconnector_spark_options.json
   fi
 else
   # Disable spark jupyterlab extensions enabled by default if no cluster is selected

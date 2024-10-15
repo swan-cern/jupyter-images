@@ -36,3 +36,6 @@ RUN pip install --no-deps --no-cache-dir \
 RUN echo -e '\nc.ServerApp.extra_template_paths = ["/opt/conda/lib/python3.11/site-packages/swancustomenvironments/templates/"]' >> /home/${NB_USER}/.jupyter/jupyter_server_config.py
 
 USER ${NB_UID}
+
+# Install UV package manager for Python (faster that pip)
+RUN curl -LsSf https://astral.sh/uv/install.sh | HOME=/home/${NB_USER} sh -s -- --no-modify-path

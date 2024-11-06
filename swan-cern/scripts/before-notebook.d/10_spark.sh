@@ -31,9 +31,11 @@ then
   echo -e "c.InteractiveShellApp.extensions.append('sparkconnector.connector')\n$( [ -f ${IPYTHON_KERNEL_CONFIG} ] && cat ${IPYTHON_KERNEL_CONFIG})" > ${IPYTHON_KERNEL_CONFIG}
 
   # Source configuration for selected cluster
-  SPARKVERSION=spark3  # Spark major version
-  HADOOPVERSION='3.3'   # Classpath compatibility for YARN
-  source $SPARK_CONFIG_SCRIPT $SPARK_CLUSTER_NAME $HADOOPVERSION $SPARKVERSION
+  if [ "$SOFTWARE_SOURCE" == "lcg" ]; then
+    SPARKVERSION=spark3  # Spark major version
+    HADOOPVERSION='3.3'   # Classpath compatibility for YARN
+    source $SPARK_CONFIG_SCRIPT $SPARK_CLUSTER_NAME $HADOOPVERSION $SPARKVERSION
+  fi
 
   if [[ $CONNECTOR_BUNDLED_CONFIGS ]]
   then

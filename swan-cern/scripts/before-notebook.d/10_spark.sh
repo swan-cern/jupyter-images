@@ -37,7 +37,7 @@ then
     source $SPARK_CONFIG_SCRIPT $SPARK_CLUSTER_NAME $HADOOPVERSION $SPARKVERSION
   fi
 
-  if [[ $CONNECTOR_BUNDLED_CONFIGS ]]
+  if [[ $CONNECTOR_BUNDLED_CONFIGS && -d "$JUPYTER_CONFIG_DIR/nbconfig" ]]
   then
     ln -s $CONNECTOR_BUNDLED_CONFIGS/bundles.json $JUPYTER_CONFIG_DIR/nbconfig/sparkconnector_bundles.json
     ln -s $CONNECTOR_BUNDLED_CONFIGS/spark_options.json $JUPYTER_CONFIG_DIR/nbconfig/sparkconnector_spark_options.json

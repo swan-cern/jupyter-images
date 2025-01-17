@@ -3,7 +3,6 @@
     "language": "python",
     "argv": [
      "python",
-     "-s",
      "-m",
      "ipykernel",
      "-f",

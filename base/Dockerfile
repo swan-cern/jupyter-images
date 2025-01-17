@@ -254,5 +254,11 @@ RUN patch /opt/conda/lib/python${PYTHON_VERSION}/site-packages/jupyterhub/servic
 # - https://discourse.jupyter.org/t/debugger-warning-it-seems-that-frozen-modules-are-being-used-python-3-11-0/16544/5
 ENV PYDEVD_DISABLE_FILE_VALIDATION=1
 
+# By default, prevent the lookup of Python modules in the user site by:
+# - The Jupyter server
+# - Python notebook processes
+# - Python processes created in the terminal
+ENV PYTHONNOUSERSITE=1
+
 # Switch back to jovyan to avoid accidental container runs as root
 USER ${NB_UID}

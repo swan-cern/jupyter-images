@@ -143,6 +143,7 @@ if [ "$(id -u)" == 0 ] ; then
         LD_LIBRARY_PATH="${LD_LIBRARY_PATH}" \
         PATH="${PATH}" \
         PYTHONPATH="${PYTHONPATH:-}" \
+        PYTHONNOUSERSITE="1" \
         "${cmd[@]}"
         # Notes on how we ensure that the environment that this container is started
         # with is preserved (except vars listed in JUPYTER_ENV_VARS_TO_UNSET) when

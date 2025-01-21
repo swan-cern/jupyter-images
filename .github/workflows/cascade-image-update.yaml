@@ -24,26 +24,25 @@ jobs:
       id: detect-tag
       run: |
         IMAGE_TAG=${GITHUB_REF#refs/tags/}
-        echo "PARENT_PATH=gitlab-registry.cern.ch/swan/docker-images/jupyter" >> $GITHUB_ENV
         echo "PARENT_NAME=jupyter/$(echo $IMAGE_TAG | cut -d / -f 1)" >> $GITHUB_ENV
         echo "PARENT_VERSION=$(echo $IMAGE_TAG | cut -d / -f 2)" >> $GITHUB_ENV
 
     - name: Update swan Dockerfile
       if: env.PARENT_IMAGE == 'base'
       run: |
-        sed -i "s|^FROM ${PARENT_PATH}/base:.*|FROM ${PARENT_PATH}/base:${PARENT_VERSION}|" swan/Dockerfile
+        sed -i "s/^ARG VERSION_PARENT=.*/ARG VERSION_PARENT=${PARENT_VERSION}/" swan/Dockerfile
         git add swan/Dockerfile
 
     - name: Update swan-cern Dockerfile
       if: env.PARENT_IMAGE == 'swan'
       run: |
-        sed -i "s|^FROM ${PARENT_PATH}/swan:.*|FROM ${PARENT_PATH}/swan:${PARENT_VERSION}|" swan-cern/Dockerfile
+        sed -i "s/^ARG VERSION_PARENT=.*/ARG VERSION_PARENT=${PARENT_VERSION}/" swan-cern/Dockerfile
         git add swan-cern/Dockerfile
 
     - name: Update prefetcher Dockerfile
       if: env.PARENT_IMAGE == 'swan-cern'
       run: |
-        sed -i "s|^FROM ${PARENT_PATH}/swan-cern:.*|FROM ${PARENT_PATH}/swan-cern:${PARENT_VERSION}|" prefetcher/Dockerfile
+        sed -i "s/^ARG VERSION_PARENT=.*/ARG VERSION_PARENT=${PARENT_VERSION}/" prefetcher/Dockerfile
         git add prefetcher/Dockerfile
 
     - name: Commit Changes

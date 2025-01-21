@@ -3,7 +3,9 @@ name: Update Child Images
 on:
   push:
     tags:
-      - '*'
+    - base/*
+    - swan/*
+    - swan-cern/*
 
 jobs:
   update-dockerfiles:

@@ -28,33 +28,33 @@ jobs:
         echo "PARENT_VERSION=$(echo $IMAGE_TAG | cut -d / -f 2)" >> $GITHUB_ENV
 
     - name: Update swan Dockerfile
-      if: env.PARENT_IMAGE == 'base'
+      if: env.PARENT_NAME == 'base'
       run: |
         sed -i "s/^ARG VERSION_PARENT=.*/ARG VERSION_PARENT=${PARENT_VERSION}/" swan/Dockerfile
         git add swan/Dockerfile
 
     - name: Update swan-cern Dockerfile
-      if: env.PARENT_IMAGE == 'swan'
+      if: env.PARENT_NAME == 'swan'
       run: |
         sed -i "s/^ARG VERSION_PARENT=.*/ARG VERSION_PARENT=${PARENT_VERSION}/" swan-cern/Dockerfile
         git add swan-cern/Dockerfile
 
     - name: Update prefetcher Dockerfile
-      if: env.PARENT_IMAGE == 'swan-cern'
+      if: env.PARENT_NAME == 'swan-cern'
       run: |
         sed -i "s/^ARG VERSION_PARENT=.*/ARG VERSION_PARENT=${PARENT_VERSION}/" prefetcher/Dockerfile
         git add prefetcher/Dockerfile
 
     - name: Commit Changes
       run: |
-        git commit -m "Update images to use new ${PARENT_IMAGE} image version ${PARENT_VERSION}"
+        git commit -m "Update images to use new ${PARENT_NAME} image version ${PARENT_VERSION}"
 
     - name: Push Changes and Create PR
       uses: peter-evans/create-pull-request@v6
       with:
-        branch: update-${{ env.PARENT_IMAGE }}-${{ env.PARENT_VERSION }}
-        title: "Update images to use new ${{ env.PARENT_IMAGE }} image version ${{ env.PARENT_VERSION }}"
-        body: "This PR updates the Dockerfiles in the repository to use the new ${{ env.PARENT_IMAGE }} image version ${{ env.PARENT_VERSION }}."
-        commit-message: "Update Dockerfiles to use new ${{ env.PARENT_IMAGE }} image version ${{ env.PARENT_VERSION }}"
+        branch: update-${{ env.PARENT_NAME }}-${{ env.PARENT_VERSION }}
+        title: "Update images to use new ${{ env.PARENT_NAME }} image version ${{ env.PARENT_VERSION }}"
+        body: "This PR updates the Dockerfiles in the repository to use the new ${{ env.PARENT_NAME }} image version ${{ env.PARENT_VERSION }}."
+        commit-message: "Update Dockerfiles to use new ${{ env.PARENT_NAME }} image version ${{ env.PARENT_VERSION }}"
         token: ${{ secrets.GITHUB_TOKEN }}
         delete-branch: true

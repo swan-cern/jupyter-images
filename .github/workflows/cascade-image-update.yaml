@@ -24,7 +24,7 @@ jobs:
       id: detect-tag
       run: |
         IMAGE_TAG=${GITHUB_REF#refs/tags/}
-        echo "PARENT_NAME=jupyter/$(echo $IMAGE_TAG | cut -d / -f 1)" >> $GITHUB_ENV
+        echo "PARENT_NAME=$(echo $IMAGE_TAG | cut -d / -f 1)" >> $GITHUB_ENV
         echo "PARENT_VERSION=$(echo $IMAGE_TAG | cut -d / -f 2)" >> $GITHUB_ENV
 
     - name: Update swan Dockerfile

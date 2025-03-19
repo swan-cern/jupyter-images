@@ -48,10 +48,15 @@ export PYTHONPATH=$PYTHONPATH:$SWAN_LIB_DIR/nb_term_lib/
 
 # Prepend the user site packages directory to PYTHONPATH, if they request it.
 # This allows to use Python packages installed on CERNBox
+USER_SITE=$(python -m site --user-site)
 if [ "$SWAN_USE_LOCAL_PACKAGES" == "true" ]; then
-  USER_SITE=$(python -m site --user-site)
   export PYTHONPATH=$USER_SITE:$PYTHONPATH
 fi
+
+# This variable is defined to automatically install user
+# python packages in their CERNBox, without them having
+# to add the "--user" flag to the pip installation command
+export PIP_TARGET=$USER_SITE
 
 # Run user startup script
 TMP_SCRIPT=`mktemp`

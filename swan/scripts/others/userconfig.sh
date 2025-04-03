@@ -76,6 +76,7 @@ then
   _log "user: $USER, host: ${SERVER_HOSTNAME%%.*}, metric: configure_user_env_script.duration_sec, value: $SETUP_SCRIPT_TIME_SEC"
 else
  _log "Cannot find user script: $USER_ENV_SCRIPT";
+ exit 127
 fi
 
 # In k8s, $KRB5CCNAME_NB_TERM points to the location of the EOS kerberos ticket that notebook and terminal

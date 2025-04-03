@@ -103,10 +103,12 @@ then
   # notebook/terminal environment unless overwritten by what appears in
   # the kernel.json or .bash_profile.
 
-  if [ $? -ne 0 ]
+  USERCONFIG_EXIT=$?
+
+  if [ $USERCONFIG_EXIT -ne 0 ]
   then
-    _log "Error configuring user environment"
-    exit 1
+    _log "Error configuring user environment. Exit code: $USERCONFIG_EXIT"
+    exit $USERCONFIG_EXIT  
   fi
   set -e
 

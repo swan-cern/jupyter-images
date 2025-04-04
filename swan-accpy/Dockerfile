@@ -32,7 +32,7 @@ RUN dnf install -y \
 
 # Install and configure SwanCustomEnvironments extension
 RUN pip install --no-deps --no-cache-dir \
-    swancustomenvironments==0.0.24
+    swancustomenvironments==0.0.25
 RUN echo -e '\nc.ServerApp.extra_template_paths = ["/opt/conda/lib/python3.11/site-packages/swancustomenvironments/templates/"]' >> /home/${NB_USER}/.jupyter/jupyter_server_config.py
 
 # Install UV for faster package installation

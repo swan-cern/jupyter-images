@@ -36,7 +36,7 @@ mkdir -p $IPYTHONDIR $PROFILEPATH
 chown -R $NB_USER:$NB_GID $LOCAL_HOME
 
 # Create a gitignore file for ignoring all .sys. files and set it as global
-# This is needed to avoid the user to have to set it manually
+# This will hide the checkpoint files created by EOS.
 GLOBAL_GITIGNORE="$LOCAL_HOME/.gitignore_global"
 echo ".sys.*" > "$GLOBAL_GITIGNORE"
 run_as_user git config --global core.excludesfile "$GLOBAL_GITIGNORE"

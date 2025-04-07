@@ -35,6 +35,12 @@ mkdir -p $IPYTHONDIR $PROFILEPATH
 # Make the user the owner of the local home and subdirectories
 chown -R $NB_USER:$NB_GID $LOCAL_HOME
 
+# Create a gitignore file for ignoring all .sys. files and set it as global
+# This is needed to avoid the user to have to set it manually
+GLOBAL_GITIGNORE="$LOCAL_HOME/.gitignore_global"
+echo ".sys.*" > "$GLOBAL_GITIGNORE"
+run_as_user git config --global core.excludesfile "$GLOBAL_GITIGNORE"
+
 if [ "$SOFTWARE_SOURCE" == "lcg" ]; then
 
   # Setup the LCG View on CVMFS

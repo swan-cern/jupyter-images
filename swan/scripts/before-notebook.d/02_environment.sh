@@ -32,6 +32,12 @@ export PROFILEPATH=$IPYTHONDIR/profile_default
 # Create missing directories
 mkdir -p $IPYTHONDIR $PROFILEPATH
 
+# Create a gitignore file for ignoring all .sys. files and set it as global
+# This is needed to avoid the user to have to set it manually
+GLOBAL_GITIGNORE="$LOCAL_HOME/.gitignore_global"
+echo ".sys.*" > "$GLOBAL_GITIGNORE"
+run_as_user git config --global core.excludesfile "$GLOBAL_GITIGNORE"
+
 # Make the user the owner of the local home and subdirectories
 chown -R $NB_USER:$NB_GID $LOCAL_HOME
 

@@ -1,4 +1,4 @@
-ARG VERSION_PARENT=v0.0.24
+ARG VERSION_PARENT=v0.0.25
 
 FROM gitlab-registry.cern.ch/swan/docker-images/jupyter/swan:${VERSION_PARENT}
 

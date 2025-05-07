@@ -29,8 +29,6 @@ RUN dnf install -y \
     dnf clean all && \
     rm -rf /var/cache/dnf
 
-RUN echo -e '\nc.ServerApp.extra_template_paths = ["/opt/conda/lib/python3.11/site-packages/swancustomenvironments/templates/"]' >> /home/${NB_USER}/.jupyter/jupyter_server_config.py
-
 # Install UV for faster package installation
 RUN export XDG_BIN_HOME=/usr/local/bin && \
     curl -LsSf https://astral.sh/uv/install.sh | sh -s -- --no-modify-path && \

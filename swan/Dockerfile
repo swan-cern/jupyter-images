@@ -106,6 +106,9 @@ ADD python/jupyter_server_config.py /home/${NB_USER}/.jupyter/jupyter_server_con
 
 USER root
 
+# Configure path to SwanCustomenvironments template
+RUN echo -e '\nc.ServerApp.extra_template_paths = ["/opt/conda/lib/python3.11/site-packages/swancustomenvironments/templates/"]' >> /home/${NB_USER}/.jupyter/jupyter_server_config.py
+
 # Create directories where we will store:
 # - SWAN extensions and their dependencies (this path gets removed from
 # notebooks by swankernelenv)

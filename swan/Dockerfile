@@ -82,7 +82,8 @@ RUN mamba install --yes \
     'webio-jupyter-extension==0.1.0' \
     # This version of pexpect is needed for
     # jupyterlab-git (0.50.0) module to work properly
-    'pexpect==4.9.0'
+    'pexpect==4.9.0' && \
+    mamba clean --all -f -y
 
 # Install all of our extensions
 # Ignore (almost all) dependencies because they have already been installed or come from CVMFS
@@ -91,7 +92,8 @@ RUN pip install --no-deps --no-cache-dir \
     swanhelp==3.0.3 \
     swankernelenv==1.0.0 \
     swanoauthrenew==1.0.2  \
-    swanshare==2.0.3
+    swanshare==2.0.3 \
+    swancustomenvironments==0.0.27
 
 RUN pip install \ 
     # Required dependency for swanoauthrenew
@@ -107,6 +109,9 @@ RUN cp /opt/conda/share/jupyter/kernels/python3/logo* /home/${NB_USER}/.local/sh
 ADD python/jupyter_server_config.py /home/${NB_USER}/.jupyter/jupyter_server_config.py
 
 USER root
+
+# Configure path to SwanCustomenvironments template
+RUN echo -e '\nc.ServerApp.extra_template_paths = ["/opt/conda/lib/python3.11/site-packages/swancustomenvironments/templates/"]' >> /home/${NB_USER}/.jupyter/jupyter_server_config.py
 
 # Create directories where we will store:
 # - SWAN extensions and their dependencies (this path gets removed from

@@ -18,9 +18,7 @@ RUN ACCPY_DIST="2020.11 2021.12 2023.06" && \
         wget http://bewww.cern.ch/ap/acc-py/installers/acc-py-${version}-installer.sh && \
         chmod +x acc-py-${version}-installer.sh && \
         ./acc-py-${version}-installer.sh --installation-root ${ACCPY_PATH} && \
-        rm -f acc-py-${version}-installer.sh && \
-        source ${ACCPY_PATH}/base/${version}/setup.sh && \
-        deactivate; \
+        rm -f acc-py-${version}-installer.sh; \
     done
 
 # Install Java JDK 11

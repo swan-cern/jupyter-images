@@ -30,3 +30,9 @@ if use_jupyterlab:
     c.ServerApp.default_url = '/lab'
 else:
     c.ServerApp.default_url = '/projects'
+
+user = os.environ.get('USER')
+# Change the HOME environment variable to the local user home instead of EOS
+# to prevent xelatex from touching EOS during the PDF conversion and so
+# reduce the time it takes to convert a PDF (including preventing timeouts).
+c.PDFExporter.latex_command = ['env', f'HOME=/home/{user}' , 'xelatex', '-quiet', '{filename}']

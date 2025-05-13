@@ -41,6 +41,12 @@ jobs:
         sed -i "s/^ARG VERSION_PARENT=.*/ARG VERSION_PARENT=${PARENT_VERSION}/" swan-cern/Dockerfile
         git add swan-cern/Dockerfile
 
+    - name: Update swan-accpy Dockerfile
+      if: env.PARENT_NAME == 'swan-cern'
+      run: |
+        sed -i "s/^ARG VERSION_PARENT=.*/ARG VERSION_PARENT=${PARENT_VERSION}/" swan-accpy/Dockerfile
+        git add swan-accpy/Dockerfile
+
     - name: Update prefetcher Dockerfile
       if: env.PARENT_NAME == 'swan-cern'
       run: |

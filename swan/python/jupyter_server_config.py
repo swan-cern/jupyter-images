@@ -1,7 +1,9 @@
 import os
+from site import getsitepackages
 
 home = os.environ.get("HOME")
 jupyter_path = os.environ.get("JUPYTER_PATH", f"{home}/.local/share/jupyter")
+site_packages_path = getsitepackages()[0]
 
 c.NotebookNotary.db_file = f"{jupyter_path}/nbsignatures.db"
 c.NotebookNotary.secret_file = f"{jupyter_path}/notebook_secret"
@@ -36,3 +38,6 @@ user = os.environ.get('USER')
 # to prevent xelatex from touching EOS during the PDF conversion and so
 # reduce the time it takes to convert a PDF (including preventing timeouts).
 c.PDFExporter.latex_command = ['env', f'HOME=/home/{user}' , 'xelatex', '-quiet', '{filename}']
+
+# Configure path to SwanCustomenvironments template
+c.ServerApp.extra_template_paths = [os.path.join(site_packages_path, "swancustomenvironments/templates/")]

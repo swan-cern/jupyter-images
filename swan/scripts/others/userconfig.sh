@@ -51,6 +51,7 @@ export PYTHONPATH=$PYTHONPATH:$SWAN_LIB_DIR/nb_term_lib/
 if [ "$SWAN_USE_LOCAL_PACKAGES" == "true" ]; then
   USER_SITE=$(python -m site --user-site)
   export PYTHONPATH=$USER_SITE:$PYTHONPATH
+  export PYTHONNOUSERSITE=0 # allow editable packages to be found by Python
 fi
 
 # Run user startup script

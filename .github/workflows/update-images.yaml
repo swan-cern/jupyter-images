@@ -3,7 +3,7 @@ name: Bump version of swan-cern in other repositories
 on:
   push:
     tags:
-    - swan-cern/*
+    - swan*
 
 jobs:
   build-publish:

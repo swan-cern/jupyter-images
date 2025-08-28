@@ -46,6 +46,19 @@ export PYTHONPATH=$SWAN_LIB_DIR/extensions/:$PYTHONPATH
 # to be exposed to the user environment (notebooks, terminals)
 export PYTHONPATH=$PYTHONPATH:$SWAN_LIB_DIR/nb_term_lib/
 
+# Append to PYTHONPATH the directories set in the USER_PYTHONPATH variable
+# to add compatibility for certain extensions in the user terminal and notebook
+if [[ -z $USER_PYTHONPATH ]];
+then
+  export PYTHONPATH=$PYTHONPATH:$USER_PYTHONPATH
+fi
+
+# Do the same thing for the PATH variable
+if [[ -z $USER_PATH ]];
+then
+  export PATH=$PATH:$USER_PATH
+fi
+
 # Prepend the user site packages directory to PYTHONPATH, if they request it.
 # This allows to use Python packages installed on CERNBox
 if [ "$SWAN_USE_LOCAL_PACKAGES" == "true" ]; then

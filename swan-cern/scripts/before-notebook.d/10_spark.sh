@@ -34,7 +34,15 @@ then
   CVMFS_BUNDLES_PATH="$(dirname $SPARK_CONFIG_SCRIPT)/bundles"
   if [ "$SOFTWARE_SOURCE" == "lcg" ]; then
     # Source configuration for selected cluster
-    SPARKVERSION=spark3  # Spark major version
+    # Detect Spark major from spark-submit and set SPARKVERSION to "spark3", "spark4" or ""
+    SPARKVERSION=""
+    if command -v spark-submit >/dev/null 2>&1; then
+      major="$(spark-submit --version 2>&1 | sed -n 's/.*version \([0-9]\+\).*/\1/p' | head -n1)"
+      case "$major" in
+        3) SPARKVERSION="spark3" ;;
+        4) SPARKVERSION="spark4" ;;
+      esac
+    fi
     HADOOPVERSION='3.3'   # Classpath compatibility for YARN
     source $SPARK_CONFIG_SCRIPT $SPARK_CLUSTER_NAME $HADOOPVERSION $SPARKVERSION
     # Make the extraJavaOptions option in the NXCALS TESTBED bundle available to SparkConnector

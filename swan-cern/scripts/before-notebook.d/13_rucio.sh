@@ -37,11 +37,10 @@ export PATH="${RUCIO_CVMFS_PATH}/bin:${PATH}"
 SERVER_PYTHON_VERSION=$(/opt/conda/bin/python -c "import sys; print('.'.join(map(str, sys.version_info[:2])))")
 _log "Using server python version: $SERVER_PYTHON_VERSION"
 
-# Select the correct python version subdirectory, regardless of the patch version
+# Select the correct python version subdirectory, regardless of the patch version, and symlink its packages
 ln -s ${RUCIO_CVMFS_PATH}/lib/python${SERVER_PYTHON_VERSION}/site-packages/* $SWAN_LIB_DIR/nb_term_lib
 
 # Add the Rucio JupyterLab Python packages directory to the PYTHONPATH environment variable.
-# export USER_PYTHONPATH="${RUCIO_CVMFS_PATH}/lib/python${SERVER_PYTHON_VERSION}/site-packages"
 export PYTHONPATH="${RUCIO_CVMFS_PATH}/lib/python${SERVER_PYTHON_VERSION}/site-packages:${PYTHONPATH}"
 
 # Set the path to the Rucio CA certificate used for secure communication.

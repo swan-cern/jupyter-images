@@ -36,12 +36,14 @@ then
     # Source configuration for selected cluster
     # Detect Spark major from spark-submit and set SPARKVERSION to "spark3", "spark4" or ""
     SPARKVERSION=""
-    if command -v spark-submit >/dev/null 2>&1; then
-      major="$(spark-submit --version 2>&1 | sed -n 's/.*version \([0-9]\+\).*/\1/p' | head -n1)"
+    if [ -x "$LCG_VIEW/bin/spark-submit" ]; then
+      major="$("$LCG_VIEW/bin/spark-submit" --version 2>&1 | sed -n 's/.*version \([0-9]\+\).*/\1/p' | head -n1)"
       case "$major" in
         3) SPARKVERSION="spark3" ;;
         4) SPARKVERSION="spark4" ;;
       esac
+    else
+      echo "Error: $LCG_VIEW/bin/spark-submit not found or not executable." >&2
     fi
     HADOOPVERSION='3.3'   # Classpath compatibility for YARN
     source $SPARK_CONFIG_SCRIPT $SPARK_CLUSTER_NAME $HADOOPVERSION $SPARKVERSION

@@ -72,12 +72,6 @@ then
     # The Rusio specific file is provided by CVMFS, and the original is copied from the Dockerfile.
     cat "${ESCAPE_CVMFS_PATH}/etc/jupyter/jupyter_server_config.py" >> /home/${NB_USER}/.jupyter/jupyter_server_config.py
 
-    # Export the env coming from the spawner to the jupyter server environment if SWAN_USE_RUCIO is true
-    export SWAN_RUCIO_INSTANCE
-    export SWAN_RUCIO_RSE
-    export SWAN_RUCIO_RSE_PATH
-    export SWAN_RUCIO_RSE_PATH_NUMBER
-
     _log "Extension configuration file written successfully."
     _log "Rucio JupyterLab setup completed."
 else

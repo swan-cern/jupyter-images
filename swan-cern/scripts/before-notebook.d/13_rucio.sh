@@ -75,5 +75,5 @@ then
     _log "Extension configuration file written successfully."
     _log "Rucio JupyterLab setup completed."
 else
-    _log "Skipping Rucio JupyterLab configuration as HTCondor is not enabled.";
+    _log "Skipping Rucio JupyterLab configuration as it's not enabled.";
 fi

@@ -62,8 +62,7 @@ then
     _log "Created directory /home/${NB_USER}/.ipython/profile_default"
 
     # Configure the iPython kernel to load the Rucio JupyterLab extension.
-    # Given that this is the first script to run, we can safely overwrite any existing configuration.
-    echo "c.IPKernelApp.extensions = ['rucio_jupyterlab.kernels.ipython']" > /home/${NB_USER}/.ipython/profile_default/ipython_kernel_config.py
+    echo "c.IPKernelApp.extensions = ['rucio_jupyterlab.kernels.ipython']" >> /home/${NB_USER}/.ipython/profile_default/ipython_kernel_config.py
 
     _log "iPython kernel for Rucio JupyterLab set up successfully."
 

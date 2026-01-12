@@ -34,6 +34,10 @@ RUN pip install --no-deps --no-cache-dir rucio-jupyterlab==${RUCIO_JUPYTERLAB_VE
 RUN pip install --no-deps --no-cache-dir --target ${SWAN_LIB_DIR}/nb_term_lib \
     swandaskcluster==3.1.0
 
+# Install the jupyter-server-proxy integration for code-server
+# This auto-registers via entrypoints, adds launcher icon, handles on-demand startup
+RUN pip install jupyter-code-server==1.2 --no-cache-dir
+
 # Add helper scripts
 COPY scripts/others/* /srv/singleuser/
 
@@ -46,6 +50,9 @@ USER root
 # Install Spark extensions for classic UI
 RUN jupyter nbclassic-extension install --py --system sparkconnector && \
     jupyter nbclassic-extension install --py --system sparkmonitor
+
+# Install code-server
+RUN curl -fsSL https://code-server.dev/install.sh | sh -s -- --version=4.107.1 --method=standalone --prefix=/usr/local
 
 # HTCondor requirements
 RUN dnf install -y \

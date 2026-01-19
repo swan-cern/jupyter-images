@@ -172,7 +172,7 @@ WORKDIR /tmp
 RUN mamba install --yes \
     'jupyterlab==4.0.7' \
     'notebook==6.5.6' \
-    'jupyterhub==4.1.6' \
+    'jupyterhub==5.4.3' \
     'nbclassic==1.0.0' && \
     jupyter server --generate-config && \
     mamba clean --all -f -y && \

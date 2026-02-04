@@ -24,7 +24,8 @@ RUN pip install --no-deps --no-cache-dir \
     sparkconnector==3.0.9 \
     sparkmonitor==3.1.0 \
     swanportallocator==2.0.0 \
-    swandask==0.0.6
+    swandask==0.0.6 \
+    swanmetrics==1.0.4
 
 # Install the Rucio JupyterLab extension
 RUN pip install --no-deps --no-cache-dir rucio-jupyterlab==${RUCIO_JUPYTERLAB_VERSION} 

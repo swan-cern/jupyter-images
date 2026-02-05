@@ -44,3 +44,10 @@ for path in getsitepackages():
     if os.path.isdir(candidate):
         c.ServerApp.extra_template_paths = [candidate]
         break
+
+# Disable authentication for the /metrics endpoint so that Prometheus
+# is able to scrape the user session metrics without requiring the
+# authentication token that is only available inside the user session
+# pod (and so Prometheus cannot access it). Network policies still
+# enforce traffic restrictions.
+c.ServerApp.authenticate_prometheus = False

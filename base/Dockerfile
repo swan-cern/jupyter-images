@@ -172,7 +172,7 @@ WORKDIR /tmp
 RUN mamba install --yes \
     'jupyterlab==4.0.7' \
     'notebook==6.5.6' \
-    'jupyterhub==4.1.6' \
+    'jupyterhub==5.4.3' \
     'nbclassic==1.0.0' && \
     jupyter server --generate-config && \
     mamba clean --all -f -y && \
@@ -240,13 +240,6 @@ RUN sed -i 's/^UID_MAX.*/UID_MAX 100000/g' /etc/login.defs
 
 # Remove warning about creation of the mailbox when running `useradd`
 RUN sed -i 's/^CREATE_MAIL_SPOOL.*/CREATE_MAIL_SPOOL=no/g' /etc/default/useradd
-
-# TEMPORARY: apply a patch to the auth file in JupyterHub,
-# while we wait for the release of a new version with it
-ADD patches/log_patch.diff /tmp/log_patch.diff
-RUN dnf install -y patch
-RUN patch /opt/conda/lib/python${PYTHON_VERSION}/site-packages/jupyterhub/services/auth.py /tmp/log_patch.diff && \
-    rm -f /tmp/log_patch.diff
 
 # Prevent warning about not being able to debug frozen modules.
 # More information here:

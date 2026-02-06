@@ -78,7 +78,7 @@ RUN pip install --no-deps --no-cache-dir \
 RUN mamba install --yes \
     'voila==0.5.5' \
     'ipyparallel==8.6.1' \
-    'jupyter-server-proxy==4.1.0' \
+    'jupyter-server-proxy==4.4.0' \
     'jupyter-resource-usage==1.1.0' \
     'jupyterlab-git==0.51.1' \
     # Extensions required by jupyter server
@@ -161,12 +161,6 @@ ADD python/configure_kernels_and_terminal.py /srv/singleuser/configure_kernels_a
 # instead called by our scripts internally
 RUN mkdir /srv/singleuser/scripts
 COPY scripts/others/* /srv/singleuser/scripts
-
-# TEMPORARY: apply a patch to the jupyter server proxy handlers,
-# while we wait for the release of a new version with it
-ADD patches/jupyter_server_proxy.diff /tmp/jupyter_server_proxy.diff
-RUN patch $(pip show jupyter-server-proxy | grep -oP 'Location: \K.*')/jupyter_server_proxy/handlers.py /tmp/jupyter_server_proxy.diff && \
-    rm -f /tmp/jupyter_server_proxy.diff
 
 # Switch back to jovyan to avoid accidental container runs as root
 USER ${NB_UID}

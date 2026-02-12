@@ -1,5 +1,4 @@
 import os
-from site import getsitepackages
 
 home = os.environ.get("HOME")
 jupyter_path = os.environ.get("JUPYTER_PATH", f"{home}/.local/share/jupyter")
@@ -37,13 +36,6 @@ user = os.environ.get('USER')
 # to prevent xelatex from touching EOS during the PDF conversion and so
 # reduce the time it takes to convert a PDF (including preventing timeouts).
 c.PDFExporter.latex_command = ['env', f'HOME=/home/{user}' , 'xelatex', '-quiet', '{filename}']
-
-# Configure path to SwanCustomenvironments template
-for path in getsitepackages():
-    candidate = os.path.join(path, "swancustomenvironments", "templates")
-    if os.path.isdir(candidate):
-        c.ServerApp.extra_template_paths = [candidate]
-        break
 
 # Disable authentication for the /metrics endpoint so that Prometheus
 # is able to scrape the user session metrics without requiring the

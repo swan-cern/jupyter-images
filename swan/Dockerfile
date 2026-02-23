@@ -76,11 +76,11 @@ RUN pip install --no-deps --no-cache-dir \
 
 # Install python pip packages
 RUN mamba install --yes \
-    'voila==0.5.5' \
-    'ipyparallel==8.6.1' \
-    'jupyter-server-proxy==4.1.0' \
-    'jupyter-resource-usage==1.1.0' \
-    'jupyterlab-git==0.51.1' \
+    'voila==0.5.11' \
+    'ipyparallel==9.0.2' \
+    'jupyter-server-proxy==4.4.0' \
+    'jupyter-resource-usage==1.2.0' \
+    'jupyterlab-git==0.51.4' \
     # Extensions required by jupyter server
     'webio-jupyter-extension==0.1.0'
 

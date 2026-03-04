@@ -219,7 +219,7 @@ WORKDIR "${HOME}"
 # This part of the base image contains SWAN specific customizations
 # and python packages.
 
-RUN pip install --no-cache-dir swanheader==2.0.1
+RUN pip install --no-cache-dir swanheader==2.0.2
 
 # This disables the Jupyter project communication warnings that appear in the UI.
 # Users cannot do anything about it (i.e update Jupyter), so it's better to hide it.

@@ -21,7 +21,7 @@ RUN pip install --no-deps --no-cache-dir dask-labextension==7.0.0
 # Install all of our extensions required to access Spark, HDFS and Dask.
 # Ignore dependencies because they have already been installed or come from CVMFS
 RUN pip install --no-deps --no-cache-dir \
-    sparkconnector==3.0.10 \
+    sparkconnector==3.0.11 \
     sparkmonitor==3.1.1 \
     swanportallocator==2.0.0 \
     swandask==0.0.6 \

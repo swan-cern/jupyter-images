@@ -27,9 +27,5 @@ RUN dnf install -y \
     dnf clean all && \
     rm -rf /var/cache/dnf
 
-# Install UV for faster package installation
-RUN export XDG_BIN_HOME=/usr/local/bin && \
-    curl -LsSf https://astral.sh/uv/install.sh | sh -s -- --no-modify-path && \
-    chmod u+x $XDG_BIN_HOME/uv
 
 USER ${NB_UID}

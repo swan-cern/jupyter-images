@@ -7,62 +7,60 @@ on:
     - swan/*
     - swan-cern/*
 
+permissions:
+  contents: write
+  pull-requests: write
+
 jobs:
   update-dockerfiles:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout Repository
-      uses: actions/checkout@v4
+    - uses: actions/checkout@v6
       with:
         ref: main
 
-    - name: Set Up Git
+    - name: Detect parent image tag
       run: |
-        git config --global user.name "github-actions"
-        git config --global user.email "github-actions@github.com"
-
-    - name: Detect Parent Image Tag
-      id: detect-tag
-      run: |
-        IMAGE_TAG=${GITHUB_REF#refs/tags/}
-        echo "PARENT_NAME=$(echo $IMAGE_TAG | cut -d / -f 1)" >> $GITHUB_ENV
-        echo "PARENT_VERSION=$(echo $IMAGE_TAG | cut -d / -f 2)" >> $GITHUB_ENV
+        IMAGE_TAG="${GITHUB_REF#refs/tags/}"
+        echo "PARENT_NAME=$(echo "$IMAGE_TAG" | cut -d / -f 1)" >> "$GITHUB_ENV"
+        echo "PARENT_VERSION=$(echo "$IMAGE_TAG" | cut -d / -f 2)" >> "$GITHUB_ENV"
 
     - name: Update swan Dockerfile
       if: env.PARENT_NAME == 'base'
       run: |
         sed -i "s/^ARG VERSION_PARENT=.*/ARG VERSION_PARENT=${PARENT_VERSION}/" swan/Dockerfile
-        git add swan/Dockerfile
 
     - name: Update swan-cern Dockerfile
       if: env.PARENT_NAME == 'swan'
       run: |
         sed -i "s/^ARG VERSION_PARENT=.*/ARG VERSION_PARENT=${PARENT_VERSION}/" swan-cern/Dockerfile
-        git add swan-cern/Dockerfile
 
     - name: Update swan-accpy Dockerfile
       if: env.PARENT_NAME == 'swan-cern'
       run: |
         sed -i "s/^ARG VERSION_PARENT=.*/ARG VERSION_PARENT=${PARENT_VERSION}/" swan-accpy/Dockerfile
-        git add swan-accpy/Dockerfile
 
     - name: Update prefetcher Dockerfile
       if: env.PARENT_NAME == 'swan-cern'
       run: |
         sed -i "s/^ARG VERSION_PARENT=.*/ARG VERSION_PARENT=${PARENT_VERSION}/" prefetcher/Dockerfile
-        git add prefetcher/Dockerfile
 
-    - name: Commit Changes
+    - name: Create pull request
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
-        git commit -m "Update images to use new ${PARENT_NAME} image version ${PARENT_VERSION}"
+        BRANCH="update-${PARENT_NAME}-${PARENT_VERSION}"
+        MESSAGE="Update images to use new ${PARENT_NAME} image version ${PARENT_VERSION}"
 
-    - name: Push Changes and Create PR
-      uses: peter-evans/create-pull-request@v6
-      with:
-        branch: update-${{ env.PARENT_NAME }}-${{ env.PARENT_VERSION }}
-        title: "Update images to use new ${{ env.PARENT_NAME }} image version ${{ env.PARENT_VERSION }}"
-        body: "This PR updates the Dockerfiles in the repository to use the new ${{ env.PARENT_NAME }} image version ${{ env.PARENT_VERSION }}."
-        commit-message: "Update Dockerfiles to use new ${{ env.PARENT_NAME }} image version ${{ env.PARENT_VERSION }}"
-        token: ${{ secrets.GITHUB_TOKEN }}
-        delete-branch: true
+        git config user.name "github-actions[bot]"
+        git config user.email "github-actions[bot]@users.noreply.github.com"
+        git checkout -b "$BRANCH"
+        git add -A
+        git commit -m "$MESSAGE"
+        git push origin "$BRANCH"
+        gh pr create \
+          --title "$MESSAGE" \
+          --body "This PR updates the Dockerfiles to use the new ${PARENT_NAME} image version ${PARENT_VERSION}." \
+          --head "$BRANCH" \
+          --base main

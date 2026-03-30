@@ -224,6 +224,8 @@ RUN pip install --no-cache-dir swanheader==2.0.2
 # This disables the Jupyter project communication warnings that appear in the UI.
 # Users cannot do anything about it (i.e update Jupyter), so it's better to hide it.
 RUN jupyter labextension disable "@jupyterlab/apputils-extension:announcements"
+# Disable the built-in interface switcher. We want to keep the JupyterLab UI separate from the classic one
+RUN jupyter labextension disable "@jupyter-notebook/lab-extension:interface-switcher"
 USER root
 
 # This setting disables the creation of the home directory for

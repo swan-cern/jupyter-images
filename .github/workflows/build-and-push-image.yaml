@@ -12,9 +12,6 @@ on:
 jobs:
   build_image:
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      packages: write
 
     steps:
       - name: Checkout repository

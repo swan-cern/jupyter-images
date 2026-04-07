@@ -1,5 +1,5 @@
 name: Release
-run-name: Release ${{ inputs.image }} by @${{ github.actor }}
+run-name: Release ${{ inputs.image }} (and dependents) by @${{ github.actor }}
 
 on:
   workflow_dispatch:
@@ -15,45 +15,60 @@ on:
           - swan-accpy
           - prefetcher
 
-permissions:
-  contents: write
+# Dependency tree:
+#   base → swan → swan-cern → swan-accpy
+#                           → prefetcher
 
 jobs:
-  release:
-    runs-on: ubuntu-latest
+  release-base:
+    if: inputs.image == 'base'
+    uses: ./.github/workflows/_release-image.yml
+    with:
+      image: base
+      children: swan
+    secrets: inherit
 
-    steps:
-      - uses: actions/checkout@v6
-        with:
-          persist-credentials: false
-          fetch-depth: 0
+  release-swan:
+    if: >-
+      !failure() && !cancelled() &&
+      contains(fromJSON('["base", "swan"]'), inputs.image)
+    needs: release-base
+    uses: ./.github/workflows/_release-image.yml
+    with:
+      image: swan
+      children: swan-cern
+      notify-swan-charts: true
+    secrets: inherit
 
-      - name: Calculate next version
-        id: version
-        run: |
-          LAST_TAG=$(git tag -l "${{ inputs.image }}/v*" --sort=-v:refname | head -n 1)
-          if [ -z "$LAST_TAG" ]; then
-            echo "::error::No existing tag found for ${{ inputs.image }}"
-            exit 1
-          fi
-          LAST_VERSION="${LAST_TAG#${{ inputs.image }}/v}"
-          IFS='.' read -r MAJOR MINOR PATCH <<< "$LAST_VERSION"
-          echo "new_tag=${{ inputs.image }}/v${MAJOR}.${MINOR}.$((PATCH + 1))" >> "$GITHUB_OUTPUT"
-          echo "last_tag=${LAST_TAG}" >> "$GITHUB_OUTPUT"
+  release-swan-cern:
+    if: >-
+      !failure() && !cancelled() &&
+      contains(fromJSON('["base", "swan", "swan-cern"]'), inputs.image)
+    needs: release-swan
+    uses: ./.github/workflows/_release-image.yml
+    with:
+      image: swan-cern
+      children: "swan-accpy prefetcher"
+      notify-swan-charts: true
+    secrets: inherit
 
-      - name: Create and push tag
-        env:
-          WORKFLOW_ACCESS_TOKEN: ${{ secrets.WORKFLOW_ACCESS_TOKEN }}
-        run: |
-          git tag "${{ steps.version.outputs.new_tag }}"
-          git remote set-url origin "https://x-access-token:${WORKFLOW_ACCESS_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
-          git push origin "${{ steps.version.outputs.new_tag }}"
+  release-swan-accpy:
+    if: >-
+      !failure() && !cancelled() &&
+      contains(fromJSON('["base", "swan", "swan-cern", "swan-accpy"]'), inputs.image)
+    needs: release-swan-cern
+    uses: ./.github/workflows/_release-image.yml
+    with:
+      image: swan-accpy
+      notify-swan-charts: true
+    secrets: inherit
 
-      - name: Create GitHub Release
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NEW_TAG: ${{ steps.version.outputs.new_tag }}
-          LAST_TAG: ${{ steps.version.outputs.last_tag }}
-        run: |
-          NOTES=$(git log "${LAST_TAG}..${NEW_TAG}" --pretty='- %h %s')
-          gh release create "$NEW_TAG" --notes "$NOTES"
+  release-prefetcher:
+    if: >-
+      !failure() && !cancelled() &&
+      contains(fromJSON('["base", "swan", "swan-cern", "prefetcher"]'), inputs.image)
+    needs: release-swan-cern
+    uses: ./.github/workflows/_release-image.yml
+    with:
+      image: prefetcher
+    secrets: inherit

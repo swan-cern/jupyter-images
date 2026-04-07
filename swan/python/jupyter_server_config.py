@@ -26,7 +26,7 @@ c.SwanOauthRenew.files = [
 
 # Toggle JupyterLab based on user preference
 use_jupyterlab = os.environ.get('SWAN_USE_JUPYTERLAB', 'false').lower() == 'true'
-if use_jupyterlab:
+if use_jupyterlab or not eos_enabled:
     c.ServerApp.default_url = '/lab'
 else:
     c.ServerApp.default_url = '/projects'

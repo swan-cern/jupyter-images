@@ -35,9 +35,9 @@ RUN pip install --no-deps --no-cache-dir rucio-jupyterlab==${RUCIO_JUPYTERLAB_VE
 RUN pip install --no-deps --no-cache-dir --target ${SWAN_LIB_DIR}/nb_term_lib \
     swandaskcluster==3.1.0
 
-# Install the jupyter-server-proxy integration for code-server
+# Install the jupyter-server-proxy integration for code-server and marimo
 # This auto-registers via entrypoints, adds launcher icon, handles on-demand startup
-RUN pip install jupyter-code-server==1.2 --no-cache-dir
+RUN pip install jupyter-code-server==1.2 marimo==0.22.4 swan-marimo-proxy==0.1.1 --no-cache-dir
 
 # Add helper scripts
 COPY scripts/others/* /srv/singleuser/

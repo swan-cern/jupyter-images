@@ -98,10 +98,6 @@ RUN pip install \
     # Required dependency for swanoauthrenew
     PyJWT
 
-# Install marimo and the jupyter server proxy which adds marimo
-# to the JupyterLab launcher.
-RUN pip install marimo==0.22.4 swan-marimo-proxy==0.1.1
-
 # Add Python 3 kernel configuration
 RUN mkdir -p /home/${NB_USER}/.local/share/jupyter/kernels/python3
 ADD config/kernel.json  /home/${NB_USER}/.local/share/jupyter/kernels/python3/kernel.json

@@ -88,7 +88,7 @@ jobs:
   update-children:
     if: inputs.children != ''
     runs-on: ubuntu-latest
-    needs: release
+    needs: [release, build-and-push]
     permissions:
       contents: write
 
@@ -110,12 +110,15 @@ jobs:
         env:
           IMAGE: ${{ inputs.image }}
           VERSION: ${{ needs.release.outputs.version }}
+          WORKFLOW_ACCESS_TOKEN: ${{ secrets.WORKFLOW_ACCESS_TOKEN }}
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add -A
           git diff --staged --quiet && exit 0
           git commit -m "Update children to ${IMAGE} ${VERSION}"
+          # Bypass branch protection rules by using the workflow access token
+          git remote set-url origin "https://x-access-token:${WORKFLOW_ACCESS_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
           git push
 
   notify-swan-charts:

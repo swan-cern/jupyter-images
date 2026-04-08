@@ -96,6 +96,7 @@ jobs:
       - uses: actions/checkout@v6
         with:
           ref: main # Upstream image actions may have pushed new commits, we need to checkout the latest main
+          persist-credentials: false
 
       - name: Update VERSION_PARENT in child Dockerfiles
         env:

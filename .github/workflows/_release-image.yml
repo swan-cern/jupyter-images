@@ -14,6 +14,10 @@ on:
         required: false
         type: boolean
         default: false
+      skip-build:
+        required: false
+        type: boolean
+        default: false
 
 jobs:
   release:
@@ -62,6 +66,7 @@ jobs:
           gh release create "$NEW_TAG" --notes "$NOTES"
 
   build-and-push:
+    if: ${{ !inputs.skip-build }}
     runs-on: ubuntu-latest
     needs: release
 

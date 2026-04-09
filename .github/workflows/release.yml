@@ -60,7 +60,7 @@ jobs:
     uses: ./.github/workflows/_release-image.yml
     with:
       image: swan-accpy
-      notify-swan-charts: true
+      skip-build: true  # Built on GitLab CI (needs CERN network for acc-py installers)
     secrets: inherit
 
   release-prefetcher:

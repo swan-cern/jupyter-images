@@ -1,0 +1,43 @@
+# swan-accpy is built on GitLab CI because it needs CERN network access
+# to both download and install the Acc-Py release.
+#
+# This pipeline is triggered when a swan-accpy/v* tag is mirrored from GitHub.
+
+stages:
+  - build
+  - notify
+
+variables:
+  IMAGE_NAME: gitlab-registry.cern.ch/swan/docker-images/jupyter/swan-accpy
+
+build-swan-accpy:
+  stage: build
+  image: quay.io/buildah/stable:latest
+  rules:
+    - if: $CI_COMMIT_TAG =~ /^swan-accpy\/v.+$/
+  script:
+    - VERSION=${CI_COMMIT_TAG#swan-accpy/}
+    - buildah login -u "${CI_REGISTRY_USER}" -p "${CI_REGISTRY_PASSWORD}" "${CI_REGISTRY}"
+    - buildah build
+      --storage-driver vfs
+      --build-arg "BUILD_TAG=${VERSION}"
+      -t "${IMAGE_NAME}:${VERSION}"
+      swan-accpy
+    - buildah push --storage-driver vfs "${IMAGE_NAME}:${VERSION}"
+
+notify-swan-charts:
+  stage: notify
+  image: alpine:latest
+  needs: [build-swan-accpy]
+  rules:
+    - if: $CI_COMMIT_TAG =~ /^swan-accpy\/v.+$/
+  script:
+    - VERSION=${CI_COMMIT_TAG#swan-accpy/}
+    - apk add --no-cache curl
+    - >-
+      curl -L -X POST
+      -H "Accept: application/vnd.github+json"
+      -H "Authorization: Bearer ${GITHUB_TOKEN}"
+      -H "X-GitHub-Api-Version: 2026-03-10"
+      https://api.github.com/repos/swan-cern/swan-charts/actions/workflows/update-images.yaml/dispatches
+      -d "{\"ref\":\"master\",\"inputs\":{\"image\":\"jupyter/swan-accpy\",\"version\":\"${VERSION}\"}}"

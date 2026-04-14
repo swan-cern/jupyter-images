@@ -21,7 +21,7 @@ jobs:
     steps:
     - uses: actions/checkout@v6
       with:
-        ref: main
+        ref: master
 
     - name: Update package version
       run: |
@@ -45,4 +45,4 @@ jobs:
         git add base/Dockerfile swan/Dockerfile swan-cern/Dockerfile
         git commit -m "$MESSAGE"
         git push origin "$BRANCH"
-        gh pr create --title "$MESSAGE" --body "" --head "$BRANCH" --base main
+        gh pr create --title "$MESSAGE" --body "" --head "$BRANCH" --base master

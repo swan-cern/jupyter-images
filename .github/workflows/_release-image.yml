@@ -73,7 +73,7 @@ jobs:
     steps:
       - uses: actions/checkout@v6
         with:
-          ref: main # Upstream image actions may have pushed new commits, we need to checkout the latest main
+          ref: master # Upstream image actions may have pushed new commits, we need to checkout the latest master
 
       - name: Log in to GitLab Container Registry
         uses: docker/login-action@v4
@@ -100,7 +100,7 @@ jobs:
     steps:
       - uses: actions/checkout@v6
         with:
-          ref: main # Upstream image actions may have pushed new commits, we need to checkout the latest main
+          ref: master # Upstream image actions may have pushed new commits, we need to checkout the latest master
           persist-credentials: false
 
       - name: Update VERSION_PARENT in child Dockerfiles

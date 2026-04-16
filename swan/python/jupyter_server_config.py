@@ -2,6 +2,7 @@ import os
 
 home = os.environ.get("HOME")
 jupyter_path = os.environ.get("JUPYTER_PATH", f"{home}/.local/share/jupyter")
+eos_enabled = os.environ.get("EOS_ENABLED", "true").lower() == "true"
 
 c.NotebookNotary.db_file = f"{jupyter_path}/nbsignatures.db"
 c.NotebookNotary.secret_file = f"{jupyter_path}/notebook_secret"
@@ -20,13 +21,18 @@ oauth2_file = os.environ.get("OAUTH2_FILE", "")
 oauth_inspection_endpoint = os.environ.get("OAUTH_INSPECTION_ENDPOINT", "")
 c.SwanOauthRenew.files = [
     ("/tmp/swan_oauth.token", "access_token", "{token}"),
-    ("/tmp/cernbox_oauth.token", f"exchanged_tokens/{cernbox_oauth_id}", "{token}"),
-    (oauth2_file, f"exchanged_tokens/{eos_oauth_id}", "oauth2:{token}:" + oauth_inspection_endpoint)
 ]
+
+if eos_enabled:
+    # Add EOS and CERNBox token renewal when EOS is enabled
+    c.SwanOauthRenew.files.extend([
+        ("/tmp/cernbox_oauth.token", f"exchanged_tokens/{cernbox_oauth_id}", "{token}"),
+        (oauth2_file, f"exchanged_tokens/{eos_oauth_id}", "oauth2:{token}:" + oauth_inspection_endpoint),
+    ])
 
 # Toggle JupyterLab based on user preference
 use_jupyterlab = os.environ.get('SWAN_USE_JUPYTERLAB', 'false').lower() == 'true'
-if use_jupyterlab:
+if use_jupyterlab or not eos_enabled:
     c.ServerApp.default_url = '/lab'
 else:
     c.ServerApp.default_url = '/projects'

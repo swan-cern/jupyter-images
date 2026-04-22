@@ -28,7 +28,7 @@ RUN pip install --no-deps --no-cache-dir \
     swanmetrics==1.0.8
 
 # Install the Rucio JupyterLab extension
-RUN pip install --no-deps --no-cache-dir rucio-jupyterlab==${RUCIO_JUPYTERLAB_VERSION} 
+RUN pip install --no-deps --no-cache-dir peewee==4.0.4 rucio-jupyterlab==${RUCIO_JUPYTERLAB_VERSION}
 
 # Install swandaskcluster in the lib directory that is exposed to notebooks and
 # terminals, which need it to do automatic TLS configuration for Dask clients

@@ -19,6 +19,8 @@ on:
         type: boolean
         default: false
 
+permissions: {}  # Deny all permissions by default at workflow level
+
 jobs:
   release:
     runs-on: ubuntu-latest

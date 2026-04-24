@@ -19,6 +19,8 @@ on:
 #   base → swan → swan-cern → swan-accpy
 #                           → prefetcher
 
+permissions: {}  # Deny all permissions by default at workflow level
+
 jobs:
   release-base:
     if: inputs.image == 'base'

@@ -37,7 +37,7 @@ RUN pip install --no-deps --no-cache-dir --target ${SWAN_LIB_DIR}/nb_term_lib \
 
 # Install the jupyter-server-proxy integration for code-server and marimo
 # This auto-registers via entrypoints, adds launcher icon, handles on-demand startup
-RUN pip install jupyter-code-server==1.2 marimo==0.22.4 swan-marimo-proxy==0.1.4 --no-cache-dir
+RUN pip install jupyter-code-server==1.2 marimo==0.23.3 swan-marimo-proxy==0.1.4 --no-cache-dir
 
 # Add helper scripts
 COPY scripts/others/* /srv/singleuser/

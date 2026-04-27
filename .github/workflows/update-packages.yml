@@ -25,7 +25,7 @@ jobs:
 
     - name: Update package version
       run: |
-        PKG_NAME_LOWER=$(echo " ${{ inputs.package }}" | tr '[:upper:]' '[:lower:]')
+        PKG_NAME_LOWER=$(echo "${{ inputs.package }}" | tr '[:upper:]' '[:lower:]')
         # Some packages have different names on PyPI
         if [[ "$PKG_NAME_LOWER" == "swanmarimoproxy" ]]; then
           PKG_NAME_LOWER="swan-marimo-proxy"

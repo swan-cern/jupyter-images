@@ -1,4 +1,4 @@
-FROM gitlab-registry.cern.ch/linuxsupport/alma9-base:20240801-1
+FROM gitlab-registry.cern.ch/linuxsupport/alma9-base:20260205-1
 
 LABEL maintainer="swan-admins@cern.ch"
 ARG NB_USER="jovyan"
@@ -123,7 +123,7 @@ RUN set -x && \
         --yes \
         "${PYTHON_SPECIFIER}" \
         'mamba=1.5.3' \
-        'jupyter_core=5.5.0' && \
+        'jupyter_core=5.9.1' && \
     rm micromamba && \
     # Pin major.minor version of python
     mamba list python | grep '^python ' | tr -s ' ' | cut -d ' ' -f 1,2 >> "${CONDA_DIR}/conda-meta/pinned" && \
@@ -164,16 +164,12 @@ USER ${NB_UID}
 # Do all this in a single RUN command to avoid duplicating all of the
 # files across image layers when the permissions change
 # Force the current latest versions of the python packages installed
-# in the SWAN base image, except for the notebook one. This package
-# is using the latest version (6.5.6) before major version 7, as there
-# are incompatibility issues that arise due to the usage of such
-# version along with the package nbclassic or swanclassic.
+# in the SWAN base image.
 WORKDIR /tmp
 RUN mamba install --yes \
-    'jupyterlab==4.0.7' \
-    'notebook==6.5.6' \
+    'jupyterlab==4.5.2' \
     'jupyterhub==5.4.3' \
-    'nbclassic==1.0.0' && \
+    'nbclassic==1.3.3' && \
     jupyter server --generate-config && \
     mamba clean --all -f -y && \
     npm cache clean --force && \

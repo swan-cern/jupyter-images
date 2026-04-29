@@ -28,7 +28,9 @@ jobs:
     with:
       image: base
       children: swan
-    secrets: inherit
+    secrets:
+      GITLAB_TOKEN: ${{ secrets.GITLAB_TOKEN }}
+      WORKFLOW_ACCESS_TOKEN: ${{ secrets.WORKFLOW_ACCESS_TOKEN }}
 
   release-swan:
     if: >-
@@ -40,7 +42,9 @@ jobs:
       image: swan
       children: swan-cern
       notify-swan-charts: true
-    secrets: inherit
+    secrets:
+      GITLAB_TOKEN: ${{ secrets.GITLAB_TOKEN }}
+      WORKFLOW_ACCESS_TOKEN: ${{ secrets.WORKFLOW_ACCESS_TOKEN }}
 
   release-swan-cern:
     if: >-
@@ -52,7 +56,9 @@ jobs:
       image: swan-cern
       children: "swan-accpy prefetcher"
       notify-swan-charts: true
-    secrets: inherit
+    secrets:
+      GITLAB_TOKEN: ${{ secrets.GITLAB_TOKEN }}
+      WORKFLOW_ACCESS_TOKEN: ${{ secrets.WORKFLOW_ACCESS_TOKEN }}
 
   release-swan-accpy:
     if: >-
@@ -63,7 +69,9 @@ jobs:
     with:
       image: swan-accpy
       skip-build: true  # Built on GitLab CI (needs CERN network for acc-py installers)
-    secrets: inherit
+    secrets:
+      GITLAB_TOKEN: ${{ secrets.GITLAB_TOKEN }}
+      WORKFLOW_ACCESS_TOKEN: ${{ secrets.WORKFLOW_ACCESS_TOKEN }}
 
   release-prefetcher:
     if: >-
@@ -73,4 +81,6 @@ jobs:
     uses: ./.github/workflows/_release-image.yml
     with:
       image: prefetcher
-    secrets: inherit
+    secrets:
+      GITLAB_TOKEN: ${{ secrets.GITLAB_TOKEN }}
+      WORKFLOW_ACCESS_TOKEN: ${{ secrets.WORKFLOW_ACCESS_TOKEN }}

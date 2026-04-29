@@ -18,6 +18,13 @@ on:
         required: false
         type: boolean
         default: false
+    secrets:
+      GITLAB_TOKEN:
+        required: false
+        description: "Token for pushing to the GitLab container registry (not needed if skip-build: true)"
+      WORKFLOW_ACCESS_TOKEN:
+        required: false
+        description: "Token to bypass branch protection on push, and to trigger swan-charts"
 
 permissions: {}  # Deny all permissions by default at workflow level
 

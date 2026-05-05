@@ -18,36 +18,48 @@ on:
         required: false
         type: boolean
         default: false
+    secrets:
+      GITLAB_TOKEN:
+        required: false
+        description: "Token for pushing to the GitLab container registry (not needed if skip-build: true)"
+      WORKFLOW_ACCESS_TOKEN:
+        required: false
+        description: "Token to bypass branch protection on push, and to trigger swan-charts"
+
+permissions: {}  # Deny all permissions by default at workflow level
 
 jobs:
   release:
     runs-on: ubuntu-latest
+    env:
+      IMAGE: ${{ inputs.image }}
     permissions:
-      contents: write
+      contents: write # Needed for pushing tags and creating releases
 
     outputs:
       version: ${{ steps.version.outputs.version }}
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           fetch-depth: 0 # Fetch all tags
+          persist-credentials: false
 
       - name: Calculate next version
         id: version
         run: |
-          LAST_TAG=$(git tag -l "${{ inputs.image }}/v*" --sort=-v:refname | head -n 1)
+          LAST_TAG=$(git tag -l "${IMAGE}/v*" --sort=-v:refname | head -n 1)
           if [ -z "$LAST_TAG" ]; then
-            echo "::error::No existing tag found for ${{ inputs.image }}"
+            echo "::error::No existing tag found for ${IMAGE}"
             exit 1
           fi
-          LAST_VERSION="${LAST_TAG#${{ inputs.image }}/v}"
+          LAST_VERSION="${LAST_TAG#${IMAGE}/v}"
           IFS='.' read -r MAJOR MINOR PATCH <<< "$LAST_VERSION"
           # Bump only the patch version. We don't follow semver, so for our use case,
           # it's enough to just increment the patch version for each new release.
           # We can always extend the logic later if we need to support minor or major version bumps.
           VERSION="v${MAJOR}.${MINOR}.$((PATCH + 1))"
-          echo "new_tag=${{ inputs.image }}/${VERSION}" >> "$GITHUB_OUTPUT"
+          echo "new_tag=${IMAGE}/${VERSION}" >> "$GITHUB_OUTPUT"
           echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
           echo "last_tag=${LAST_TAG}" >> "$GITHUB_OUTPUT"
 
@@ -69,36 +81,41 @@ jobs:
     if: ${{ !inputs.skip-build }}
     runs-on: ubuntu-latest
     needs: release
+    env:
+      IMAGE: ${{ inputs.image }}
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           ref: master # Upstream image actions may have pushed new commits, we need to checkout the latest master
+          persist-credentials: false
 
       - name: Log in to GitLab Container Registry
-        uses: docker/login-action@v4
+        uses: docker/login-action@4907a6ddec9925e35a0a9e82d7399ccc52663121 # v4.1.0
         with:
           registry: gitlab-registry.cern.ch
           username: ${{ github.actor }}
           password: ${{ secrets.GITLAB_TOKEN }}
 
       - name: Build and push image
-        uses: docker/build-push-action@v7
+        uses: docker/build-push-action@bcafcacb16a39f128d818304e6c9c0c18556b85f # v7.1.0
         with:
-          context: ./${{ inputs.image }}
+          context: ./${{ env.IMAGE }}
           build-args: BUILD_TAG=${{ needs.release.outputs.version }}
           push: true
-          tags: gitlab-registry.cern.ch/swan/docker-images/jupyter/${{ inputs.image }}:${{ needs.release.outputs.version }}
+          tags: gitlab-registry.cern.ch/swan/docker-images/jupyter/${{ env.IMAGE }}:${{ needs.release.outputs.version }}
 
   update-children:
     if: inputs.children != ''
     runs-on: ubuntu-latest
     needs: [release, build-and-push]
+    env:
+      IMAGE: ${{ inputs.image }}
     permissions:
-      contents: write
+      contents: write # Needed for pushing commits to update child Dockerfiles
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           ref: master # Upstream image actions may have pushed new commits, we need to checkout the latest master
           persist-credentials: false
@@ -114,7 +131,6 @@ jobs:
 
       - name: Commit and push
         env:
-          IMAGE: ${{ inputs.image }}
           VERSION: ${{ needs.release.outputs.version }}
           WORKFLOW_ACCESS_TOKEN: ${{ secrets.WORKFLOW_ACCESS_TOKEN }}
         run: |
@@ -130,6 +146,8 @@ jobs:
   notify-swan-charts:
     if: inputs.notify-swan-charts
     runs-on: ubuntu-latest
+    env:
+      IMAGE: ${{ inputs.image }}
     needs: [release, build-and-push]
 
     steps:
@@ -140,5 +158,5 @@ jobs:
           gh workflow run "Update jupyter and jupyterhub images" \
             --repo swan-cern/swan-charts \
             --ref master \
-            -f image="jupyter/${{ inputs.image }}" \
+            -f image="jupyter/${IMAGE}" \
             -f version="${{ needs.release.outputs.version }}"

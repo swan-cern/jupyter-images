@@ -100,10 +100,10 @@ jobs:
       - name: Build and push image
         uses: docker/build-push-action@bcafcacb16a39f128d818304e6c9c0c18556b85f # v7.1.0
         with:
-          context: ./${IMAGE}
+          context: ./${{ env.IMAGE }}
           build-args: BUILD_TAG=${{ needs.release.outputs.version }}
           push: true
-          tags: gitlab-registry.cern.ch/swan/docker-images/jupyter/${IMAGE}:${{ needs.release.outputs.version }}
+          tags: gitlab-registry.cern.ch/swan/docker-images/jupyter/${{ env.IMAGE }}:${{ needs.release.outputs.version }}
 
   update-children:
     if: inputs.children != ''

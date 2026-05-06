@@ -82,7 +82,14 @@ RUN mamba install --yes \
     'jupyter-resource-usage==1.2.0' \
     'jupyterlab-git==0.51.4' \
     # Extensions required by jupyter server
-    'webio-jupyter-extension==0.1.0'
+    'webio-jupyter-extension==0.1.0' \
+    # Fix the version of ipykernel to avoid issues with pyzmq compatibility resulting in SparkConnector failing to load.
+    # Some older LCG releases (e.g. 106) come with pyzmq 22 which is not compatible with ipykernel 7+.
+    # Technically speaking, 6.29.5 requires pyzmq 24+, but it has always worked so there's no need to
+    # downgrade to 6.26 (latest version which supports pyzmq 22).
+    # In order to bump the ipykernel version in the future, we need to make sure all LCG releases have
+    # a modern enough pyzmq version (25+).
+    'ipykernel==6.29.5'
 
 # Install all of our extensions
 # Ignore (almost all) dependencies because they have already been installed or come from CVMFS

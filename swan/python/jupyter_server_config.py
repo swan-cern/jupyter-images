@@ -3,13 +3,22 @@ import os
 home = os.environ.get("HOME")
 jupyter_path = os.environ.get("JUPYTER_PATH", f"{home}/.local/share/jupyter")
 eos_enabled = os.environ.get("EOS_ENABLED", "true").lower() == "true"
+local_home = os.environ.get("LOCAL_HOME", "false").lower() == "true"
 
 c.NotebookNotary.db_file = f"{jupyter_path}/nbsignatures.db"
 c.NotebookNotary.secret_file = f"{jupyter_path}/notebook_secret"
 
-# Configure jupyter lab to start in the HOME of the user
-# which is usually EOS for CERN users.
-c.ServerApp.root_dir = home
+# Configure jupyter lab start directory
+if eos_enabled and not local_home:
+    # The most common case: EOS is enabled and user home is "/eos/user/<letter>/<username>"
+    # In this case, set the root_dir to "/eos" and the preferred_dir to the user home,
+    # so that the user sees their home when they open Jupyter but can also easily navigate to other parts of EOS.
+    c.ServerApp.root_dir = '/eos'
+    c.FileContentsManager.preferred_dir = home
+else:
+    # The less common case: either EOS is disabled or $HOME is not on EOS
+    # In this case, just set the root_dir to the user home.
+    c.ServerApp.root_dir = home
 
 c.ServerApp.contents_manager_class = "swancontents.filemanager.SwanEosFileManager"
 # To allow deleting Projects, which are never empty because of .swancontents

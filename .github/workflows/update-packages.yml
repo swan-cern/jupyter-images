@@ -39,6 +39,9 @@ jobs:
         if [[ "$PKG_NAME_LOWER" == "swanmarimoproxy" ]]; then
           PKG_NAME_LOWER="swan-marimo-proxy"
         fi
+        if [[ "$PKG_NAME_LOWER" == "swanml" ]]; then
+          PKG_NAME_LOWER="swan-ml"
+        fi
         PKG_VER=$(echo "${VERSION}" | sed -e "s/v//g")
 
         for DIR in base swan swan-cern; do

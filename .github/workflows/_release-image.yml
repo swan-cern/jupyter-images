@@ -65,6 +65,8 @@ jobs:
           echo "last_tag=${LAST_TAG}" >> "$GITHUB_OUTPUT"
 
       - name: Create and push tag
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           git remote set-url origin "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
           git tag "${{ steps.version.outputs.new_tag }}"

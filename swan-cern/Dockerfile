@@ -25,8 +25,7 @@ RUN pip install --no-deps --no-cache-dir \
     sparkmonitor==3.3.0 \
     swanportallocator==2.0.0 \
     swandask==0.0.6 \
-    swanmetrics==1.0.8 \
-    swan-ml==0.4.7
+    swanmetrics==1.0.8
 
 # Install the Rucio JupyterLab extension
 RUN pip install --no-deps --no-cache-dir peewee==4.0.4 rucio-jupyterlab==${RUCIO_JUPYTERLAB_VERSION}
@@ -36,9 +35,14 @@ RUN pip install --no-deps --no-cache-dir peewee==4.0.4 rucio-jupyterlab==${RUCIO
 RUN pip install --no-deps --no-cache-dir --target ${SWAN_LIB_DIR}/nb_term_lib \
     swandaskcluster==3.1.0
 
-# Install the jupyter-server-proxy integration for code-server and marimo
-# This auto-registers via entrypoints, adds launcher icon, handles on-demand startup
-RUN pip install jupyter-code-server==1.2 marimo==0.23.3 swan-marimo-proxy==0.1.4 --no-cache-dir
+RUN pip install --no-cache-dir \
+    # Install the jupyter-server-proxy integration for code-server and marimo
+    # This auto-registers via entrypoints, adds launcher icon, handles on-demand startup
+    jupyter-code-server==1.2 \
+    marimo==0.23.3 \
+    swan-marimo-proxy==0.1.4 \
+    # Install the swan-ml package for Kubeflow integration
+    swan-ml==0.4.7
 
 # Add helper scripts
 COPY scripts/others/* /srv/singleuser/

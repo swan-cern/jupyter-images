@@ -42,7 +42,7 @@ RUN pip install --no-cache-dir \
     marimo==0.23.3 \
     swan-marimo-proxy==0.1.4 \
     # Install the swan-ml package for Kubeflow integration
-    swan-ml==0.4.7
+    swan-ml==0.4.8
 
 # Add helper scripts
 COPY scripts/others/* /srv/singleuser/

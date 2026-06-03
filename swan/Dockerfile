@@ -95,7 +95,7 @@ RUN mamba install --yes \
 # Ignore (almost all) dependencies because they have already been installed or come from CVMFS
 RUN pip install --no-deps --no-cache-dir \
     swancontents==2.1.23 \
-    swanhelp==3.0.3 \
+    swanhelp==3.0.4 \
     swankernelenv==1.0.0 \
     swanoauthrenew==1.0.2  \
     swanshare==2.0.3 \

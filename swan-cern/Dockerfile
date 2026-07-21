@@ -94,7 +94,7 @@ RUN chmod +x /usr/local/bin/before-notebook.d/*
 
 # Install UV for faster package installation
 RUN export XDG_BIN_HOME=/usr/local/bin && \
-    curl -LsSf https://astral.sh/uv/install.sh | sh -s -- --no-modify-path && \
+    curl -LsSf https://astral.sh/uv/install.sh | sh -s && \
     chmod u+x $XDG_BIN_HOME/uv
 
 # Switch back to jovyan to avoid accidental container runs as root

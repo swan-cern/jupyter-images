@@ -39,6 +39,8 @@ RUN pip install --no-cache-dir \
     # Install the jupyter-server-proxy integration for code-server and marimo
     # This auto-registers via entrypoints, adds launcher icon, handles on-demand startup
     jupyter-code-server==1.2 \
+    # Jupyter AI (https://jupyter-ai.readthedocs.io/en/stable)
+    jupyter-ai==3.0.1 \
     marimo==0.23.3 \
     swan-marimo-proxy==0.1.4 \
     # Install the swan-ml package for Kubeflow integration
@@ -50,6 +52,12 @@ COPY scripts/others/* /srv/singleuser/
 # Add dask configuration file
 # Dask config: lab extension must use SwanHTCondorCluster
 ADD config/dask-labextension.yaml /etc/dask/labextension.yaml
+
+# Install ACP
+RUN npm install -g \
+    @agentclientprotocol/claude-agent-acp \
+    @zed-industries/codex-acp \
+    opencode-ai
 
 USER root
 
@@ -94,8 +102,42 @@ RUN chmod +x /usr/local/bin/before-notebook.d/*
 
 # Install UV for faster package installation
 RUN export XDG_BIN_HOME=/usr/local/bin && \
-    curl -LsSf https://astral.sh/uv/install.sh | sh -s -- --no-modify-path && \
+    curl -LsSf https://astral.sh/uv/install.sh | sh -s && \
     chmod u+x $XDG_BIN_HOME/uv
 
 # Switch back to jovyan to avoid accidental container runs as root
 USER ${NB_UID}
+
+
+# Set PATH to include the local bin directory for user-installed packages
+ENV PATH="$HOME/.local/bin:$PATH"
+
+# Install agentic coding assistants
+# goose:       https://block.github.io/goose/docs/getting-started/installation
+#              CONFIGURE=false avoids goose building its own python env, which conflicts with the CVMFS python environment
+# claude:      https://docs.anthropic.com/en/docs/claude-code/quickstart
+# kiro:        https://kiro.dev/docs/cli/installation/
+# opencode:    https://opencode.ai
+# codex:       https://learn.chatgpt.com/docs/codex/cli
+# copilot:     https://docs.github.com/en/copilot/how-tos/copilot-cli/set-up-copilot-cli/install-copilot-cli
+# vibe:        https://docs.mistral.ai/mistral-vibe/introduction/install
+# antigravity: https://antigravity.google/download (TODO: no ACP yet, unusable with JupyterAI)
+ENV INSTALL_URLS="\
+    https://github.com/block/goose/releases/download/stable/download_cli.sh \
+    https://claude.ai/install.sh \
+    https://cli.kiro.dev/install \
+    # opencode acp is only installed if done through npm
+    # https://opencode.ai/install \
+    https://chatgpt.com/codex/install.sh \
+    https://gh.io/copilot-install \
+    https://mistral.ai/vibe/install.sh \
+    https://antigravity.google/cli/install.sh \
+"
+
+RUN for url in $INSTALL_URLS; do \
+        CONFIGURE=""; \
+        case "$url" in \
+            *goose*) CONFIGURE=false ;; \
+        esac; \
+        curl -fsSL "$url" | CONFIGURE="$CONFIGURE" bash; \
+    done

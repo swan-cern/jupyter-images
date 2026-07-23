@@ -56,6 +56,16 @@ def configure_terminal():
                 # Setting up colors
                 "alias ls='ls --color'\n",
                 "alias grep='grep --color'\n",
+                # Kiro Alias
+                "alias kiro=kiro-cli\n",
+                # Codex Alias: Reassign HOME to user's home dir instead of his EOS home dir, so Codex can find its local database
+                "codex() {\n",
+                "HOME=/home/$USER command codex \"$@\" \n",
+                "}\n",
+                # Vibe Alias: Unset PYTHONHOME and PYTHONPATH to avoid conflicts with Mistral's vibe cli (installed with uv, conflicts in user's session with cvmfs python environment)
+                "vibe() {\n",
+                "env -u PYTHONHOME -u PYTHONPATH command vibe \"$@\"\n",
+                "}\n",
                 # There's no JupyterLab setting for the terminal directory, so we
                 # set it here to always be HOME
                 f"cd {HOME}\n"

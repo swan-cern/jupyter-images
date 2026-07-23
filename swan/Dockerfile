@@ -89,7 +89,8 @@ RUN mamba install --yes \
     # downgrade to 6.26 (latest version which supports pyzmq 22).
     # In order to bump the ipykernel version in the future, we need to make sure all LCG releases have
     # a modern enough pyzmq version (25+).
-    'ipykernel==6.29.5'
+    'ipykernel==6.29.5' \
+    'nodejs=22'
 
 # Install all of our extensions
 # Ignore (almost all) dependencies because they have already been installed or come from CVMFS

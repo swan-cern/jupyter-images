@@ -48,7 +48,7 @@ export PYTHONPATH=$PYTHONPATH:$SWAN_LIB_DIR/nb_term_lib/
 
 # Append to PATH a directory where to install binaries
 # to be exposed to the user environment (notebooks, terminals)
-export PATH=$PATH:$SWAN_BIN_DIR/nb_term_bin/
+export PATH=$PATH:$SWAN_BIN_DIR/nb_term_bin/:/home/${USER}/.local/bin
 
 # Prepend the user site packages directory to PYTHONPATH, if they request it.
 # This allows to use Python packages installed on CERNBox

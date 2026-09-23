@@ -86,10 +86,6 @@ RUN echo "auth requisite pam_deny.so" >> /etc/pam.d/su && \
 # Change to jovyan user
 USER ${NB_UID}
 
-# Setup work directory for backward-compatibility
-RUN mkdir "/home/${NB_USER}/work" && \
-    fix-permissions "/home/${NB_USER}"
-
 # Download and install Micromamba, and initialize Conda prefix.
 #   <https://github.com/mamba-org/mamba#micromamba>
 #   Similar projects using Micromamba:

@@ -161,10 +161,13 @@ USER ${NB_UID}
 # files across image layers when the permissions change
 # Force the current latest versions of the python packages installed
 # in the SWAN base image.
+# tornado 6.5.8 is pinned to avoid extension load errors
+# via symlinks not allowed from 6.5.9
 WORKDIR /tmp
 RUN mamba install --yes \
     'jupyterlab==4.5.6' \
     'jupyterhub==5.4.3' \
+    'tornado==6.5.8' \
     'nbclassic==1.3.3' && \
     jupyter server --generate-config && \
     mamba clean --all -f -y && \

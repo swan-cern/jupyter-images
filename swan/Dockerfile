@@ -98,7 +98,7 @@ RUN pip install --no-deps --no-cache-dir \
     swanhelp==3.0.5 \
     swankernelenv==1.0.1 \
     swanoauthrenew==1.0.3  \
-    swanshare==2.0.3 \
+    swanshare==2.0.4 \
     swancustomenvironments==0.0.38
 
 RUN pip install \ 

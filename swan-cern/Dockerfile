@@ -40,7 +40,7 @@ RUN pip install --no-cache-dir \
     # This auto-registers via entrypoints, adds launcher icon, handles on-demand startup
     jupyter-code-server==1.2 \
     marimo==0.23.3 \
-    swan-marimo-proxy==0.1.4 \
+    swan-marimo-proxy==0.1.5 \
     # Install the swan-ml package for Kubeflow integration
     swan-ml==0.4.8
 

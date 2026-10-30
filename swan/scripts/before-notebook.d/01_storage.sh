@@ -23,6 +23,18 @@ then
     chmod 600 $OAUTH2_FILE
 fi
 
+# Store the CERNBox oAuth token given by the spawner inside a file so that
+# the CS3 contents manager can authenticate as soon as it's loaded.
+if [[ ! -z "$CERNBOX_ACCESS_TOKEN" ]];
+then
+    _log "Storing oAuth token for CERNBox"
+    CERNBOX_OAUTH_FILE=/tmp/cernbox_oauth.token
+    echo -n "$CERNBOX_ACCESS_TOKEN" > $CERNBOX_OAUTH_FILE
+    chown $NB_USER:$NB_GID $CERNBOX_OAUTH_FILE
+    chmod 600 $CERNBOX_OAUTH_FILE
+    unset CERNBOX_ACCESS_TOKEN
+fi
+
 set +e
 run_as_user 'if [[ ! -d "$HOME" || ! -x "$HOME" ]]; then exit 1; fi'
 if [ $? -ne 0 ]

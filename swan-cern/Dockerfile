@@ -100,5 +100,9 @@ RUN export XDG_BIN_HOME=/usr/local/bin && \
     curl -LsSf https://astral.sh/uv/install.sh | sh -s -- --no-modify-path && \
     chmod u+x $XDG_BIN_HOME/uv
 
+# Remove user write permission for /opt/conda/bin
+RUN chown -R root:root "${CONDA_DIR}/bin" && \
+    chmod -R 755 "${CONDA_DIR}/bin"
+
 # Switch back to jovyan to avoid accidental container runs as root
 USER ${NB_UID}

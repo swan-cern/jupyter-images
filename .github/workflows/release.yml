@@ -28,6 +28,7 @@ jobs:
     permissions:
       contents: write # Required by the nested workflow
     with:
+      squash: true
       image: base
       children: swan
     secrets:

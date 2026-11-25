@@ -28,7 +28,9 @@ RUN pip install --no-deps --no-cache-dir \
     swanmetrics==1.0.9
 
 # Install the Rucio JupyterLab extension
-RUN pip install --no-deps --no-cache-dir peewee==4.0.4 rucio-jupyterlab==${RUCIO_JUPYTERLAB_VERSION}
+RUN pip install --no-deps --no-cache-dir peewee==4.0.4 rucio-jupyterlab==${RUCIO_JUPYTERLAB_VERSION} && \
+    # rucio-jupyterlab creates cache files when building even with --no-cache-dir
+    rm -rf "$HOME/.cache/pip"
 
 # Install swandaskcluster in the lib directory that is exposed to notebooks and
 # terminals, which need it to do automatic TLS configuration for Dask clients
@@ -58,7 +60,9 @@ RUN jupyter nbclassic-extension install --py --system sparkconnector && \
     jupyter nbclassic-extension install --py --system sparkmonitor
 
 # Install code-server
-RUN curl -fsSL https://code-server.dev/install.sh | sh -s -- --version=4.107.1 --method=standalone --prefix=/usr/local
+RUN curl -fsSL https://code-server.dev/install.sh | sh -s -- --version=4.107.1 --method=standalone --prefix=/usr/local && \
+    # The install script do not automatically delete downloaded tarballs after installing
+    rm -rf "$HOME/.cache/code-server"
 
 # HTCondor requirements
 RUN dnf install -y \
@@ -88,7 +92,7 @@ RUN ln -s $(pip show sparkconnector | grep -oP 'Location: \K.*')/sparkconnector 
     # dependency of dask-labextension
     ln -s $(pip show jupyter-server-proxy | grep -oP 'Location: \K.*')/jupyter_server_proxy ${SWAN_LIB_DIR}/extensions/ && \
     # dependency of jupyter-server-proxy
-    ln -s $(pip show simpervisor | grep -oP 'Location: \K.*')/simpervisor ${SWAN_LIB_DIR}/extensions/ \
+    ln -s $(pip show simpervisor | grep -oP 'Location: \K.*')/simpervisor ${SWAN_LIB_DIR}/extensions/ && \
     # dependency of rucio-jupyterlab
     ln -s $(pip show rucio-jupyterlab | grep -oP 'Location: \K.*')/rucio_jupyterlab ${SWAN_LIB_DIR}/extensions/
 

@@ -1,4 +1,4 @@
-FROM gitlab-registry.cern.ch/linuxsupport/alma9-base:20260205-1
+FROM gitlab-registry.cern.ch/linuxsupport/alma9-base:20261116-1 as root_image
 
 LABEL maintainer="swan-admins@cern.ch"
 ARG NB_USER="jovyan"
@@ -25,6 +25,13 @@ RUN echo "skip_missing_names_on_install=False" >> /etc/dnf/dnf.conf
 # This image is the base image of the base-notebook one, and we decided to merge
 # them into one single image in this Dockerfile.
 
+# Micromamba is taken from the official image, pinned by digest for integrity
+# Dependabot keeps this version and digest up to date (`docker` ecosystem covers this directory)
+# The binary is bind-mounted into the install RUN below, so it is not added to any image layer
+FROM docker.io/mambaorg/micromamba:2.10.0@sha256:e1476182cd40eb1f7c0cfae4adec9bfd78f3d7f05c61368306abfdc8939c1198 AS micromamba
+
+FROM root_image
+
 USER root
 
 # Install all OS dependencies and additional packages for Server that starts
@@ -46,8 +53,8 @@ RUN dnf update -y && \
     tini \
     wget
 
-# We do not clean the dnf cache because we do it in the last image, as we
-# expect the images to be squashed.
+# We do not clean the dnf cache because we do it at the end of this Dockerfile, as we
+# expect this image to be squashed.
 
 # Configure environment
 ENV CONDA_DIR=/opt/conda \
@@ -68,10 +75,11 @@ RUN chmod a+rx /usr/local/bin/fix-permissions
 # logic to enable prompt color
 # hadolint ignore=SC2016
 RUN sed -i 's/^#force_color_prompt=yes/force_color_prompt=yes/' /etc/skel/.bashrc && \
-   # Add call to conda init script see https://stackoverflow.com/a/58081608/4413446
-   echo 'eval "$(command conda shell.bash hook 2> /dev/null)"' >> /etc/skel/.bashrc
+    # More information in: https://github.com/jupyter/docker-stacks/pull/2047
+    # and docs: https://docs.conda.io/projects/conda/en/latest/dev-guide/deep-dives/activation.html
+    echo 'eval "$(conda shell.bash hook)"' >> /etc/skel/.bashrc
 
-# Create NB_USER with name jovyan user with UID=1000 and in the 'users' group
+# Create "${NB_USER}" user (`jovyan` by default) with UID="${NB_UID}" (`1000` by default) and in the 'users' group
 # and make sure these dirs are writable by the `users` group.
 RUN echo "auth requisite pam_deny.so" >> /etc/pam.d/su && \
     sed -i.bak -e 's/^%admin/#%admin/' /etc/sudoers && \
@@ -86,43 +94,36 @@ RUN echo "auth requisite pam_deny.so" >> /etc/pam.d/su && \
 # Change to jovyan user
 USER ${NB_UID}
 
-# Download and install Micromamba, and initialize Conda prefix.
+# Install the Conda prefix using Micromamba from the digest-pinned official image (see top of this file).
 #   <https://github.com/mamba-org/mamba#micromamba>
 #   Similar projects using Micromamba:
 #     - Micromamba-Docker: <https://github.com/mamba-org/micromamba-docker>
 #     - repo2docker: <https://github.com/jupyterhub/repo2docker>
-# Install Python, Mamba and jupyter_core
-# Cleanup temporary files and remove Micromamba
+# Install Python, Mamba, and jupyter_core
+# Cleanup temporary files
 # Correct permissions
 # Do all this in a single RUN command to avoid duplicating all of the
 # files across image layers when the permissions change
 COPY --chown="${NB_UID}:${NB_GID}" initial-condarc "${CONDA_DIR}/.condarc"
 WORKDIR /tmp
-RUN set -x && \
-    arch=$(uname -m) && \
-    if [ "${arch}" = "x86_64" ]; then \
-        # Should be simpler, see <https://github.com/mamba-org/mamba/issues/1437>
-        arch="64"; \
-    fi && \
-    # curl is used instead of wget, as we get a 403 Forbidden error while downloading
-    # micromamba only when using the later command.
-    curl -L -o /tmp/micromamba.tar.bz2 \
-        "https://micro.mamba.pm/api/micromamba/linux-${arch}/latest" && \
-    tar -xvjf /tmp/micromamba.tar.bz2 --strip-components=1 bin/micromamba && \
-    rm /tmp/micromamba.tar.bz2 && \
+RUN --mount=type=bind,from=micromamba,source=/bin/micromamba,target=/usr/local/bin/micromamba \
+    set -x && \
     PYTHON_SPECIFIER="python=${PYTHON_VERSION}" && \
-    if [[ "${PYTHON_VERSION}" == "default" ]]; then PYTHON_SPECIFIER="python"; fi && \
+    if [ "${PYTHON_VERSION}" = "default" ]; then PYTHON_SPECIFIER="python"; fi && \
     # Install the packages
-    ./micromamba install \
+    micromamba install \
         --root-prefix="${CONDA_DIR}" \
         --prefix="${CONDA_DIR}" \
         --yes \
-        "${PYTHON_SPECIFIER}" \
-        'mamba=1.5.3' \
-        'jupyter_core=5.9.1' && \
-    rm micromamba && \
+        'jupyter_core=5.9.1' \
+        'conda' \
+        # Install mamba with the same version as the micromamba image pinned above
+        # (they are released together)
+        "mamba==$(micromamba --version)" \
+        "${PYTHON_SPECIFIER}" && \
     # Pin major.minor version of python
-    mamba list python | grep '^python ' | tr -s ' ' | cut -d ' ' -f 1,2 >> "${CONDA_DIR}/conda-meta/pinned" && \
+    # https://conda.io/projects/conda/en/latest/user-guide/tasks/manage-pkgs.html#preventing-packages-from-updating-pinning
+    mamba list --full-name 'python' | awk 'END{sub("[^.]*$", "*", $2); print $1 " " $2}' >> "${CONDA_DIR}/conda-meta/pinned" && \
     mamba clean --all -f -y && \
     fix-permissions "${CONDA_DIR}" && \
     fix-permissions "/home/${NB_USER}"
@@ -148,12 +149,14 @@ RUN mkdir /usr/local/bin/start-notebook.d && \
 # https://github.com/jupyter/docker-stacks/tree/0d8b4e498766fb451e3ba08f9ade9da344db5d83/images/base-notebook
 
 # Install all base notebook dependencies
-RUN dnf install -y pandoc
+RUN dnf install -y pandoc && \
+    dnf clean all && \
+    rm -rf /var/cache/dnf
 
 # Switch back to jovyan to avoid accidental container runs as root
 USER ${NB_UID}
 
-# Install JupyterLab, Jupyter Notebook, JupyterHub and NBClassic
+# Install JupyterHub, JupyterLab, NBClassic and Jupyter Notebook
 # Generate a Jupyter Server config
 # Cleanup temporary files
 # Correct permissions
@@ -165,13 +168,17 @@ USER ${NB_UID}
 # via symlinks not allowed from 6.5.9
 WORKDIR /tmp
 RUN mamba install --yes \
-    'jupyterlab==4.5.6' \
-    'jupyterhub==5.4.3' \
     'tornado==6.5.8' \
-    'nbclassic==1.3.3' && \
+    'jupyterhub-singleuser==5.4.3' \
+    'jupyterlab==4.5.6' \
+    'nbclassic==1.3.3' \
+    # Sometimes, when the new version of `jupyterlab` is released, latest `notebook` might not support it for some time
+    # Old versions of `notebook` (<v7) didn't have a restriction on the `jupyterlab` version, and old `notebook` is getting installed
+    # That's why we have to pin the minimum notebook version
+    # More info: https://github.com/jupyter/docker-stacks/pull/2167
+    'notebook>=7.2.2' && \
     jupyter server --generate-config && \
     mamba clean --all -f -y && \
-    npm cache clean --force && \
     jupyter lab clean && \
     rm -rf "/home/${NB_USER}/.cache/yarn" && \
     fix-permissions "${CONDA_DIR}" && \

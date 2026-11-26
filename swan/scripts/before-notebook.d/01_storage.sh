@@ -32,6 +32,15 @@ then
     echo -n "$CERNBOX_ACCESS_TOKEN" > $CERNBOX_OAUTH_FILE
     chown $NB_USER:$NB_GID $CERNBOX_OAUTH_FILE
     chmod 600 $CERNBOX_OAUTH_FILE
+    # CERNBox creates a missing home (first-time users) on an authenticated request.
+    if [[ ! -z "$CERNBOX_HOME" ]];
+    then
+        CERNBOX_RESPONSE=$(curl -q -sS --max-time 10 -o /dev/null \
+            -w '%{http_code} in %{time_total}s' -X PROPFIND -H 'Depth: 0' \
+            -H "Authorization: Bearer $CERNBOX_ACCESS_TOKEN" \
+            "https://cernbox.cern.ch/remote.php/webdav$HOME/") || true
+        _log "CERNBox home request: HTTP $CERNBOX_RESPONSE"
+    fi
     unset CERNBOX_ACCESS_TOKEN
 fi
 

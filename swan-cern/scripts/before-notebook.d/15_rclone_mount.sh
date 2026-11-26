@@ -40,7 +40,7 @@ then
   
   mkdir -p /eos/opendata
   rclone mount opendata: /eos/opendata \
-    --allow-other --uid "$NB_UID" --gid "$NB_GID" \
+    --allow-other --uid "$NB_UID" --gid "$NB_GID" --read-only \
     --vfs-cache-mode full --vfs-cache-max-size 5G --cache-dir=/tmp/cache/ \
     --dir-cache-time 30s --attr-timeout 10s \
     -v --log-file=/tmp/rclone-opendata.log --daemon || cat /tmp/rclone-opendata.log

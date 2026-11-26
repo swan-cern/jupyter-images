@@ -23,6 +23,11 @@ then
     vendor other \
     bearer_token_command "cat /tmp/swan_oauth.token"
 
+  rclone config create \
+    opendata webdav \
+    url https://opendata.cern.ch/eos/opendata/ \
+    vendor other
+
   _log "Mounting WebDAV..";
 
   mkdir -p /cernbox
@@ -32,6 +37,13 @@ then
     --vfs-cache-mode full --vfs-cache-max-size 5G --cache-dir=/tmp/cache/ \
     --dir-cache-time 30s --attr-timeout 10s \
     -v --log-file=/tmp/rclone.log --daemon || cat /tmp/rclone.log
+  
+  mkdir -p /eos/opendata
+  rclone mount opendata: /eos/opendata \
+    --allow-other --uid "$NB_UID" --gid "$NB_GID" --read-only \
+    --vfs-cache-mode full --vfs-cache-max-size 5G --cache-dir=/tmp/cache/ \
+    --dir-cache-time 30s --attr-timeout 10s \
+    -v --log-file=/tmp/rclone-opendata.log --daemon || cat /tmp/rclone-opendata.log
 else
   _log "Skipping WebDAV configuration";
 fi

@@ -18,6 +18,11 @@ on:
         required: false
         type: boolean
         default: false
+      squash:
+        required: false
+        type: boolean
+        default: false
+        description: "Squash all image layers into one before pushing"
     secrets:
       GITLAB_TOKEN:
         required: false
@@ -87,6 +92,7 @@ jobs:
     needs: release
     env:
       IMAGE: ${{ inputs.image }}
+      IMAGE_REF: gitlab-registry.cern.ch/swan/docker-images/jupyter/${{ inputs.image }}:${{ needs.release.outputs.version }}
 
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -101,13 +107,20 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITLAB_TOKEN }}
 
-      - name: Build and push image
+      - name: Build image (and push if not squashed)
         uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
         with:
           context: ./${{ env.IMAGE }}
           build-args: BUILD_TAG=${{ needs.release.outputs.version }}
-          push: true
-          tags: gitlab-registry.cern.ch/swan/docker-images/jupyter/${{ env.IMAGE }}:${{ needs.release.outputs.version }}
+          push: ${{ !inputs.squash }}
+          load: ${{ inputs.squash }}
+          tags: ${{ env.IMAGE_REF }}
+
+      - name: Squash and push image
+        if: inputs.squash
+        run: |
+          pipx run --spec docker-squash==1.3.0 docker-squash -t "$IMAGE_REF" "$IMAGE_REF"
+          docker push "$IMAGE_REF"
 
   update-children:
     if: inputs.children != ''

@@ -57,14 +57,13 @@ RUN dnf install -y \
     # Added to allow tex outputs to be converted to png
     texlive-dvipng \
     fontconfig && \
+    # Install HEP_OSlibs
+    # This installs system packages for LCGs to work
+    dnf --repofrompath=wlcg,'https://linuxsoft.cern.ch/wlcg/el9/$basearch/' install -y --nogpgcheck wlcg-repo && \
+    dnf -y install HEP_OSlibs-9.2.3-1.el9 && \
     # Clear the dnf cache as we no longer need to install packages
     dnf clean all && \
     rm -rf /var/cache/dnf
-
-# Install HEP_OSlibs
-# This installs system packages for LCGs to work
-RUN dnf --repofrompath=wlcg,'https://linuxsoft.cern.ch/wlcg/el9/$basearch/' install -y --nogpgcheck wlcg-repo
-RUN dnf -y install HEP_OSlibs-9.2.3-1.el9
 
 # Switch back to jovyan to avoid accidental container runs as root
 USER ${NB_UID}
@@ -89,7 +88,8 @@ RUN mamba install --yes \
     # downgrade to 6.26 (latest version which supports pyzmq 22).
     # In order to bump the ipykernel version in the future, we need to make sure all LCG releases have
     # a modern enough pyzmq version (25+).
-    'ipykernel==6.29.5'
+    'ipykernel==6.29.5' && \
+    mamba clean --all -f -y
 
 # Install all of our extensions
 # Ignore (almost all) dependencies because they have already been installed or come from CVMFS
@@ -101,7 +101,7 @@ RUN pip install --no-deps --no-cache-dir \
     swanshare==2.0.4 \
     swancustomenvironments==0.0.38
 
-RUN pip install \ 
+RUN pip install --no-cache-dir \ 
     # Required dependency for swanoauthrenew
     PyJWT
 
